@@ -57,3 +57,7 @@ gulpfile.tmp.*
 /html-starter
 /html-demo
 /html-starter-demo
+
+#dari yuyus
+.env
+myvenv/

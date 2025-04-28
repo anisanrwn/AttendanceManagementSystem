@@ -1,0 +1,9 @@
+cmake
+opencv-python
+face-recognition
+numpy==1.25.1
+fastapi[all]
+sqlalchemy
+alembic
+psycopg2
+asyncpg

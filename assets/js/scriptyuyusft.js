@@ -1,0 +1,254 @@
+const employeeForm = document.getElementById("addEmployeeForm");
+
+// fetch data employee 
+async function fetchEmployees() {
+    try {
+        const tableBody = document.getElementById("employeeTable").getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = '<tr><td colspan="8">Loading...</td></tr>';
+
+        const response = await fetch("http://localhost:8000/employee/view");
+        const employees = await response.json();
+
+        tableBody.innerHTML = '';
+        employees.sort((a, b) => a.first_name.localeCompare(b.first_name));
+        
+        employees.forEach(employee => {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+            <td class="text-center">${employee.nrp_id}</td>
+            <td class="text-center">${employee.first_name}</td>
+            <td class="text-center">${employee.last_name}</td>
+            <td class="text-center">${employee.position}</td>
+            <td class="text-center">${employee.department}</td>
+            <td class="text-center">
+                <button class="btn btn-sm btn-info" onclick="viewProfile('${employee.employee_id}')">View Profile</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteEmployee(${employee.employee_id})">Delete</button>
+                <button class="btn btn-sm btn-warning" onclick="editEmployee(${employee.employee_id})">Edit</button>           
+            </td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Error fetching employees:', error);
+    }
+}
+
+// View Profile Employee
+async function viewProfile(id) {
+    try {
+        const response = await fetch(`http://localhost:8000/employee/profile/${id}`);
+        
+        if (!response.ok) {
+            throw new Error('Employee not found');
+        }
+        
+        const employee = await response.json();
+        
+        document.getElementById('modalFirstName').innerText = employee.first_name;
+        document.getElementById('modalLastName').innerText = employee.last_name;
+        document.getElementById('modalNRP').innerText = employee.nrp_id;
+        document.getElementById('modalEmail').innerText = employee.email;
+        document.getElementById('modalPhoneNumber').innerText = employee.phone_number;
+        document.getElementById('modalPosition').innerText = employee.position;
+        document.getElementById('modalDepartment').innerText = employee.department;
+        
+        const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
+        profileModal.show();
+    } catch (error) {
+        Swal.fire('Error', error.message, 'error');
+    }
+}
+
+// Add employee
+document.getElementById('submit').addEventListener('click', saveEmployee);
+async function saveEmployee(e) {
+    e.preventDefault(); 
+
+    const formData = new FormData(employeeForm);
+
+    try {
+        $('#addEmployeeModal').modal('hide');
+
+        Swal.fire({
+            title: 'Registering...',
+            text: 'Please wait while we save the employee data.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        const response = await fetch("http://localhost:8000/employee/add", {
+            method: "POST",
+            body: formData
+        });
+
+        Swal.close();
+
+        if (response.ok) {
+            Swal.fire({
+                title: 'Success!',
+                text: 'Employee registered successfully!',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
+
+            employeeForm.reset(); // gunakan employeeForm juga di sini
+            fetchEmployees();
+        
+        } else {
+            const errorData = await response.json();
+            Swal.fire('Error!', errorData.detail || 'Failed to register employee.', 'error');
+        }
+
+    } catch (error) {
+        Swal.fire('Error!', `An error occurred: ${error.message}`, 'error');
+    }
+}
+
+document.getElementById('submitEdit').addEventListener('click', saveEditedEmployee);
+
+async function editEmployee(id) {
+    try {
+        const response = await fetch(`http://localhost:8000/employee/profile/${id}`);
+        if (!response.ok) {
+            throw new Error('Employee not found');
+        }
+        const employee = await response.json();
+
+        document.getElementById('editfirst_name').value = employee.first_name;
+        document.getElementById('editlast_name').value = employee.last_name;
+        document.getElementById('editemail').value = employee.email;
+        document.getElementById('editphone_number').value = employee.phone_number;
+        document.getElementById('editposition').value = employee.position;
+        document.getElementById('editdepartment').value = employee.department;
+
+        // Set ID ke form supaya pas save bisa tahu edit siapa
+        const editEmployeeForm = document.getElementById('editEmployeeForm');
+        editEmployeeForm.setAttribute('data-employee-id', id);
+
+        // Buka Modal
+        const editModal = new bootstrap.Modal(document.getElementById('editEmployeeModal'));
+        editModal.show();
+
+
+    } catch (error) {
+        Swal.fire('Error', error.message, 'error');
+    }
+}
+
+async function saveEditedEmployee(e) {
+    e.preventDefault(); 
+
+    const editEmployeeForm = document.getElementById('editEmployeeForm');
+    const employeeId = editEmployeeForm.getAttribute('data-employee-id');
+    const formData = new FormData(editEmployeeForm);
+
+    try {
+        $('#editEmployeeModal').modal('hide');
+
+        const response = await fetch(`http://localhost:8000/employee/edit/${employeeId}`, {
+            method: "POST",
+            body: formData
+        });
+
+        Swal.close();
+
+        if (response.ok) {
+            Swal.fire({
+                title: 'Success!',
+                text: 'Employee updated successfully!',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
+
+            editEmployeeForm.reset();
+            fetchEmployees(); 
+        
+        } else {
+            const errorData = await response.json();
+            Swal.fire('Error!', errorData.detail || 'Failed to update employee.', 'error');
+        }
+
+    } catch (error) {
+        Swal.fire('Error!', `An error occurred: ${error.message}`, 'error');
+    }
+}
+
+
+//delete employee
+async function deleteEmployee(id) {
+    const confirmResult = await Swal.fire({
+        title: 'Are you sure you want to delete?',
+        text: `Employee ID: ${id}`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel'
+    });
+
+    if (confirmResult.isConfirmed) {
+        try {
+            const response = await fetch(`http://localhost:8000/employee/delete/${id}`, {
+            method: 'DELETE'
+            });
+
+            if (response.ok) {
+                Swal.fire({
+                    title: 'Deleted!',
+                    text: 'Employee successfully deleted.',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+            });
+
+            fetchEmployees();
+
+            } else {
+                const errorData = await response.json();
+                Swal.fire('Error!', errorData.detail || 'Failed to delete employee.', 'error');
+            }
+        } catch (error) {
+            Swal.fire('Error!', `An error occurred: ${error.message}`, 'error');
+        }
+    }
+}
+
+// Filter employees function
+document.getElementById('filterButton').addEventListener('click', filterEmployees);
+function filterEmployees() {
+    const searchValue = document.getElementById('searchInput').value.toLowerCase();
+    const filterDepartment = document.getElementById('filterDepartment').value.toLowerCase();
+    const filterPosition = document.getElementById('filterPosition').value.toLowerCase();
+    
+    const rows = document.querySelectorAll('#employeeTable tbody tr');
+
+    rows.forEach(row => {
+        const firstName = row.cells[0].textContent.toLowerCase();
+        const lastName = row.cells[1].textContent.toLowerCase();
+        const position = row.cells[2].textContent.toLowerCase();
+        const department = row.cells[3].textContent.toLowerCase();
+        const nrp = row.cells[4].textContent.toLowerCase();
+
+        const matchesSearch = firstName.includes(searchValue) || 
+                             lastName.includes(searchValue) ||
+                             nrp.includes(searchValue);
+        const matchesDepartment = filterDepartment === '' || department.includes(filterDepartment);
+        const matchesPosition = filterPosition === '' || position.includes(filterPosition);
+
+        if (matchesSearch && matchesDepartment && matchesPosition) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+fetchEmployees();
+

@@ -31,6 +31,9 @@
 
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="../assets/js/config.js"></script>
+
+    <!--Sweetalert-->
+    <script src=" https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
 
   <body>
@@ -114,7 +117,7 @@
                 <div data-i18n="Analytics">Dashboard</div>
               </a>
             </li>
-            <li class="menu-item">
+            <li class="menu-item active">
               <a href="ProfileEmployee.html" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-user"></i>
                 <div data-i18n="Basic">Profile Employee</div>
@@ -125,7 +128,7 @@
               <span class="menu-header-text">Settings</span>
             </li>
 
-            <li class="menu-item active">
+            <li class="menu-item">
               <a href="UserList.html" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-group"></i>
                 <div data-i18n="Basic">User List</div>
@@ -238,253 +241,200 @@
               <!-- Content -->
               <div class="container-xxl flex-grow-1 container-p-y">
                 <h4 class="fw-bold mt-6 mb-4"><span class="text-muted fw-light">Pages /</span> Profile Employee</h4>
-                
 
-<!-- Employee Profile View with Filters and Search -->
-<div class="card">
-    <h5 class="card-header">Employee Profile</h5>
+                <!-- Employee Profile View with Filters and Search -->
+                <div class="card">
+                    <h5 class="card-header">Employee Profile</h5>
+                  
+                    <!-- Filters Section -->
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <input type="text" id="searchInput" class="form-control me-2" style="flex: 1; max-width: 300px;" placeholder="Search by Name or NRP">
+                        <select id="filterDepartment" class="form-select me-2" style="flex: 1; max-width: 300px;">
+                          <option value="">Select Department</option>
+                          <option value="IT">IT</option>
+                          <option value="HR">HR</option>
+                          <option value="Sales">Sales</option>
+                          <option value="Marketing">Marketing</option>
+                        </select>
+
+                        <select id="filterPosition" class="form-select me-2" style="flex: 1; max-width: 300px;">
+                          <option value="">Select Position</option>
+                          <option value="Manager">Manager</option>
+                          <option value="Developer">Developer</option>
+                          <option value="HR Specialist">HR Specialist</option>
+                        </select>
+                        <button class="btn" id="filterButton" style="background-color: #7f82ff; color: white; max-width: 120px;">Search</button>
+                        <button class="btn ms-2" id="addEmployeeButton" style="max-width: 150px; background-color: #7f82ff; color: white;" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">Add Employee</button>
+                      </div>
+                    </div>
   
-    <!-- Filters Section -->
-    <div class="card-body">
-      <div class="d-flex justify-content-between align-items-center">
-        <input type="text" id="searchInput" class="form-control me-2" style="flex: 1; max-width: 400px;" placeholder="Search by Name or NRP">
-        <select id="filterDepartment" class="form-select me-2" style="flex: 1; max-width: 300px;">
-          <option value="">Select Department</option>
-          <option value="IT">IT</option>
-          <option value="HR">HR</option>
-          <option value="Sales">Sales</option>
-          <option value="Marketing">Marketing</option>
-        </select>
-        <select id="filterPosition" class="form-select me-2" style="flex: 1; max-width: 300px;">
-          <option value="">Select Position</option>
-          <option value="Manager">Manager</option>
-          <option value="Developer">Developer</option>
-          <option value="HR Specialist">HR Specialist</option>
-        </select>
-        <button class="btn" id="filterButton" style="background-color: #7f82ff; color: white; max-width: 120px;">Cari</button>
+                    <!-- Employee Profiles Table -->
+                    <div class="table-responsive text-nowrap">
+                      <table class="table table-sm" id="employeeTable">
+                        <thead>
+                          <tr>
+                            <th class="text-center">NRP</th>
+                            <th class="text-center">First Name</th>
+                            <th class="text-center">Last Name</th>
+                            <th class="text-center">Position</th>
+                            <th class="text-center">Department</th>
+                            <th class="text-center">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <!-- Data Employee -->
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <!-- Modal Add Employee-->
+                  <div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="addEmployeeModalLabel">Add New Account</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addEmployeeForm">
+                              <div class="mb-3">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                              </div>
+                              <div class="mb-3">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                              </div>
+                              <div class="mb-3">
+                                <label for="nrp_id" class="form-label">NRP ID</label>
+                                <input type="number" class="form-control" id="nrp_id" name="nrp_id" required>
+                              </div>
+                              <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email"required>
+                              </div>
+                              <div class="mb-3">
+                                <label for="phone_number" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone_number" name="phone_number" required>
+                              </div>
+                              <div class="mb-3">
+                                <label for="position" class="form-label">Position</label>
+                                <input type="text" class="form-control" id="position" name="position" required>
+                              </div>
+                              <div class="mb-3">
+                                <label for="department" class="form-label">Department</label>
+                                <input type="text" class="form-control" id="department" name="department" required>
+                              </div>
+                              <div class="mb-3">
+                                <label for="photo" class="form-label">Upload Photo</label>
+                                <input type="file" class="form-control" id="photo" name="file" accept="image/*" required>
+                              </div>
+                            </form>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" id="submit" class="btn" style="background-color: #7f82ff; color: white;">Save Account</button>
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Modal for Viewing Profile -->
+                  <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="profileModalLabel">Employee Profile</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <p><strong>First Name:</strong> <span id="modalFirstName"></span></p>
+                          <p><strong>Last Name:</strong> <span id="modalLastName"></span></p>
+                          <p><strong>NRP ID:</strong> <span id="modalNRP"></span></p>
+                          <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+                          <p><strong>Phone Number:</strong> <span id="modalPhoneNumber"></span></p>
+                          <p><strong>Position:</strong> <span id="modalPosition"></span></p>
+                          <p><strong>Department:</strong> <span id="modalDepartment"></span></p>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Modal for Edit Employee -->
+                  <div class="modal fade" id="editEmployeeModal" tabindex="-1" aria-labelledby="editEmployeeModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="editEmployeeModalLabel">Edit Employee</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form id="editEmployeeForm">
+                            <div class="mb-3">
+                              <label for="editfirst_name" class="form-label">First Name</label>
+                              <input type="text" class="form-control" id="editfirst_name" name= "first_name" required>
+                            </div>
+                            <div class="mb-3">
+                              <label for="editlast_name" class="form-label">Last Name</label>
+                              <input type="text" class="form-control" id="editlast_name" name="last_name" required>
+                            </div>
+                            <div class="mb-3">
+                              <label for="editemail" class="form-label">Email</label>
+                              <input type="email" class="form-control" id="editemail" name="email"required>
+                            </div>
+                            <div class="mb-3">
+                              <label for="editphone_number" class="form-label">Phone Number</label>
+                              <input type="tel" class="form-control" id="editphone_number" name="phone_number" required>
+                            </div>
+                            <div class="mb-3">
+                              <label for="editposition" class="form-label">Position</label>
+                              <input type="text" class="form-control" id="editposition" name="position" required>
+                            </div>
+                            <div class="mb-3">
+                              <label for="editdepartment" class="form-label">Department</label>
+                              <input type="text" class="form-control" id="editdepartment" name="department" required>
+                            </div>
+                          </form>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-primary" id="submitEdit">Save changes</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <div class="layout-overlay layout-menu-toggle"></div>
+              </div>
+            </div>
+        
+        </div>
       </div>
+        <!-- Core JS -->
+        <script src="../assets/vendor/libs/jquery/jquery.js"></script>
+        <script src="../assets/vendor/libs/popper/popper.js"></script>
+        <script src="../assets/vendor/js/bootstrap.js"></script>
+        <script src="../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+        <script src="../assets/vendor/js/menu.js"></script>
+
+        <!-- Vendors JS -->
+        <script src="../assets/vendor/libs/apex-charts/apexcharts.js"></script>
+
+        <!-- Main JS -->
+        <script src="../assets/js/main.js"></script>
+
+        <!-- Page JS -->
+        <script src="../assets/js/dashboards-analytics.js"></script>
+
+        <!-- functionalities JS -->
+        <script src="../assets/js/scriptyuyusft.js"></script>
+
+        <!-- Script Filter + Export 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script> -->
     </div>
-  
-    <!-- Employee Profiles Table -->
-    <div class="table-responsive text-nowrap">
-      <table class="table table-sm" id="employeeTable">
-        <thead>
-          <tr>
-            <th class="text-center">First Name</th>
-            <th class="text-center">Last Name</th>
-            <th class="text-center">Email</th>
-            <th class="text-center">Organization</th>
-            <th class="text-center">Phone Number</th>
-            <th class="text-center">Position</th>
-            <th class="text-center">Department</th>
-            <th class="text-center">NRP ID</th>
-            <th class="text-center">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Example dummy data (will be dynamically filtered based on search and filter) -->
-          <tr data-department="IT" data-position="Developer" data-name="John Doe" data-nrp="NRP12345">
-            <td class="text-center">John</td>
-            <td class="text-center">Doe</td>
-            <td class="text-center">john.doe@email.com</td>
-            <td class="text-center">ABC Corp</td>
-            <td class="text-center">123-456-7890</td>
-            <td class="text-center">Developer</td>
-            <td class="text-center">IT</td>
-            <td class="text-center">NRP12345</td>
-            <td class="text-center">
-              <button class="btn btn-sm btn-info" onclick="viewProfile('NRP12345')">View Profile</button>
-            </td>
-          </tr>
-          <tr data-department="HR" data-position="HR Specialist" data-name="Jane Smith" data-nrp="NRP67890">
-            <td class="text-center">Jane</td>
-            <td class="text-center">Smith</td>
-            <td class="text-center">jane.smith@email.com</td>
-            <td class="text-center">XYZ Corp</td>
-            <td class="text-center">987-654-3210</td>
-            <td class="text-center">HR Specialist</td>
-            <td class="text-center">HR</td>
-            <td class="text-center">NRP67890</td>
-            <td class="text-center">
-                <button class="btn btn-sm" style="background-color: #7f82ff; color: white;" onclick="viewProfile('NRP67890')">View Profile</button>
-
-            </td>
-          </tr>
-          <tr data-department="Sales" data-position="Manager" data-name="Michael Johnson" data-nrp="NRP11223">
-            <td class="text-center">Michael</td>
-            <td class="text-center">Johnson</td>
-            <td class="text-center">michael.johnson@email.com</td>
-            <td class="text-center">LMN Corp</td>
-            <td class="text-center">321-654-9870</td>
-            <td class="text-center">Manager</td>
-            <td class="text-center">Sales</td>
-            <td class="text-center">NRP11223</td>
-            <td class="text-center">
-              <button class="btn btn-sm btn-info" onclick="viewProfile('NRP11223')">View Profile</button>
-            </td>
-          </tr>
-          <tr data-department="Marketing" data-position="Developer" data-name="Emma White" data-nrp="NRP33445">
-            <td class="text-center">Emma</td>
-            <td class="text-center">White</td>
-            <td class="text-center">emma.white@email.com</td>
-            <td class="text-center">DEF Corp</td>
-            <td class="text-center">654-321-0987</td>
-            <td class="text-center">Developer</td>
-            <td class="text-center">Marketing</td>
-            <td class="text-center">NRP33445</td>
-            <td class="text-center">
-                <button class="btn btn-sm" style="background-color: #7f82ff; color: white;" onclick="viewProfile('NRP67890')">View Profile</button>
-
-            </td>
-          </tr>
-          <!-- Add more employees as needed -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-  
-  <!-- Modal for Viewing Profile -->
-  <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="profileModalLabel">Employee Profile</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p><strong>First Name:</strong> <span id="modalFirstName"></span></p>
-          <p><strong>Last Name:</strong> <span id="modalLastName"></span></p>
-          <p><strong>Email:</strong> <span id="modalEmail"></span></p>
-          <p><strong>Organization:</strong> <span id="modalOrganization"></span></p>
-          <p><strong>Phone Number:</strong> <span id="modalPhoneNumber"></span></p>
-          <p><strong>Position:</strong> <span id="modalPosition"></span></p>
-          <p><strong>Department:</strong> <span id="modalDepartment"></span></p>
-          <p><strong>NRP ID:</strong> <span id="modalNRP"></span></p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-      <!-- Overlay -->
-      <div class="layout-overlay layout-menu-toggle"></div>
-    </div>
-    <!-- / Layout wrapper -->
-
-   
-
-    <!-- Core JS -->
-    <!-- build:js assets/vendor/js/core.js -->
-    <script src="../assets/vendor/libs/jquery/jquery.js"></script>
-    <script src="../assets/vendor/libs/popper/popper.js"></script>
-    <script src="../assets/vendor/js/bootstrap.js"></script>
-    <script src="../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-
-    <script src="../assets/vendor/js/menu.js"></script>
-    <!-- endbuild -->
-
-    <!-- Vendors JS -->
-    <script src="../assets/vendor/libs/apex-charts/apexcharts.js"></script>
-
-    <!-- Main JS -->
-    <script src="../assets/js/main.js"></script>
-
-    <!-- Page JS -->
-    <script src="../assets/js/dashboards-analytics.js"></script>
-
-    <!-- Place this tag in your head or just before your close body tag. -->
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
-    <!-- Script Filter + Export -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
- <!-- JS for search, filter, and modal -->
- <script>
-    // Function to open the profile modal with employee data
-    function viewProfile(nrp) {
-      const employeeData = {
-        'NRP12345': {
-          firstName: 'John',
-          lastName: 'Doe',
-          email: 'john.doe@email.com',
-          organization: 'ABC Corp',
-          phoneNumber: '123-456-7890',
-          position: 'Developer',
-          department: 'IT',
-          nrp: 'NRP12345',
-        },
-        'NRP67890': {
-          firstName: 'Jane',
-          lastName: 'Smith',
-          email: 'jane.smith@email.com',
-          organization: 'XYZ Corp',
-          phoneNumber: '987-654-3210',
-          position: 'HR Specialist',
-          department: 'HR',
-          nrp: 'NRP67890',
-        },
-        'NRP11223': {
-          firstName: 'Michael',
-          lastName: 'Johnson',
-          email: 'michael.johnson@email.com',
-          organization: 'LMN Corp',
-          phoneNumber: '321-654-9870',
-          position: 'Manager',
-          department: 'Sales',
-          nrp: 'NRP11223',
-        },
-        'NRP33445': {
-          firstName: 'Emma',
-          lastName: 'White',
-          email: 'emma.white@email.com',
-          organization: 'DEF Corp',
-          phoneNumber: '654-321-0987',
-          position: 'Developer',
-          department: 'Marketing',
-          nrp: 'NRP33445',
-        }
-      };
-  
-      const employee = employeeData[nrp];
-      if (employee) {
-        document.getElementById('modalFirstName').innerText = employee.firstName;
-        document.getElementById('modalLastName').innerText = employee.lastName;
-        document.getElementById('modalEmail').innerText = employee.email;
-        document.getElementById('modalOrganization').innerText = employee.organization;
-        document.getElementById('modalPhoneNumber').innerText = employee.phoneNumber;
-        document.getElementById('modalPosition').innerText = employee.position;
-        document.getElementById('modalDepartment').innerText = employee.department;
-        document.getElementById('modalNRP').innerText = employee.nrp;
-  
-        const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
-        profileModal.show();
-      }
-    }
-  
-    // Search and Filter functionality
-    document.getElementById('filterButton').addEventListener('click', function() {
-      const searchValue = document.getElementById('searchInput').value.toLowerCase();
-      const filterDepartment = document.getElementById('filterDepartment').value.toLowerCase();
-      const filterPosition = document.getElementById('filterPosition').value.toLowerCase();
-      
-      const rows = document.querySelectorAll('#employeeTable tbody tr');
-  
-      rows.forEach(row => {
-        const name = row.dataset.name.toLowerCase();
-        const nrp = row.dataset.nrp.toLowerCase();
-        const department = row.dataset.department.toLowerCase();
-        const position = row.dataset.position.toLowerCase();
-  
-        const matchesSearch = name.includes(searchValue) || nrp.includes(searchValue);
-        const matchesDepartment = department.includes(filterDepartment);
-        const matchesPosition = position.includes(filterPosition);
-  
-        if (matchesSearch && matchesDepartment && matchesPosition) {
-          row.style.display = '';
-        } else {
-          row.style.display = 'none';
-        }
-      });
-    });
-  </script>
   </body>
 </html>
