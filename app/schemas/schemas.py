@@ -28,6 +28,16 @@ class EmployeeRead(EmployeeBase):
     class Config:
         from_attributes = True
 
+class RoleBase(BaseModel):
+    roles_id: int
+    roles_name: str
+
+class RoleRead(RoleBase):
+    pass
+
+    class Config:
+        from_attributes = True
+
 class UserBase(BaseModel):
     username: str
     email: EmailStr
@@ -40,16 +50,7 @@ class UserCreate(UserBase):
 class UserRead(UserBase):
     user_id: int
     employee: Optional[EmployeeRead] 
-    roles: list[str]
-
-    class Config:
-        from_attributes = True
-
-class RoleBase(BaseModel):
-    roles_name: str
-
-class RoleRead(RoleBase):
-    roles_id: int
+    roles: list[RoleRead]
 
     class Config:
         from_attributes = True

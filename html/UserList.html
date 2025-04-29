@@ -264,7 +264,7 @@
                             <option value="nonactive">Non Active</option>
                           </select>
         
-                          <button class="btn" id="filterButton" style="background-color: #7f82ff; color: white; max-width: 120px;">Filter</button>
+                          <button class="btn" id="filterButton" style="background-color: #7f82ff; color: white; max-width: 120px;">Search</button>
         
                           <!-- Add User Button -->
                           <button class="btn ms-2" id="addAccountButton" style="max-width: 150px; background-color: #7f82ff; color: white;" data-bs-toggle="modal" data-bs-target="#addAccountModal">Add Account</button>
@@ -283,35 +283,35 @@
                         <div class="modal-body">
                             <form id="addAccountForm">
                               <div class="mb-3">
-                                <label for="selectEmployee" class="form-label">Select Employee</label>
-                                <select id="employeeSelect" class="form-control" id="employee" required >
+                                <label for="employeeSelect" class="form-label">Select Employee</label>
+                                <select id="employeeSelect" class="form-control" name="employee_id"required >
                                   <option value="">-- Select Employee --</option>
                                 </select>
                               </div>
                               <div class="mb-3">
                                 <label for="username" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="username" required>
+                                <input type="text" class="form-control" id="username" name="username" required>
                               </div>
                               <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" required>
+                                <input type="email" class="form-control" id="email" name="email" required>
                               </div>
                               <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" required>
+                                <input type="password" class="form-control" id="password" name="password" required>
                               </div>
                               <div class="mb-3">
-                                <label for="selectRole" class="form-label">Select Roles</label>
-                                <select id="roleSelect" class="form-control" id="roles" required >
+                                <label for="roleSelect" class="form-label">Select Roles</label>
+                                <select id="roleSelect" class="form-control" name="role_name"required >
                                   <option value="">-- Select Roles --</option>
                                 </select>
                               </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" id="submitAccount" class="btn" style="background-color: #7f82ff; color: white;">Save Account</button>
+                              </div>
                             </form>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn" style="background-color: #7f82ff; color: white;" id="saveAccountButton">Save Account</button>
-                          </div>
+                          </div>  
                       </div>
                     </div>
                   </div>
@@ -326,7 +326,7 @@
                           <th class="text-center">Username</th>
                           <th class="text-center">Email</th>
                           <th class="text-center">Role</th>
-                          <th class="text-center">Status</th>
+                          <!-- <th class="text-center">Status</th> -->
                           <th class="text-center">Actions</th>
                         </tr>
                       </thead>
@@ -426,8 +426,7 @@
       <script src="../assets/js/dashboards-analytics.js"></script>
 
       <!-- functionalities JS -->
-      <script src="../assets/js/scriptyuyus.js"></script>
-      <script src="../assets/js/scriptyuyusft.js"></script>
+      <script src="../assets/js/scriptyuyusul.js"></script>
     </div>
   </body>
 </html>
