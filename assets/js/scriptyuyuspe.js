@@ -179,7 +179,6 @@ async function saveEditedEmployee(e) {
     }
 }
 
-
 //delete employee
 async function deleteEmployee(id) {
     const confirmResult = await Swal.fire({

@@ -30,8 +30,7 @@ class User(Base):
     password = Column(String(100))
 
     employee = relationship("Employee", back_populates="user")
-    roles = relationship("UserRoles", back_populates="user")
-
+    roles = relationship("Roles", secondary="user_roles", back_populates="users")
 
 class Roles(Base):
     __tablename__ = 'roles'
@@ -39,7 +38,7 @@ class Roles(Base):
     roles_id = Column(Integer, primary_key=True, index=True)
     roles_name = Column(String(25), unique=True)
 
-    users = relationship("UserRoles", back_populates="role")
+    users = relationship("User", secondary="user_roles", back_populates="roles")
 
 
 class UserRoles(Base):
@@ -47,9 +46,6 @@ class UserRoles(Base):
 
     user_id = Column(Integer, ForeignKey('user.user_id'), primary_key=True)
     roles_id = Column(Integer, ForeignKey('roles.roles_id'), primary_key=True)
-
-    user = relationship("User", back_populates="roles")
-    role = relationship("Roles", back_populates="users")
 
 
 class Attendance(Base):

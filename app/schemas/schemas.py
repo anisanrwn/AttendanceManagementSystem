@@ -44,7 +44,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
-    roles: list[str]
+    roles: list[RoleRead]
     employee_id: Optional[int] = None
 
 class UserRead(UserBase):
