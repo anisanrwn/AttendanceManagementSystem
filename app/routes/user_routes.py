@@ -89,6 +89,18 @@ def get_users(db: Session = Depends(get_db)):
         logger.error(f"Failed to fetch users: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch users")
 
+#fetch employee list from database to add account
+@router.get("/available_employees", response_model=List[s.EmployeeRead])
+async def get_available_employees(db: Session = Depends(get_db)):
+    employees = db.query(m.Employee).all()
+    return employees
+
+#fetch roles list from database to add account
+@router.get("/available_roles", response_model=List[s.RoleRead])
+async def get_available_roles(db: Session = Depends(get_db)):
+    roles = db.query(m.Roles).all()
+    return roles
+
 @router.post("/create", response_model=s.UserRead)
 async def create_user(
     employee_id: int = Form(...),
