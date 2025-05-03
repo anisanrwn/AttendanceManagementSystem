@@ -81,7 +81,7 @@ class Permission(Base):
 class ActivityLog(Base):
     __tablename__ = "activity_logs"
 
-    id = Column(Integer, primary_key=True, index=True)
+    log_id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey('user.user_id'), nullable=True)
     action = Column(String(500), nullable=False)
     detail = Column(Text, nullable=True)
