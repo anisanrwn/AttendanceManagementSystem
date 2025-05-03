@@ -19,30 +19,24 @@ def get_users(db: Session = Depends(get_db)):
             joinedload(m.User.employee),
             joinedload(m.User.roles)
         ).all()
-        log_activity(db, "Fetched users", "Successfully fetched users list")
         return users
     except Exception as e:
-        log_activity(db, "Fetch users failed", str(e))
         raise HTTPException(status_code=500, detail="Failed to fetch users")
 
 @router.get("/available_employees", response_model=List[s.EmployeeRead])
 async def get_available_employees(db: Session = Depends(get_db)):
     try:
         employees = db.query(m.Employee).all()
-        log_activity(db, "Fetched employees", "Successfully fetched employees list")
         return employees
     except Exception as e:
-        log_activity(db, "Fetch employees failed", str(e))
         raise HTTPException(status_code=500, detail="Failed to fetch employees")
 
 @router.get("/available_roles", response_model=List[s.RoleRead])
 async def get_available_roles(db: Session = Depends(get_db)):
     try:
         roles = db.query(m.Roles).all()
-        log_activity(db, "Fetched roles", "Successfully fetched roles list")
         return roles
     except Exception as e:
-        log_activity(db, "Fetch roles failed", str(e))
         raise HTTPException(status_code=500, detail="Failed to fetch roles")
 
 @router.post("/create", response_model=s.UserRead)
