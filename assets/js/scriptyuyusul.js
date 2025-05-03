@@ -8,6 +8,13 @@ async function fetchUsers() {
       const tableBody = document.getElementById("userTable").getElementsByTagName('tbody')[0];
   
       tableBody.innerHTML = '';
+      
+      users.sort((a, b) => {
+        const nameA = (a.employee?.first_name || "").toLowerCase();
+        const nameB = (b.employee?.first_name || "").toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+      
       users.forEach(user => {
         const employee = user.employee || {};
         const row = document.createElement("tr");
@@ -16,7 +23,17 @@ async function fetchUsers() {
             <td class="text-center">${employee.last_name || '-'}</td>
             <td class="text-center">${user.username}</td>
             <td class="text-center">${user.email}</td>
-            <td class="text-center">${user.roles.map(r => r.roles_name).join(", ")}</td>
+            <td class="text-center">
+                ${user.roles.map(role => {
+                    const roleBadgeClass = {
+                    "Super Admin": "bg-label-primary",
+                    "Admin": "bg-label-info",
+                    "Employee": "bg-label-warning"
+                    }[role.roles_name] || "bg-label-secondary";
+                    
+                    return `<span class="badge ${roleBadgeClass}">${role.roles_name}</span>`;
+                }).join(" ")}
+            </td>
             <td class="text-center">
                 <button class="btn btn-sm btn-warning" onclick="editAccount(${user.user_id})">Edit</button>
                 <button class="btn btn-sm btn-danger" onclick="deleteAccount(${user.user_id})">Delete</button>
@@ -168,19 +185,34 @@ async function deleteAccount(id) {
 }
 
 async function editAccount(userId) {
-    const response = await fetch(`http://localhost:8000/user/view`);
-    const users = await response.json();
+    const [userResponse, roleResponse] = await Promise.all([
+        fetch("http://localhost:8000/user/view"),
+        fetch("http://localhost:8000/user/available_roles")
+    ]);
+    const users = await userResponse.json();
+    const roles = await roleResponse.json();
     const user = users.find(u => u.user_id === userId);
     if (!user) return;
+
+    const roleSelect = document.getElementById("editRole");
+    roleSelect.innerHTML = "";
+
+    roles.forEach(role => {
+        const option = document.createElement("option");
+        option.value = role.roles_name;
+        option.textContent = role.roles_name;
+        roleSelect.appendChild(option);
+    });
 
     document.getElementById("editUsername").value = user.username;
     document.getElementById("editEmail").value = user.email;
     document.getElementById("editRole").value = user.roles[0]?.roles_name || '';
-    document.getElementById("editPassword").value = ''; // blank on fetch
+    document.getElementById("editPassword").value = '';
     document.getElementById("editUserId").value = user.user_id;
 
     $('#editAccountModal').modal('show');
 }
+
 
 async function saveUserChanges() {
     const form = document.getElementById("editAccountForm");

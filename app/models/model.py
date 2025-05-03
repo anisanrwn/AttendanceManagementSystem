@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, Text, LargeBinary
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, Text, LargeBinary, DateTime, Boolean
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 from app.database import Base
 
 class Employee(Base):
@@ -27,10 +28,11 @@ class User(Base):
     employee_id = Column(Integer, ForeignKey('employees.employee_id'), index=True)
     username = Column(String(100), unique=True)
     email = Column(String(100), unique=True)
-    password = Column(String(100))
+    password = Column(String(500))
 
     employee = relationship("Employee", back_populates="user")
     roles = relationship("Roles", secondary="user_roles", back_populates="users")
+    activity_logs = relationship("ActivityLog", back_populates="user")
 
 class Roles(Base):
     __tablename__ = 'roles'
@@ -39,6 +41,7 @@ class Roles(Base):
     roles_name = Column(String(25), unique=True)
 
     users = relationship("User", secondary="user_roles", back_populates="roles")
+    locks = relationship("RoleLock", back_populates="role", cascade="all, delete-orphan")
 
 
 class UserRoles(Base):
@@ -74,3 +77,27 @@ class Permission(Base):
     approved_date = Column(Date)
 
     employee = relationship("Employee", back_populates="permissions")
+
+class ActivityLog(Base):
+    __tablename__ = "activity_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('user.user_id'), nullable=True)
+    action = Column(String(500), nullable=False)
+    detail = Column(Text, nullable=True)
+    ip_address = Column(String(45), nullable=True)
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User", back_populates="activity_logs")
+
+class RoleLock(Base):
+    __tablename__ = "lock_system"
+
+    lock_id = Column(Integer, primary_key=True, index=True)
+    role_id = Column(Integer, ForeignKey("roles.roles_id"))
+    start_date = Column(DateTime, nullable=False)
+    end_date = Column(DateTime, nullable=False)
+    reason = Column(Text, nullable=True)
+
+    role = relationship("Roles", back_populates="locks")
+
