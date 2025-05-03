@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app.models import model as m
 from app.schemas import schemas as s
-from app.routes.user_routes import verify_password  # Import verify_password
+from app.utils.verifpass import verify_password
 
 router = APIRouter(
     prefix="/login",
