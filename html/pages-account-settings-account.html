@@ -155,7 +155,7 @@
                 </g>
               </svg>
             </span>
-            <span class="app-brand-text demo menu-text fw-bolder ms-2">Sneat</span>
+            <span class="app-brand-text demo menu-text fw-bolder ms-2">Attendance System</span>
           </a>
 
           <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
@@ -181,7 +181,7 @@
           </li>
           
           <li class="menu-item">
-            <a href="attendancerecap.html" class="menu-link">
+             <a href="attendancerecap.html" class="menu-link">
               <i class="menu-icon tf-icons bx bx-history"></i>
               <div data-i18n="Basic">Attendance Recap</div>
             </a>
@@ -204,7 +204,7 @@
             </a>
           </li>
           <li class="menu-item">
-            <a href="auth-login-basic.html" class="menu-link">
+            <a href="Login.html" class="menu-link">
               <i class="menu-icon tf-icons bx bx-log-out"></i>
               <div data-i18n="Basic">Logout</div>
             </a>
@@ -286,7 +286,7 @@
                     <div class="dropdown-divider"></div>
                   </li>
                   <li>
-                    <a class="dropdown-item" href="auth-login-basic.html">
+                    <a class="dropdown-item" href="Login.html">
                       <i class="bx bx-power-off me-2"></i>
                       <span class="align-middle">Log Out</span>
                     </a>
@@ -328,9 +328,9 @@
                           <input type="file" id="avatarInput" accept="image/*" />
                         </div>
                         <div class="user-info">
-                          <h4 class="mb-1">John Doe</h4>
-                          <p class="mb-2 text-muted">Employee</p>
-                          <span class="badge bg-label-primary">Active</span>
+                          <h4 class="mb-1" id="profileName">John Doe</h4>
+                          <p class="mb-2 text-muted" id="profilePosition">Employee</p>
+                          <span class="badge bg-label-primary" id="profileStatus">Active</span>
                         </div>
                         </div>
                         </div>
@@ -339,38 +339,38 @@
                           <div class="row">
                             <div class="mb-4 col-md-6">
                               <label class="profile-label">First Name</label>
-                              <div class="profile-value">John</div>
+                              <div class="profile-value" id="firstName">John</div>
                             </div>
                             <div class="mb-4 col-md-6">
                               <label class="profile-label">Last Name</label>
-                              <div class="profile-value">Doe</div>
+                              <div class="profile-value" id="lastName">Doe</div>
                             </div>
                             <div class="mb-4 col-md-6">
                               <label class="profile-label">E-mail</label>
-                              <div class="profile-value">john.doe@example.com</div>
+                              <div class="profile-value" id="email">john.doe@example.com</div>
                             </div>
                             <div class="mb-4 col-md-6">
                               <label class="profile-label">Organization</label>
-                              <div class="profile-value">ThemeSelection</div>
+                              <div class="profile-value" id="organization">ThemeSelection</div>
                             </div>
                             <div class="mb-4 col-md-6">
                               <label class="profile-label">Phone Number</label>
-                              <div class="profile-value">+1 (202) 555-0111</div>
+                              <div class="profile-value" id="phone">+1 (202) 555-0111</div>
                             </div>
                             <div class="mb-4 col-md-6">
                               <label class="profile-label">Position Employee</label>
-                              <div class="profile-value">Software Engineer</div> <!-- diganti sesuai position -->
+                              <div class="profile-value" id="position">Software Engineer</div>
                             </div>
                             <div class="mb-4 col-md-6">
                               <label class="profile-label">Department</label>
-                              <div class="profile-value">Information Technology</div> <!-- diganti sesuai department -->
+                              <div class="profile-value" id="department">Information Technology</div>
                             </div>
                             <div class="mb-4 col-md-6">
                               <label class="profile-label">NRP ID</label>
-                              <div class="profile-value">12345678</div> <!-- diisi contoh NRP ID -->
+                              <div class="profile-value" id="nrp">12345678</div>
                             </div>
                           </div>
-                        </div>
+                        </div>                        
                         </div>
                         </div>
                         </div>
