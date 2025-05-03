@@ -26,7 +26,7 @@ def get_users(db: Session = Depends(get_db)):
 @router.get("/available_employees", response_model=List[s.EmployeeRead])
 async def get_available_employees(db: Session = Depends(get_db)):
     try:
-        employees = db.query(m.Employee).all()
+        employees = db.query(m.Employee).outerjoin(m.User).filter(m.User.user_id == None).all()
         return employees
     except Exception as e:
         raise HTTPException(status_code=500, detail="Failed to fetch employees")
@@ -41,7 +41,7 @@ async def get_available_roles(db: Session = Depends(get_db)):
 
 @router.post("/create", response_model=s.UserRead)
 async def create_user(
-    employee_id: int = Form(...),
+    employee_id: Optional[int] = Form(None),
     username: str = Form(...),
     email: str = Form(...),
     password: str = Form(...),
@@ -49,6 +49,11 @@ async def create_user(
     db: Session = Depends(get_db)
 ):
     try:
+        if employee_id:
+            employee = db.query(m.Employee).filter_by(employee_id=employee_id).first()
+            if employee and not email:
+                email = employee.email
+
         existing_user = db.query(m.User).filter(
             (m.User.username == username) | 
             (m.User.email == email)

@@ -34,6 +34,7 @@ async function fetchUsers() {
                     return `<span class="badge ${roleBadgeClass}">${role.roles_name}</span>`;
                 }).join(" ")}
             </td>
+            
             <td class="text-center">
                 <button class="btn btn-sm btn-warning" onclick="editAccount(${user.user_id})">Edit</button>
                 <button class="btn btn-sm btn-danger" onclick="deleteAccount(${user.user_id})">Delete</button>
@@ -54,6 +55,15 @@ async function loadEmployee() {
         const response = await fetch('http://localhost:8000/user/available_employees'); 
         const employee = await response.json();
         const employeeSelect = document.getElementById('employeeSelect');
+        
+        employeeSelect.innerHTML = '';
+
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = '-- Select Employee --';
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        employeeSelect.appendChild(defaultOption);
 
         employee.forEach(employee => {
             const option = document.createElement('option');
@@ -69,11 +79,13 @@ async function loadEmployee() {
 loadEmployee();
 
 // auto filled email pas employee selected
-document.getElementById('employeeSelect').addEventListener('change', function() {
+document.getElementById('employeeSelect').addEventListener('change', function () {
     const selectedOption = this.options[this.selectedIndex];
     const email = selectedOption.dataset.email || '';
     document.getElementById('email').value = email;
-    });
+    document.getElementById('email').readOnly = !!email;
+});
+
 
 // load roles yg ada dari database
 async function loadRoles() {
@@ -132,6 +144,7 @@ async function saveAccount(e) {
 
             accountForm.reset();
             fetchUsers();
+            loadEmployee(); 
         
         } else {
             const errorData = await response.json();
