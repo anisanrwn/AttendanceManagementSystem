@@ -4,13 +4,9 @@ from app.database import get_db
 from app.models import model as m
 from app.schemas import schemas as s
 from typing import List, Optional
-from Crypto.Cipher import AES, ChaCha20
-from Crypto.Random import get_random_bytes
-from Crypto.Util.Padding import pad, unpad
-import base64
-import os
+import bcrypt
 import logging
-from pydantic import BaseModel
+import os
 
 # Logging config
 logging.basicConfig(level=logging.INFO)
@@ -21,61 +17,11 @@ router = APIRouter(
     tags=["User"]
 )
 
-# Encryption keys
-AES_KEY_SIZE = 32
-CHACHA_KEY_SIZE = 32
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'default-secret-key-32-chars-long!')
-AES_KEY = SECRET_KEY[:AES_KEY_SIZE].encode()
-CHACHA_KEY = SECRET_KEY[-CHACHA_KEY_SIZE:].encode()
-
-class EncryptedData(BaseModel):
-    aes_nonce: str
-    chacha_nonce: str
-    ciphertext: str
-
-def encrypt_data(plaintext: str) -> str:
-    try:
-        aes_cipher = AES.new(AES_KEY, AES.MODE_GCM)
-        aes_ciphertext, aes_tag = aes_cipher.encrypt_and_digest(plaintext.encode())
-
-        chacha_cipher = ChaCha20.new(key=CHACHA_KEY)
-        combined = aes_ciphertext + aes_tag
-        final_ciphertext = chacha_cipher.encrypt(combined)
-
-        encrypted_data = EncryptedData(
-            aes_nonce=base64.b64encode(aes_cipher.nonce).decode(),
-            chacha_nonce=base64.b64encode(chacha_cipher.nonce).decode(),
-            ciphertext=base64.b64encode(final_ciphertext).decode()
-        )
-
-        return base64.b64encode(encrypted_data.json().encode()).decode()
-    except Exception as e:
-        logger.error(f"Encryption failed: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to encrypt data")
-
-def decrypt_data(encrypted_str: str) -> str:
-    try:
-        decoded = base64.b64decode(encrypted_str).decode()
-        encrypted_data = EncryptedData.parse_raw(decoded)
-
-        aes_nonce = base64.b64decode(encrypted_data.aes_nonce)
-        chacha_nonce = base64.b64decode(encrypted_data.chacha_nonce)
-        ciphertext = base64.b64decode(encrypted_data.ciphertext)
-
-        chacha_cipher = ChaCha20.new(key=CHACHA_KEY, nonce=chacha_nonce)
-        combined = chacha_cipher.decrypt(ciphertext)
-
-        aes_ciphertext = combined[:-16]
-        aes_tag = combined[-16:]
-
-        aes_cipher = AES.new(AES_KEY, AES.MODE_GCM, nonce=aes_nonce)
-        plaintext = aes_cipher.decrypt_and_verify(aes_ciphertext, aes_tag)
-
-        return plaintext.decode()
-    except Exception as e:
-        logger.error(f"Decryption failed: {str(e)}")
-        raise HTTPException(status_code=400, detail="Failed to decrypt data")
+def verify_password(input_password: str, stored_hash: str) -> bool:
+    return bcrypt.checkpw(input_password.encode(), stored_hash.encode())
 
 @router.get("/view", response_model=List[s.UserRead])
 def get_users(db: Session = Depends(get_db)):
@@ -89,13 +35,11 @@ def get_users(db: Session = Depends(get_db)):
         logger.error(f"Failed to fetch users: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch users")
 
-#fetch employee list from database to add account
 @router.get("/available_employees", response_model=List[s.EmployeeRead])
 async def get_available_employees(db: Session = Depends(get_db)):
     employees = db.query(m.Employee).all()
     return employees
 
-#fetch roles list from database to add account
 @router.get("/available_roles", response_model=List[s.RoleRead])
 async def get_available_roles(db: Session = Depends(get_db)):
     roles = db.query(m.Roles).all()
@@ -118,13 +62,14 @@ async def create_user(
         if existing_user:
             raise HTTPException(status_code=400, detail="Username or Email already exists")
 
-        encrypted_password = encrypt_data(password)
+        # Directly hash the password
+        hashed_password = hash_password(password)
 
         new_user = m.User(
             employee_id=employee_id,
             username=username,
             email=email,
-            password=encrypted_password
+            password=hashed_password
         )
         db.add(new_user)
         db.commit()
@@ -168,7 +113,8 @@ def update_user(
         user.email = email
 
         if password:
-            user.password = encrypt_data(password)
+            hashed_password = hash_password(password)
+            user.password = hashed_password
 
         if role_name:
             role = db.query(m.Roles).filter_by(roles_name=role_name).first()
