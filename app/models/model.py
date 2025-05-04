@@ -41,10 +41,12 @@ class User(Base):
         cascade="all, delete-orphan",
         order_by="desc(LoginAttempt.attempt_time)"
     )
+
 class LoginAttempt(Base):
     __tablename__ = 'login_attempts'
 
-    id = Column(Integer, primary_key=True, index=True)
+    logAtt_id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('user.user_id'))
     email = Column(String(100), index=True, nullable=False)
     ip_address = Column(String(45), nullable=False)
     attempt_time = Column(DateTime, default=func.now(), nullable=False)
@@ -53,9 +55,7 @@ class LoginAttempt(Base):
     failed_attempts = Column(Integer, default=0)
     lockout_until = Column(DateTime)
 
-    user_id = Column(Integer, ForeignKey('user.user_id'))
     user = relationship('User', back_populates='login_attempts')
-
 
 class Roles(Base):
     __tablename__ = 'roles'
