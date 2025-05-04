@@ -6,6 +6,8 @@ from app.schemas import schemas as s
 from app.utils.logger import log_activity
 from app.utils.verifpass import hash_password
 from typing import List, Optional
+from app.routes import user_routes
+
 
 router = APIRouter(
     prefix="/user",

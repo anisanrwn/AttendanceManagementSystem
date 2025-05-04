@@ -34,6 +34,29 @@ class User(Base):
     roles = relationship("Roles", secondary="user_roles", back_populates="users")
     activity_logs = relationship("ActivityLog", back_populates="user")
 
+
+    login_attempts = relationship(
+        "LoginAttempt",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        order_by="desc(LoginAttempt.attempt_time)"
+    )
+class LoginAttempt(Base):
+    __tablename__ = 'login_attempts'
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String(100), index=True, nullable=False)
+    ip_address = Column(String(45), nullable=False)
+    attempt_time = Column(DateTime, default=func.now(), nullable=False)
+    is_successful = Column(Boolean, default=False)
+    user_agent = Column(Text)
+    failed_attempts = Column(Integer, default=0)
+    lockout_until = Column(DateTime)
+
+    user_id = Column(Integer, ForeignKey('user.user_id'))
+    user = relationship('User', back_populates='login_attempts')
+
+
 class Roles(Base):
     __tablename__ = 'roles'
 
