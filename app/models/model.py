@@ -123,4 +123,4 @@ class RoleLock(Base):
     reason = Column(Text, nullable=True)
 
     role = relationship("Roles", back_populates="locks")
-
+    
