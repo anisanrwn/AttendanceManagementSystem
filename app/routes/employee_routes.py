@@ -141,3 +141,26 @@ def get_employee_profile(employee_id: int, db: Session = Depends(get_db)):
         "position": employee.position,
         "department": employee.department,
     }
+
+@router.get("/departmentfilter")
+async def get_departments(db: Session = Depends(get_db)):
+    try:
+        departments = db.query(m.Employee.department).distinct().all()
+        return [dept[0] for dept in departments if dept[0]]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to fetch departments")
+
+@router.get("/positionfilter")
+async def get_positions(db: Session = Depends(get_db)):
+    try:
+        positions = db.query(m.Employee.position).distinct().all()
+        return [pos[0] for pos in positions if pos[0]]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to fetch positions")
+    
+@router.get("/check_email/{email}")
+def check_email(email: str, db: Session = Depends(get_db)):
+    employee = db.query(m.Employee).filter(m.Employee.email == email).first()
+    if employee:
+        return {"available": False}
+    return {"available": True}

@@ -61,13 +61,57 @@ async function viewProfile(id) {
     }
 }
 
+async function isEmailAvail(email) {
+    try {
+        const response = await fetch(`http://localhost:8000/employee/check_email/${email}`);
+        const result = await response.json();
+        return result.available;
+    } catch (error) {
+        console.error("Error checking email availability:", error);
+        return false;
+    }
+}
 // Add employee
 document.getElementById('submit').addEventListener('click', saveEmployee);
 async function saveEmployee(e) {
     e.preventDefault(); 
 
-    const formData = new FormData(employeeForm);
+    // manual validation
+    const firstName = document.getElementById('first_name').value.trim();
+    const lastName = document.getElementById('last_name').value.trim();
+    const nrp = document.getElementById('nrp_id').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone_number').value.trim();
+    const position = document.getElementById('position').value.trim();
+    const department = document.getElementById('department').value.trim();
+    const image = document.getElementById('photo').value.trim();
+    const emailAvailable = await isEmailAvail(email);
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^08[0-9]{8,11}$/;
 
+    if (!firstName || !lastName || !email || !phone || !nrp || !position || !department|| !image) {
+        Swal.fire('Error!', 'Please fill in all required fields.', 'error');
+        return;
+    }
+
+    if (!emailRegex.test(email)) {
+        Swal.fire('Error!', 'Please enter a valid email address. Example : yourname@gmail.com', 'error');
+        return;
+    }
+
+    if (!emailAvailable) {
+        Swal.fire('Error!', 'Email already exists. Please choose another one.', 'error');
+        return;
+    }
+
+    if (!phoneRegex.test(phone)) {
+        Swal.fire('Error!', 'Phone number must be 10–13 digits (numbers only) and starts with 08.', 'error');
+        return;
+    }
+
+    //saving data
+    const formData = new FormData(employeeForm);
     try {
         $('#addEmployeeModal').modal('hide');
 
@@ -96,7 +140,7 @@ async function saveEmployee(e) {
                 showConfirmButton: false
             });
 
-            employeeForm.reset(); // gunakan employeeForm juga di sini
+            employeeForm.reset();
             fetchEmployees();
         
         } else {
@@ -109,8 +153,8 @@ async function saveEmployee(e) {
     }
 }
 
+// edit employee
 document.getElementById('submitEdit').addEventListener('click', saveEditedEmployee);
-
 async function editEmployee(id) {
     try {
         const response = await fetch(`http://localhost:8000/employee/profile/${id}`);
@@ -142,8 +186,40 @@ async function editEmployee(id) {
 
 async function saveEditedEmployee(e) {
     e.preventDefault(); 
-
     const editEmployeeForm = document.getElementById('editEmployeeForm');
+
+    // manual validation
+    const efirstName = document.getElementById('editfirst_name').value.trim();
+    const elastName = document.getElementById('editlast_name').value.trim();
+    const eemail = document.getElementById('editemail').value.trim();
+    const ephone = document.getElementById('editphone_number').value.trim();
+    const eposition = document.getElementById('editposition').value.trim();
+    const edepartment = document.getElementById('editdepartment').value.trim();
+    const eemailAvailable = await isEmailAvail(eemail);
+    
+    const eemailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const ephoneRegex = /^08[0-9]{8,11}$/;
+
+    if (!efirstName || !elastName || !eemail || !ephone || !eposition || !edepartment) {
+        Swal.fire('Error!', 'Please fill in all required fields.', 'error');
+        return;
+    }
+
+    if (!eemailRegex.test(eemail)) {
+        Swal.fire('Error!', 'Please enter a valid email address. Example : yourname@gmail.com', 'error');
+        return;
+    }
+    
+    if (!eemailAvailable) {
+        Swal.fire('Error!', 'Email already exists. Please choose another one.', 'error');
+        return;
+    }
+
+    if (!ephoneRegex.test(ephone)) {
+        Swal.fire('Error!', 'Phone number must be 10–13 digits (numbers only) and starts with 08.', 'error');
+        return;
+    }
+
     const employeeId = editEmployeeForm.getAttribute('data-employee-id');
     const formData = new FormData(editEmployeeForm);
 
@@ -219,28 +295,83 @@ async function deleteEmployee(id) {
     }
 }
 
-// Filter employees function
-document.getElementById('filterButton').addEventListener('click', filterEmployees);
+// dropdown dept + position
+async function loadDept() {
+    try {
+        const response = await fetch('http://localhost:8000/employee/departmentfilter');
+        const dept = await response.json();
+        const deptSelect = document.getElementById('filterDepartment');
+
+        dept.forEach(dept => {
+            const option = document.createElement('option');
+            option.value = dept;
+            option.textContent = dept;
+            deptSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Failed to load dept', error);
+    }
+}
+async function loadPosition() {
+    try {
+        const response = await fetch('http://localhost:8000/employee/positionfilter');
+        const positions = await response.json();
+        const positionSelect = document.getElementById('filterPosition');
+
+        positions.forEach(position => {
+            const option = document.createElement('option');
+            option.value = position;
+            option.textContent = position;
+            positionSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Failed to load positions', error);
+    }
+}
+loadDept();
+loadPosition();
+
+// filter search entirely
+const searchInput = document.getElementById('searchInput');
+const filterDepartment = document.getElementById('filterDepartment');
+const filterPosition = document.getElementById('filterPosition');
+
+// Debounce untuk mencegah spam pencarian
+let debounceTimer;
+const debounce = (callback, delay) => {
+    return (...args) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => callback(...args), delay);
+    };
+};
+
+searchInput.addEventListener('input', debounce(filterEmployees, 300));
+filterDepartment.addEventListener('change', filterEmployees);
+filterPosition.addEventListener('change', filterEmployees);
+
 function filterEmployees() {
     const searchValue = document.getElementById('searchInput').value.toLowerCase();
     const filterDepartment = document.getElementById('filterDepartment').value.toLowerCase();
     const filterPosition = document.getElementById('filterPosition').value.toLowerCase();
-    
+           
     const rows = document.querySelectorAll('#employeeTable tbody tr');
 
     rows.forEach(row => {
-        const firstName = row.cells[0].textContent.toLowerCase();
-        const lastName = row.cells[1].textContent.toLowerCase();
-        const position = row.cells[2].textContent.toLowerCase();
-        const department = row.cells[3].textContent.toLowerCase();
-        const nrp = row.cells[4].textContent.toLowerCase();
-
+        if (row.cells.length < 5) return;  // skip incomplete rows
+    
+        const nrp = row.cells[0].textContent.toLowerCase();
+        const firstName = row.cells[1].textContent.toLowerCase();
+        const lastName = row.cells[2].textContent.toLowerCase();
+        const position = row.cells[3].textContent.toLowerCase();
+        const department = row.cells[4].textContent.toLowerCase();
+    
         const matchesSearch = firstName.includes(searchValue) || 
                              lastName.includes(searchValue) ||
                              nrp.includes(searchValue);
+    
         const matchesDepartment = filterDepartment === '' || department.includes(filterDepartment);
         const matchesPosition = filterPosition === '' || position.includes(filterPosition);
-
+    
         if (matchesSearch && matchesDepartment && matchesPosition) {
             row.style.display = '';
         } else {
@@ -249,5 +380,12 @@ function filterEmployees() {
     });
 }
 
-fetchEmployees();
+document.getElementById('clearFiltersButton').addEventListener('click', () => {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('filterDepartment').value = '';
+    document.getElementById('filterPosition').value = '';
+    filterEmployees();
+});
 
+fetchEmployees();
+filterEmployees();
