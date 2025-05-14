@@ -31,6 +31,7 @@
 
     <!--extra css-->
     <link rel="stylesheet" href="../assets/css/scriptyuyusta.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Helpers -->
     <script src="../assets/vendor/js/helpers.js"></script>
@@ -309,16 +310,14 @@
                             <p>We need access to your location to verify your attendance.</p>
                             <div class="d-flex justify-content-center align-items-center gap-2">
                                 <!-- Add this inside Step 2 and Step 3 cards -->
-<button id="backToAttendanceBtn" class="btn btn-secondary">Back to Attendance</button>
-
-
-                                <button class="btn btn-primary" id="locationBtn">Allow Location Access</button>
+                                <button id="backToAttendanceBtn" class="btn btn-secondary">Back to Attendance</button>
+                                <button class="btn btn-primary" id="allowLocationBtn">Allow Location Access</button>
                             </div>
                           </div>
                         </div>
 
                         <!-- Step 2: Show Map & Verify Location -->
-                        <div class="step-container" id="step3Container">
+                        <div class="step-container" id="step2Container">
                             <h4 class="mb-4">Step 2: Location Verification</h4>
                             
                             <!-- Location Details Card -->
@@ -365,14 +364,13 @@
                             
                             <div class="d-grid gap-2 mt-3">
                               <!-- Add this inside Step 2 and Step 3 cards -->
-<button class="btn btn-outline-secondary mt-3" id="btn-back-step">Back</button>
-
+                                <button class="btn btn-outline-secondary mt-3" id="btn-back-step">Back</button>
                                 <button class="btn btn-primary" id="verifyLocationBtn" disabled>Next: Face Verification</button>
                             </div>
                         </div>
 
-                        <div class="step-container" id="step4Container" style="display: none;">
-                          <h4 class="mb-4">Step 4: Face Recognition</h4>
+                        <div class="step-container" id="step3Container" style="display: none;">
+                          <h4 class="mb-4">Step 3: Face Recognition</h4>
                           <div class="text-center">
                             <video id="videoFeed" width="320" height="240" autoplay muted></video>
                             <canvas id="canvasOverlay" width="320" height="240" style="position: absolute;"></canvas>
