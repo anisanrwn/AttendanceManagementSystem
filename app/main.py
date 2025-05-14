@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
-from app.routes import employee_routes, user_routes, login_routes, locksystem_routes
+from app.routes import employee_routes, user_routes, login_routes, locksystem_routes, attendance_routes
 
 # Initialize FastAPI app
 main_app = FastAPI()
@@ -26,4 +26,5 @@ main_app.include_router(employee_routes.router)
 main_app.include_router(user_routes.router)
 main_app.include_router(login_routes.router)
 main_app.include_router(locksystem_routes.router)
+main_app.include_router(attendance_routes.router)
 

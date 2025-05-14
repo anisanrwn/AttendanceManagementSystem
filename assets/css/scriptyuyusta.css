@@ -1,0 +1,138 @@
+  #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        #video {
+            width: 100%;
+            border-radius: 10px;
+            display: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .step-container {
+            display: none;
+        }
+        .active-step {
+            display: block;
+        }
+        .status-indicator {
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .inside-geofence {
+            background-color: #1cc88a;
+            color: white;
+        }
+        .outside-geofence {
+            background-color: #e74a3b;
+            color: white;
+        }
+        #reasonForm {
+            display: none;
+        }
+        .progress-tracker {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .progress-step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #dddddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+            color: #666;
+        }
+        .progress-step.active {
+            background-color: #4e73df;
+            color: white;
+        }
+        .progress-step.completed {
+            background-color: #1cc88a;
+            color: white;
+        }
+        .progress-line {
+            position: absolute;
+            height: 3px;
+            background-color: #dddddd;
+            top: 15px;
+            left: 40px;
+            right: 40px;
+            z-index: 0;
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+        }
+        #videoOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .location-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .location-info p {
+            margin-bottom: 5px;
+        }
+        .location-history {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+        }
+        .location-history-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        .accuracy-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .accuracy-high {
+            background-color: #1cc88a;
+        }
+        .accuracy-medium {
+            background-color: #f6c23e;
+        }
+        .accuracy-low {
+            background-color: #e74a3b;
+        }
+        .path-track {
+            stroke: #4e73df;
+            stroke-width: 3;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
