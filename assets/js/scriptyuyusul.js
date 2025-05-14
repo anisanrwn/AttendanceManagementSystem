@@ -60,7 +60,7 @@ async function loadEmployee() {
 
         const defaultOption = document.createElement('option');
         defaultOption.value = '';
-        defaultOption.textContent = '-- Select Employee --';
+        defaultOption.textContent = 'Select Employee';
         defaultOption.disabled = true;
         defaultOption.selected = true;
         employeeSelect.appendChild(defaultOption);
@@ -88,30 +88,84 @@ document.getElementById('employeeSelect').addEventListener('change', function ()
 
 
 // load roles yg ada dari database
-async function loadRoles() {
+async function loadRoles(dropdownIds = ['roleSelect','filterRole']) {
     try {
-        const response = await fetch('http://localhost:8000/user/available_roles'); // <-- FIXED
+        const response = await fetch('http://localhost:8000/user/available_roles'); 
         const roles = await response.json();
-        const roleSelect = document.getElementById('roleSelect');
+        dropdownIds.forEach(id => {
+            const roleSelect = document.getElementById(id);
 
-        roles.forEach(role => {
-            const option = document.createElement('option');
-            option.value = role.roles_name;
-            option.textContent = role.roles_name;
-            roleSelect.appendChild(option);
+            roles.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role.roles_name;
+                option.textContent = role.roles_name;
+                roleSelect.appendChild(option);
+            });
         });
     } catch (error) {
         console.error('Failed to load roles', error);
     }
 }
-
 loadRoles();
+
+async function isEmailAvailable(email, userId = null) {
+    try {
+        let url = `http://localhost:8000/user/check_email/${email}`;
+        if (userId) url += `?exclude_id=${userId}`;
+        const response = await fetch(url);
+        const result = await response.json();
+        return result.available;
+    } catch (error) {
+        console.error("Error checking email availability:", error);
+        return false;
+    }
+}
+
+async function isUsernameAvailable(username, userId = null) {
+    try {
+        let url = `http://localhost:8000/user/check_username/${username}`;
+        if (userId) url += `?exclude_id=${userId}`;
+        const response = await fetch(url);
+        const result = await response.json();
+        return result.available;
+    } catch (error) {
+        console.error("Error checking username availability:", error);
+        return false;
+    }
+}
 
 // add user
 document.getElementById('submitAccount').addEventListener('click', saveAccount);
 async function saveAccount(e) {
     e.preventDefault(); 
 
+    // manual validate
+    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const role = document.getElementById('roleSelect').value.trim();
+    const emailAvailable = await isEmailAvailable(email);
+    const usernameAvailable = await isUsernameAvailable(username);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!username || !email || !password || !role) {
+        Swal.fire('Error!', 'Please fill in all required fields.', 'error');
+        return;
+    }
+    if (!usernameAvailable) {
+        Swal.fire('Error!', 'Username already exists. Please choose another one.', 'error');
+        return;
+     }
+    if (!emailRegex.test(email)) {
+        Swal.fire('Error!', 'Please enter a valid email address. Example : yourname@gmail.com', 'error');
+        return;
+    }
+    if (!emailAvailable) {
+        Swal.fire('Error!', 'Email already exists. Please choose another one.', 'error');
+        return;
+    }
+    
+    //add account
     const formData = new FormData(accountForm);
 
     try {
@@ -197,6 +251,7 @@ async function deleteAccount(id) {
     }
 }
 
+//edit account
 async function editAccount(userId) {
     const [userResponse, roleResponse] = await Promise.all([
         fetch("http://localhost:8000/user/view"),
@@ -226,10 +281,36 @@ async function editAccount(userId) {
     $('#editAccountModal').modal('show');
 }
 
-
 async function saveUserChanges() {
-    const form = document.getElementById("editAccountForm");
     const userId = document.getElementById("editUserId").value;
+    const eusername = document.getElementById('editUsername').value.trim();
+    const eemail = document.getElementById('editEmail').value.trim();
+    const erole = document.getElementById('editRole').value.trim();
+    const eusernameAvailable = await isUsernameAvailable(eusername, userId);
+    const eemailAvailable = await isEmailAvailable(eemail, userId);    
+    const eemailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!eusername || !eemail || !erole) {
+        Swal.fire('Error!', 'Please fill in all required fields.', 'error');
+        return;
+    }
+    
+    if (!eusernameAvailable) {
+        Swal.fire('Error Editing!', 'Username already exists. Please choose another one.', 'error');
+        return;
+    }
+    
+    if (!eemailRegex.test(eemail)) {
+        Swal.fire('Error!', 'Please enter a valid email address. Example: yourname@gmail.com', 'error');
+        return;
+    }
+    
+    if (!eemailAvailable) {
+        Swal.fire('Error!', 'Email already exists. Please choose another one.', 'error');
+        return;
+    }
+    
+
     const formData = new FormData();
 
     formData.append("username", document.getElementById("editUsername").value);
@@ -259,3 +340,55 @@ async function saveUserChanges() {
         Swal.fire("Error", error.message, "error");
     }
 }
+
+// Filter search
+const searchInput = document.getElementById('searchInput');
+const filterRole = document.getElementById('filterRole');
+
+let debounceTimer;
+const debounce = (callback, delay) => {
+    return (...args) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => callback(...args), delay);
+    };
+};
+
+searchInput.addEventListener('input', debounce(filterUser, 300));
+filterRole.addEventListener('change', filterUser);
+
+document.getElementById('clearFiltersButton').addEventListener('click', () => {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('filterRole').value = '';
+    filterUser();
+});
+
+function filterUser() {
+    const searchValue = document.getElementById('searchInput').value.toLowerCase();
+    const selectedRole = document.getElementById('filterRole').value.toLowerCase();
+
+    const rows = document.querySelectorAll('#userTable tbody tr');
+
+    rows.forEach(row => {
+        const firstName = row.cells[0].textContent.toLowerCase();
+        const lastName = row.cells[1].textContent.toLowerCase();
+        const username = row.cells[2].textContent.toLowerCase();
+        
+        const rolesCell = row.cells[4];
+        const firstRole = rolesCell.querySelector('.badge')?.textContent.toLowerCase() || '';
+
+        const matchesSearch = firstName.includes(searchValue) ||
+                              lastName.includes(searchValue) ||
+                              username.includes(searchValue);
+
+        const matchesRole = selectedRole === '' || firstRole === selectedRole;
+
+        if (matchesSearch && matchesRole) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+fetchUsers();
+filterUser();

@@ -135,41 +135,34 @@
                 <div data-i18n="Basic">Recap Attendance</div>
               </a>
             </li>
-            
-          
-          
-          
-          <li class="menu-header small text-uppercase">
-            <span class="menu-header-text">Settings</span>
-          </li>
-          <li class="menu-item">
-              <a href="UserList.html" class="menu-link">
+            <li class="menu-header small text-uppercase">
+              <span class="menu-header-text">Settings</span>
+            </li>
+            <li class="menu-item">
+                <a href="UserList.html" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-group"></i>
                 <div data-i18n="Basic">User List</div>
               </a>
             </li>
-            
             <li class="menu-item">
               <a href="LockSystem.html" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-lock"></i>
                 <div data-i18n="Basic">Lock System</div>
               </a>
             </li>
-            
             <li class="menu-item">
               <a href="LogActivity.html" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-clipboard"></i>
                 <div data-i18n="Basic">Log Activity</div>
               </a>
             </li>
-            
-          <li class="menu-item">
-            <a href="Login.html" class="menu-link">
-              <i class="menu-icon tf-icons bx bx-log-out"></i>
-              <div data-i18n="Basic">Logout</div>
-            </a>
-          </li>
-          
+            <li class="menu-item">
+              <a href="Login.html" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-log-out"></i>
+                <div data-i18n="Basic">Logout</div>
+              </a>
+            </li>
+          </ul>
         </aside>
   
         <!-- Layout container -->
@@ -264,26 +257,23 @@
                   <div class="card-body">
                       <div class="d-flex justify-content-between align-items-center mb-4">
                         <!-- Filters Section -->
-                        <input type="text" id="searchInput" class="form-control me-2" style="flex: 1; max-width: 700px;" placeholder="Search by Name or Username">
-                        <div class="d-flex">
-                          <select id="filterRole" class="form-select me-2" style="flex: 1; max-width: 200px;">
-                            <option value="">All Roles</option>
-                            <option value="superadmin">Superadmin</option>
-                            <option value="admin">Admin (HR)</option>
-                            <option value="employee">Employee</option>
+                        <input type="text" id="searchInput" class="form-control me-2" style="flex: 1; max-width: 500px;" placeholder="Search by Name or Username">
+                          <select id="filterRole" class="form-select me-2" style="flex: 1; max-width: 400px;">
+                            <option value="">Select Roles</option>
                           </select>
-                          
+                          <!--
                           <select id="filterStatus" class="form-select me-2" style="flex: 1; max-width: 200px;">
                             <option value="">All Status</option>
                             <option value="active">Active</option>
                             <option value="nonactive">Non Active</option>
                           </select>
-        
-                          <button class="btn" id="filterAccountButton" style="background-color: #7f82ff; color: white; max-width: 120px;">Search</button>
-        
+                          -->
+                          <button class="btn" id="clearFiltersButton" style="background-color: #7f82ff; color: white; max-width: 150px;">Clear Filters</button>
                           <!-- Add User Button -->
-                          <button class="btn ms-2" id="addAccountButton" style="max-width: 150px; background-color: #7f82ff; color: white;" data-bs-toggle="modal" data-bs-target="#addAccountModal">Add Account</button>
-                        </div>
+                          <button class="btn ms-2 d-flex align-items-center justify-content-center gap-2" id="addAccountButton" style="max-width: 200px; background-color: #7f82ff; color: white;" data-bs-toggle="modal" data-bs-target="#addAccountModal">
+                            <i class="bx bx-plus"></i>
+                            <span>Add Account</span>
+                          </button>
                       </div>
                   </div>
   
@@ -300,7 +290,7 @@
                               <div class="mb-3">
                                 <label for="employeeSelect" class="form-label">Select Employee</label>
                                 <select id="employeeSelect" class="form-control" name="employee_id"required >
-                                  <option value="">-- Select Employee --</option>
+                                  <option value="">Select Employee</option>
                                 </select>
                               </div>
                               <div class="mb-3">
@@ -318,7 +308,7 @@
                               <div class="mb-3">
                                 <label for="roleSelect" class="form-label">Select Roles</label>
                                 <select id="roleSelect" class="form-control" name="role_name"required >
-                                  <option value="">-- Select Roles --</option>
+                                  <option value="">Select Roles</option>
                                 </select>
                               </div>
                               <div class="modal-footer">
@@ -372,7 +362,7 @@
                             <input type="email" class="form-control" id="editEmail">
                           </div>
                           <div class="mb-3">
-                            <label for="editRole" class="form-label">Role (leave blank to keep current)</label>
+                            <label for="editRole" class="form-label">Role</label>
                             <select class="form-select" id="editRole">
                               <option value="superadmin">Superadmin</option>
                               <option value="admin">Admin (HR)</option>

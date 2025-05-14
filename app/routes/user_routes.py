@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Form, Path
+from fastapi import APIRouter, Depends, HTTPException, Form, Path, Query
 from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app.models import model as m
@@ -156,3 +156,20 @@ async def delete_user(
         db.rollback()
         log_activity(db, "User deletion failed", str(e))
         raise HTTPException(status_code=500, detail="Failed to delete account")
+
+
+@router.get("/check_email/{email}")
+def check_email_availability(email: str, exclude_id: Optional[int] = Query(None), db: Session = Depends(get_db)):
+    query = db.query(m.User).filter(m.User.email == email)
+    if exclude_id:
+        query = query.filter(m.User.user_id != exclude_id)
+    existing = query.first()
+    return {"available": existing is None}
+
+@router.get("/check_username/{username}")
+def check_username_availability(username: str, exclude_id: Optional[int] = Query(None), db: Session = Depends(get_db)):
+    query = db.query(m.User).filter(m.User.username == username)
+    if exclude_id:
+        query = query.filter(m.User.user_id != exclude_id)
+    existing = query.first()
+    return {"available": existing is None}
