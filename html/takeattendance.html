@@ -15,7 +15,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Dashboard - Analytics | Sneat - Bootstrap 5 HTML Admin Template - Pro</title>
+    <title>Take Attendance</title>
 
     <meta name="description" content="" />
 
@@ -167,7 +167,7 @@
               </a>
             </li>
             <li class="menu-item">
-              <a href="auth-login-basic.html" class="menu-link">
+              <a href="Login.html" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-log-out"></i>
                 <div data-i18n="Basic">Logout</div>
               </a>
@@ -252,7 +252,7 @@
                       <div class="dropdown-divider"></div>
                     </li>
                     <li>
-                      <a class="dropdown-item" href="auth-login-basic.html">
+                      <a class="dropdown-item" href="Login.html">
                         <i class="bx bx-power-off me-2"></i>
                         <span class="align-middle">Log Out</span>
                       </a>
@@ -272,6 +272,7 @@
 
             <div class="container-xxl flex-grow-1 container-p-y">
               <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Pages /</span> Take Attendance</h4>
+              <h2 id="welcome-message"></h2>
 
       <!-- Overlay -->
       <div class="layout-overlay layout-menu-toggle"></div>
@@ -298,6 +299,46 @@
 
     <!-- Page JS -->
     <script src="../assets/js/dashboards-analytics.js"></script>
+
+    <script src="path/to/getEmployeeId.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const userId = sessionStorage.getItem("user_id");
+        const employeeId = sessionStorage.getItem("employee_id");
+    
+        if (userId && employeeId) {
+            console.log("User ID:", userId);
+            console.log("Employee ID:", employeeId);
+            // Gunakan data ini untuk fetch atau menampilkan konten
+        } else {
+            console.error("User belum login");
+            // Redirect ke login jika perlu
+            window.location.href = "/login.html";
+        }
+    });
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const userId = sessionStorage.getItem("user_id");
+      const employeeId = sessionStorage.getItem("employee_id");
+  
+      if (!userId || !employeeId) {
+          alert("Session expired or not found. Please login again.");
+          window.location.href = "login.html";
+          return;
+      }
+  
+      // Debug: tampilkan user_id di console
+      console.log("User ID from session:", userId);
+      console.log("Employee ID from session:", employeeId);
+  
+      // Misalnya, tampilkan nama user di dashboard
+      document.getElementById("welcome-message").textContent = `Welcome, User #${userId}`;
+  });
+  
+    
+    </script>
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>

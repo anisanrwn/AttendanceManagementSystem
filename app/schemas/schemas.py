@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-from datetime import date, time
+from datetime import date, time, datetime
 
 class EmployeeBase(BaseModel):
     first_name: str
@@ -65,7 +65,7 @@ class UserRolesCreate(UserRolesBase):
 class UserRolesRead(UserRolesBase):
     class Config:
         from_attributes = True
-
+ 
 class AttendanceBase(BaseModel):
     employee_id: int
     clock_in: time
@@ -98,6 +98,34 @@ class PermissionCreate(PermissionBase):
 
 class PermissionRead(PermissionBase):
     permissions_id: int
+
+    class Config:
+        from_attributes = True
+
+   
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class ActivityLogCreate(BaseModel):
+    action: str
+    detail: Optional[str] = None
+    user_id: Optional[int] = None
+    ip_address: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+class RoleLockBase(BaseModel):
+    role_id: int
+    start_date: datetime
+    end_date: datetime
+    reason: Optional[str]
+
+class RoleLockStatus(BaseModel):
+    roles_id: int
+    roles_name: str
+    status: bool 
 
     class Config:
         from_attributes = True

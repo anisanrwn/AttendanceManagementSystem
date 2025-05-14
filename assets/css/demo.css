@@ -105,3 +105,12 @@
   text-align: center;
   margin-top: 1rem;
 }
+
+/*
+* punya yuyus
+******************************************************************************/
+
+/* Force SweetAlert to be on top of Bootstrap modals */
+.swal2-container {
+  z-index: 20000 !important;
+}

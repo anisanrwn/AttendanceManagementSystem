@@ -1,9 +1,11 @@
 cmake
 opencv-python
 face-recognition
-numpy==1.25.1
+numpy
 fastapi[all]
 sqlalchemy
 alembic
 psycopg2
 asyncpg
+pycryptodome
+bcrypt
