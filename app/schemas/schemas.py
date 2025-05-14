@@ -147,3 +147,28 @@ class NotificationOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+class NotificationOut(BaseModel):
+    notification_id: int
+    title: str
+    message: str
+    created_at: datetime
+    is_read: bool
+    notification_type: str
+
+    class Config:
+        from_attributes = True
+        
+class UserResponse(BaseModel):
+    """Schema untuk respons login yang bisa berisi status OTP atau data user"""
+    status: str
+    message: Optional[str] = None
+    email: Optional[str] = None
+    user_id: Optional[int] = None
+    employee_id: Optional[int] = None
+    username: Optional[str] = None
+    roles: list[RoleRead] = None
+    employee: Optional[dict] = None
+
+    class Config:
+        orm_mode = True

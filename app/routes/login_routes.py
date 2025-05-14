@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Form, Request, status, Response, Body
+from fastapi import APIRouter, Depends, HTTPException, Form, Request, status, Response, Body, Response
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 from app.database import get_db
@@ -7,6 +7,12 @@ from datetime import datetime, timedelta
 from app.schemas import schemas as s
 from app.utils.verifpass import verify_password
 from user_agents import parse
+import random
+import string
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from typing import Optional
 import json
 import asyncio
 from app.utils.auth import verify_token, get_current_user, create_access_token, create_refresh_token
@@ -19,10 +25,58 @@ SECRET_KEY = "your-secret-key-here"  # Ganti dengan key yang aman
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
+
 router = APIRouter(
     prefix="/login",
     tags=["Login"]
 )
+
+# Konfigurasi email - pindahkan ke file konfigurasi di produksi
+EMAIL_ADDRESS = "hrsystem812@gmail.com"  # Ganti dengan email Anda
+EMAIL_PASSWORD = "dfxhwuyiwqszauxh"    # Ganti dengan password aplikasi email Anda
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
+
+# Penyimpanan OTP - di produksi sebaiknya simpan di database
+# Format: {"email": {"otp": "123456", "expiry": datetime}}
+otp_storage = {}
+
+def generate_otp():
+    """Menghasilkan OTP 6 digit"""
+    return ''.join(random.choices(string.digits, k=6))
+
+def send_otp_email(email, otp):
+    """Mengirim OTP ke email pengguna"""
+    try:
+        message = MIMEMultipart()
+        message["From"] = EMAIL_ADDRESS
+        message["To"] = email
+        message["Subject"] = "Kode Verifikasi Login Sistem Absensi"
+        
+        body = f"""
+        <html>
+        <body>
+            <h2>Kode Verifikasi Login</h2>
+            <p>Berikut adalah kode OTP Anda untuk login:</p>
+            <h1 style="background-color: #f2f2f2; padding: 10px; font-family: monospace; letter-spacing: 5px;">{otp}</h1>
+            <p>Kode ini berlaku untuk 5 menit.</p>
+            <p>Jika Anda tidak meminta kode ini, abaikan email ini.</p>
+        </body>
+        </html>
+        """
+        
+        message.attach(MIMEText(body, "html"))
+        
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
+        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+        server.send_message(message)
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"Error mengirim email: {e}")
+        return False
+
 templates = Jinja2Templates(directory="templates")
 
 @router.get("/login")
@@ -180,7 +234,7 @@ async def refresh_token(refresh_token: str = Body(...), db: Session = Depends(ge
         raise HTTPException(status_code=401, detail="Refresh token expired")
     except jwt.JWTError:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
-
+    
 @router.post("/login")
 async def login_user(
     request: Request,
@@ -192,8 +246,6 @@ async def login_user(
     raw_user_agent = request.headers.get("user-agent", "unknown")
     user_agent_parsed = parse(raw_user_agent)
     browser_name = f"{user_agent_parsed.browser.family} {user_agent_parsed.browser.version_string}".strip()
-    os_name = user_agent_parsed.os.family
-    device_name = user_agent_parsed.device.family
 
     user = db.query(m.User).options(joinedload(m.User.roles)).filter_by(email=email).first()
 
@@ -248,19 +300,83 @@ async def login_user(
         db.commit()
         raise HTTPException(status_code=401, detail="Email atau password salah.")
 
-    # Generate tokens
-    access_token = create_access_token(data={"sub": user.email, "user_id": user.user_id})
-    refresh_token = create_refresh_token(data={"sub": user.email, "type": "refresh"})
+    # Jika login benar, generate dan kirim OTP
+    otp = generate_otp()
+    expiry_time = datetime.utcnow() + timedelta(minutes=5)
+    otp_storage[email] = {
+        'otp': otp,
+        'expiry': expiry_time,
+        'user_id': user.user_id,
+        'ip_address': ip_address,
+        'user_agent': browser_name
+    }
 
-    new_attempt = m.LoginAttempt(
+    if not send_otp_email(email, otp):
+        raise HTTPException(status_code=500, detail="Gagal mengirim kode OTP. Silakan coba lagi.")
+
+    # Catat login attempt belum berhasil (menunggu OTP)
+    attempt = m.LoginAttempt(
         user_id=user.user_id,
         email=email,
         ip_address=ip_address,
-        is_successful=True,
         user_agent=browser_name,
-        failed_attempts=0
+        failed_attempts=0,
+        is_successful=False,
     )
-    db.add(new_attempt)
+    db.add(attempt)
+    db.commit()
+
+    return {
+        "status": "otp_required",
+        "message": "Kode OTP telah dikirim ke email Anda",
+        "email": email
+    }
+
+
+@router.post("/verify-otp")
+async def verify_otp(
+    request: Request,
+    email: str = Form(...),
+    otp: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    ip_address = request.headers.get("x-forwarded-for", request.client.host)
+    raw_user_agent = request.headers.get("user-agent", "unknown")
+    user_agent_parsed = parse(raw_user_agent)
+    browser_name = f"{user_agent_parsed.browser.family} {user_agent_parsed.browser.version_string}".strip()
+
+    if email not in otp_storage:
+        raise HTTPException(status_code=400, detail="Sesi OTP tidak ditemukan. Silakan login kembali.")
+
+    stored_data = otp_storage[email]
+    stored_otp = stored_data['otp']
+    expiry_time = stored_data['expiry']
+    user_id = stored_data['user_id']
+
+    if datetime.utcnow() > expiry_time:
+        del otp_storage[email]
+        raise HTTPException(status_code=400, detail="Kode OTP telah kedaluwarsa. Silakan login kembali.")
+
+    if otp != stored_otp:
+        raise HTTPException(status_code=400, detail="Kode OTP salah.")
+
+    del otp_storage[email]
+
+    user = db.query(m.User).options(joinedload(m.User.roles)).filter_by(user_id=user_id).first()
+
+    access_token = create_access_token(data={"sub": user.email, "user_id": user.user_id})
+    refresh_token = create_refresh_token(data={"sub": user.email, "type": "refresh"})
+
+    # Catat login berhasil
+    attempt = m.LoginAttempt(
+        user_id=user.user_id,
+        email=email,
+        ip_address=ip_address,
+        user_agent=browser_name,
+        failed_attempts=0,
+        is_successful=True
+    )
+    db.add(attempt)
 
     last_success = (
         db.query(m.LoginAttempt)
@@ -286,8 +402,8 @@ async def login_user(
             db.add(notification)
 
     db.commit()
-    
-    user_dict = {
+
+    return {
         "user_id": user.user_id,
         "email": user.email,
         "employee_id": user.employee_id,
@@ -295,5 +411,33 @@ async def login_user(
         "access_token": access_token,
         "refresh_token": refresh_token
     }
-    
-    return user_dict
+
+
+@router.post("/resend-otp")
+async def resend_otp(
+    email: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    if email not in otp_storage:
+        raise HTTPException(status_code=400, detail="Sesi OTP tidak ditemukan. Silakan login kembali.")
+
+    otp = generate_otp()
+    expiry_time = datetime.utcnow() + timedelta(minutes=5)
+    user_id = otp_storage[email]['user_id']
+    ip_address = otp_storage[email]['ip_address']
+    user_agent = otp_storage[email]['user_agent']
+
+    otp_storage[email] = {
+        'otp': otp,
+        'expiry': expiry_time,
+        'user_id': user_id,
+        'ip_address': ip_address,
+        'user_agent': user_agent
+    }
+
+    if not send_otp_email(email, otp):
+        raise HTTPException(status_code=500, detail="Gagal mengirim kode OTP. Silakan coba lagi.")
+
+    return {"status": "success", "message": "Kode OTP baru telah dikirim ke email Anda"}
+
+
