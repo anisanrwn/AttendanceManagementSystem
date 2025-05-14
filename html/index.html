@@ -562,33 +562,8 @@
     <!-- Page JS -->
     <script src="../assets/js/dashboards-analytics.js"></script>
 
-    <script src="path/to/getEmployeeId.js"></script>
-
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const userId = sessionStorage.getItem("user_id");
-        const employeeId = sessionStorage.getItem("employee_id");
-    
-        if (!userId || !employeeId) {
-            alert("Session expired or not found. Please login again.");
-            window.location.href = "login.html";
-            return;
-        }
-    
-        // Debug: tampilkan user_id di console
-        console.log("User ID from session:", userId);
-        console.log("Employee ID from session:", employeeId);
-    
-        // Misalnya, tampilkan nama user di dashboard
-        document.getElementById("welcome-message").textContent = `Welcome, User #${userId}`;
-    });
-    
-    
-  
-
-
-    </script>
-
+    <!--Welcome User-->
+    <script src="../assets/js/scriptnabgreetuser.js"></script>
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>

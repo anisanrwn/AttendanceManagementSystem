@@ -9,3 +9,11 @@ psycopg2
 asyncpg
 pycryptodome
 bcrypt
+fastapi-sessions
+uvicorn
+python-multipart
+user-agents
+python-dotenv
+pyjwt
+passlib
+python-jose[cryptography]
