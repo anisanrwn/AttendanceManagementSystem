@@ -46,12 +46,29 @@
         #reasonForm {
             display: none;
         }
-        .progress-tracker {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            position: relative;
-        }
+.progress-tracker {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  margin: 0 auto 30px auto;
+  max-width: 600px;
+  padding: 0 20px;
+}
+
+/* Garis abu di belakang step */
+.progress-tracker::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: calc(15px + 20px); /* 15px = half step circle (30px), 20px = padding */
+  right: calc(15px + 20px);
+  height: 4px;
+  background-color: #ddd;
+  z-index: 0;
+  transform: translateY(-50%);
+}
+
         .progress-step {
             width: 30px;
             height: 30px;
