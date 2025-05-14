@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Form, Request, status, Response
+from fastapi import APIRouter, Depends, HTTPException, Form, Request, status, Response, Body
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 from app.database import get_db
@@ -9,12 +9,15 @@ from app.utils.verifpass import verify_password
 from user_agents import parse
 import json
 import asyncio
-from app.utils.auth import verify_token, get_current_user
+from app.utils.auth import verify_token, get_current_user, create_access_token, create_refresh_token
 from fastapi.responses import StreamingResponse
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
+from jose import jwt
 
-
+# JWT Configuration
+SECRET_KEY = "your-secret-key-here"  # Ganti dengan key yang aman
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 router = APIRouter(
     prefix="/login",
@@ -87,7 +90,6 @@ async def notification_stream(
         }
     )
 
-# Notification History
 @router.get("/notifications/history")
 def get_notification_history(
     user_id: int = Depends(verify_token),
@@ -114,17 +116,15 @@ def get_notification_history(
         for notif in notifications
     ]
 
-# Mark as Read
 @router.post("/notifications/mark-as-read/{notification_id}")
 def mark_as_read(
     notification_id: int,
-    current_user: dict = Depends(verify_token),  # Gunakan dependency untuk verifikasi
+    current_user: dict = Depends(verify_token),
     db: Session = Depends(get_db)
 ):
-    # Dapatkan notifikasi hanya milik user yang login
     notification = db.query(m.Notification).filter(
         m.Notification.notification_id == notification_id,
-        m.Notification.user_id == current_user['user_id']  # Pastikan hanya pemilik notifikasi
+        m.Notification.user_id == current_user['user_id']
     ).first()
 
     if not notification:
@@ -134,6 +134,7 @@ def mark_as_read(
         )
 
     notification.is_read = True
+    notification.read_at = datetime.utcnow()
     db.commit()
     
     return {"message": "Notification marked as read"}
@@ -145,7 +146,42 @@ async def check_auth(current_user: dict = Depends(verify_token)):
         "is_authenticated": True
     }
 
-@router.post("/login", response_model=s.UserRead)
+@router.post("/refresh-token")
+async def refresh_token(refresh_token: str = Body(...), db: Session = Depends(get_db)):
+    try:
+        payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+        
+        if payload.get("type") != "refresh":
+            raise HTTPException(status_code=401, detail="Invalid token type")
+            
+        user_id = payload.get("sub")
+        user = db.query(m.User).filter(m.User.user_id == user_id).first()
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+            
+        # Create new access token
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = jwt.encode(
+            {
+                "sub": str(user.user_id),
+                "exp": datetime.utcnow() + access_token_expires,
+                "user_id": user.user_id,
+                "email": user.email,
+                "roles": [role.roles_name for role in user.roles]
+            },
+            SECRET_KEY,
+            algorithm=ALGORITHM
+        )
+        
+        return {"access_token": access_token, "token_type": "bearer"}
+        
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Refresh token expired")
+    except jwt.JWTError:
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
+
+@router.post("/login")
 async def login_user(
     request: Request,
     email: str = Form(...),
@@ -212,6 +248,10 @@ async def login_user(
         db.commit()
         raise HTTPException(status_code=401, detail="Email atau password salah.")
 
+    # Generate tokens
+    access_token = create_access_token(data={"sub": user.email, "user_id": user.user_id})
+    refresh_token = create_refresh_token(data={"sub": user.email, "type": "refresh"})
+
     new_attempt = m.LoginAttempt(
         user_id=user.user_id,
         email=email,
@@ -246,4 +286,14 @@ async def login_user(
             db.add(notification)
 
     db.commit()
-    return user
+    
+    user_dict = {
+        "user_id": user.user_id,
+        "email": user.email,
+        "employee_id": user.employee_id,
+        "roles": [{"roles_name": role.roles_name} for role in user.roles],
+        "access_token": access_token,
+        "refresh_token": refresh_token
+    }
+    
+    return user_dict

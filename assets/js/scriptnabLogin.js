@@ -17,29 +17,33 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            const user = await response.json();
-            console.log("Login success:", user);
+            const data = await response.json();
+            console.log("Login success:", data);
 
-            const roleNames = user.roles.map(role => role.roles_name);
+            // Store tokens in localStorage
+            localStorage.setItem('token', data.access_token);
+            localStorage.setItem('refreshToken', data.refresh_token);
 
-            const userId = user.user_id;
-            const employeeId = user.employee_id;
+            // Store user info in sessionStorage
+            sessionStorage.setItem("user_id", data.user_id);
+            sessionStorage.setItem("employee_id", data.employee_id);
+            sessionStorage.setItem("user_email", data.email);
 
-            // Simpan ke sessionStorage
-            sessionStorage.setItem("user_id", userId);
-            sessionStorage.setItem("employee_id", employeeId);
+            // Extract role names
+            const roleNames = data.roles.map(role => role.roles_name);
 
+            // Redirect based on role
             if (roleNames.includes("Super Admin") || roleNames.includes("Admin")) {
                 window.location.href = `/html/dashboardsuperadmin.html`;
             } else if (roleNames.includes("Employee")) {
                 window.location.href = `/html/index.html`;
             } else {
-                alert("Role tidak dikenali");
+                alert("Role not recognized");
+                window.location.href = "/login/login";
             }
         } catch (error) {
-            alert("An error occurred: " + error.message);
+            console.error("Login error:", error);
+            alert("An error occurred during login. Please try again.");
         }
     });
 });
-
-

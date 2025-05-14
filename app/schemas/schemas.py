@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, List
 from datetime import date, time, datetime
 
 class EmployeeBase(BaseModel):
@@ -10,7 +10,14 @@ class EmployeeBase(BaseModel):
     phone_number: str
     position: str
     department: str
-
+    
+class UserLoginResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str
+    user_id: int
+    email: str
+    roles: List[str]
 class EmployeeCreate(EmployeeBase):
     pass
 

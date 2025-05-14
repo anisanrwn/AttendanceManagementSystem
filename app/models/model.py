@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, Text, LargeBinary, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, Text, LargeBinary, DateTime, Boolean, Index
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -35,7 +35,7 @@ class User(Base):
     employee = relationship("Employee", back_populates="user")
     roles = relationship("Roles", secondary="user_roles", back_populates="users")
     activity_logs = relationship("ActivityLog", back_populates="user")
-    notifications = relationship("Notification", back_populates="user")
+    notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
 
 
 
@@ -50,15 +50,19 @@ class Notification(Base):
     __tablename__ = 'notifications'
 
     notification_id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey('user.user_id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.user_id'), nullable=False, index=True)
     title = Column(String(255), nullable=False)
     message = Column(String(1000), nullable=False)
-    notification_type = Column(String(50), default='info')
-    is_read = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    notification_type = Column(String(50), default='info', index=True)
+    is_read = Column(Boolean, default=False, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
     read_at = Column(DateTime, nullable=True)
 
     user = relationship("User", back_populates="notifications")
+
+    __table_args__ = (
+        Index('ix_notifications_user_read', 'user_id', 'is_read'),
+    )
 
 
 class LoginAttempt(Base):
