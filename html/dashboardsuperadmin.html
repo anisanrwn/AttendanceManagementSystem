@@ -51,6 +51,37 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="../assets/js/config.js"></script>
+   <style>
+/* Notifikasi dropdown */
+.dropdown-menu[aria-labelledby="notification-area"] {
+    padding: 0;
+}
+
+.dropdown-menu[aria-labelledby="notification-area"] .dropdown-item {
+    white-space: normal;
+}
+
+/* Badge notifikasi */
+.badge-notification {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 10px;
+    padding: 3px 6px;
+}
+
+/* Animasi untuk notifikasi baru */
+@keyframes pulse {
+    0% { background-color: rgba(248, 249, 250, 1); }
+    50% { background-color: rgba(248, 249, 250, 0.5); }
+    100% { background-color: rgba(248, 249, 250, 1); }
+}
+
+.bg-light {
+    animation: pulse 2s infinite;
+}
+   </style>
+  
   </head>
 
   <body>
@@ -208,18 +239,19 @@
             <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
               
 
-              <ul class="navbar-nav flex-row align-items-center ms-auto">
+    <ul class="navbar-nav flex-row align-items-center ms-auto">
+    <li class="nav-item lh-1 me-3 position-relative">  <!-- Tambah position-relative -->
+        <a href="#" class="nav-link px-2" id="notification-area" data-bs-toggle="dropdown" aria-expanded="false" role="button">
+            <i class="bx bx-bell" style="font-size: 1.5rem;"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-badge" style="display: none;"></span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="notification-area" style="width: 350px; max-height: 400px; overflow-y: auto;">
+            <li><div class="dropdown-item text-center py-3 text-muted">Loading notifications...</div></li>
+        </ul>
+    </li>
+</ul>
 
-                 <li class="nav-item lh-1 me-3">
-                <a href="javascript:void(0);" class="nav-link" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="bx bx-bell" style="font-size: 25px; vertical-align: middle;"></i> <!-- Moderate icon size -->
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
-                  <li><a class="dropdown-item" href="#">Notification 1</a></li>
-                  <li><a class="dropdown-item" href="#">Notification 2</a></li>
-                  <li><a class="dropdown-item" href="#">Notification 3</a></li>
-                </ul>
-              </li>
+
 
                 <!-- User -->
                 <li class="nav-item navbar-dropdown dropdown-user dropdown">
@@ -280,6 +312,8 @@
 
           <!-- Content wrapper -->
           <div class="content-wrapper">
+              
+
             <!-- Content -->
             <div class="container-xxl flex-grow-1 container-p-y">
               <h4 class="fw-bold mt-6 mb-4"><span class="text-muted fw-light">Pages /</span> Dashboard</h4>
@@ -360,7 +394,7 @@
 
     <!-- Main JS -->
     <script src="../assets/js/main.js"></script>
-
+<script src="/AttendanceManagementSystem/assets/js/notifications.js"></script>
     <!-- Page JS -->
     <script src="../assets/js/dashboards-analytics.js"></script>
 
@@ -415,6 +449,7 @@
       }
     }
   });
+ 
 </script>
   </body>
 </html>
