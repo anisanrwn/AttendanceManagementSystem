@@ -129,3 +129,14 @@ class RoleLockStatus(BaseModel):
 
     class Config:
         from_attributes = True
+
+class NotificationOut(BaseModel):
+    notification_id: int
+    title: str
+    message: str
+    created_at: datetime
+    is_read: bool
+    notification_type: str
+
+    class Config:
+        from_attributes = True

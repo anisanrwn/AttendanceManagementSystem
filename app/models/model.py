@@ -2,6 +2,8 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, Text, La
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
+from datetime import datetime
+
 
 class Employee(Base):
     __tablename__ = 'employees'
@@ -33,6 +35,8 @@ class User(Base):
     employee = relationship("Employee", back_populates="user")
     roles = relationship("Roles", secondary="user_roles", back_populates="users")
     activity_logs = relationship("ActivityLog", back_populates="user")
+    notifications = relationship("Notification", back_populates="user")
+
 
 
     login_attempts = relationship(
@@ -41,6 +45,21 @@ class User(Base):
         cascade="all, delete-orphan",
         order_by="desc(LoginAttempt.attempt_time)"
     )
+
+class Notification(Base):
+    __tablename__ = 'notifications'
+
+    notification_id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('user.user_id'), nullable=False)
+    title = Column(String(255), nullable=False)
+    message = Column(String(1000), nullable=False)
+    notification_type = Column(String(50), default='info')
+    is_read = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    read_at = Column(DateTime, nullable=True)
+
+    user = relationship("User", back_populates="notifications")
+
 
 class LoginAttempt(Base):
     __tablename__ = 'login_attempts'
