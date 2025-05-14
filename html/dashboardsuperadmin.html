@@ -189,8 +189,9 @@
             <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
               
 
-    <ul class="navbar-nav flex-row align-items-center ms-auto">
-    <li class="nav-item lh-1 me-3 position-relative">  <!-- Tambah position-relative -->
+   <!-- Notification dropdown in navbar -->
+<ul class="navbar-nav flex-row align-items-center ms-auto">
+    <li class="nav-item lh-1 me-3 position-relative">
         <a href="#" class="nav-link px-2" id="notification-area" data-bs-toggle="dropdown" aria-expanded="false" role="button">
             <i class="bx bx-bell" style="font-size: 1.5rem;"></i>
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-badge" style="display: none;"></span>
@@ -200,6 +201,8 @@
         </ul>
     </li>
 </ul>
+
+
 
 
 
@@ -352,6 +355,8 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
  <!-- Chart.js Script -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Include the notification script -->
+<script src="/static/js/notifications.js"></script>
 <script>
   // Chart.js Initialization
   const ctx = document.getElementById('attendanceOverviewChart').getContext('2d');
