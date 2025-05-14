@@ -68,12 +68,14 @@ function countdownLoop() {
 let hasPunchedIn = localStorage.getItem("hasPunchedIn") === "true";
 let hasPunchedOut = localStorage.getItem("hasPunchedOut") === "true";
 
+// Saat klik Punch In
 document.getElementById("punchInBtn").addEventListener("click", function () {
   document.getElementById("attendance-page").style.display = "none";
   document.getElementById("step-page").style.display = "block";
 
   hasPunchedIn = true;
   localStorage.setItem("hasPunchedIn", "true");
+  localStorage.setItem("currentPage", "step");  // <== Tambahkan ini
 
   document.getElementById("punchOutBtn").disabled = false;
   document.getElementById("status").textContent = "Clocked In";
@@ -82,37 +84,12 @@ document.getElementById("punchInBtn").addEventListener("click", function () {
   document.getElementById("punchInBtn").disabled = true;
 });
 
-document.getElementById("punchOutBtn").addEventListener("click", function () {
-  hasPunchedOut = true;
-  localStorage.setItem("hasPunchedOut", "true");
-
-  document.getElementById("status").textContent = "Clocked Out";
-  document.getElementById("status").classList.remove("bg-label-success");
-  document.getElementById("status").classList.add("bg-label-danger");
-  document.getElementById("punchOutBtn").disabled = true;
-});
-
-function restorePunchStatus() {
-  if (hasPunchedIn) {
-    document.getElementById("punchInBtn").disabled = true;
-    document.getElementById("punchOutBtn").disabled = false;
-    document.getElementById("status").textContent = "Clocked In";
-    document.getElementById("status").classList.remove("bg-label-warning");
-    document.getElementById("status").classList.add("bg-label-success");
-  }
-
-  if (hasPunchedOut) {
-    document.getElementById("punchOutBtn").disabled = true;
-    document.getElementById("status").textContent = "Clocked Out";
-    document.getElementById("status").classList.remove("bg-label-success");
-    document.getElementById("status").classList.add("bg-label-danger");
-  }
-}
-
 initTimeSync().then(() => {
   updateClock();
   countdownLoop();
-  setInterval(updateClock, 1000);
-  setInterval(countdownLoop, 1000);
   restorePunchStatus();  // Restore punch state on page load
 });
+
+// TIMER JALAN LANGSUNG, TIDAK NUNGGU PROMISE
+setInterval(updateClock, 1000);
+setInterval(countdownLoop, 1000);

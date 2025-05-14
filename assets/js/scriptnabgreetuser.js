@@ -28,5 +28,5 @@
     console.log("Employee ID from session:", employeeId);
 
     // Misalnya, tampilkan nama user di dashboard
-    document.getElementById("welcome-message").textContent = `Welcome, User #${userId}`;
+    document.getElementById("welcome-message").textContent = `User #${userId}`;
 });
