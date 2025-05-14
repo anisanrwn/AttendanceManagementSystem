@@ -308,7 +308,10 @@
                           <div class="d-grid gap-2">
                             <p>We need access to your location to verify your attendance.</p>
                             <div class="d-flex justify-content-center align-items-center gap-2">
-                                <button class="btn btn-primary" id="backToAttendanceBtn"">Back to previous page</button>
+                                <!-- Add this inside Step 2 and Step 3 cards -->
+<button id="backToAttendanceBtn" class="btn btn-secondary">Back to Attendance</button>
+
+
                                 <button class="btn btn-primary" id="locationBtn">Allow Location Access</button>
                             </div>
                           </div>
@@ -361,6 +364,9 @@
                             </div>
                             
                             <div class="d-grid gap-2 mt-3">
+                              <!-- Add this inside Step 2 and Step 3 cards -->
+<button class="btn btn-outline-secondary mt-3" id="btn-back-step">Back</button>
+
                                 <button class="btn btn-primary" id="verifyLocationBtn" disabled>Next: Face Verification</button>
                             </div>
                         </div>

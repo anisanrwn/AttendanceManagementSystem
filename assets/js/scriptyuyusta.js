@@ -1,4 +1,6 @@
 // Function to format time as HH:MM:SS
+const punchInTime = "08:00";
+const punchOutTime = "17:00";
 function formatTime(ms) {
   const sec = Math.floor(Math.abs(ms) / 1000);
   const h = sec / 3600 | 0;
@@ -33,63 +35,8 @@ function updateClock() {
   document.getElementById("currentDate").textContent = now.toDateString();
 }
 
-// Countdown Loop and Status Update
-function countdownLoop() {
-  const now = getTrustedNow();
-  const [inH, inM] = punchInTime.split(":");
-  const [outH, outM] = punchOutTime.split(":");
-
-  const punchInTarget = new Date(now);
-  punchInTarget.setHours(inH, inM, 0, 0);
-
-  const punchOutTarget = new Date(now);
-  punchOutTarget.setHours(outH, outM, 0, 0);
-
-  let diff, label;
-  const statusText = document.getElementById("attendance-status");
-
-  if (!hasPunchedIn) {
-    diff = punchInTarget - now;
-    label = diff > 0 ? `Clock in starts in ${formatTime(diff)}` : `You're late by ${formatTime(-diff)}`;
-    statusText.textContent = diff > 0 ? `Office hour starts at ${punchInTime}` : `You're late. Please clock in.`;
-  } else if (!hasPunchedOut) {
-    diff = punchOutTarget - now;
-    label = diff > 0 ? `Clock out in ${formatTime(diff)}` : `Working hours ended`;
-    statusText.textContent = diff > 0 ? "Happy working!" : "You can clock out now.";
-  } else {
-    label = "Rest well ✨";
-    statusText.textContent = "See you tomorrow!";
-  }
-
-  document.getElementById("countdown-text").textContent = label;
-}
-
-// Punch In Event
-let hasPunchedIn = localStorage.getItem("hasPunchedIn") === "true";
-let hasPunchedOut = localStorage.getItem("hasPunchedOut") === "true";
-
-// Saat klik Punch In
-document.getElementById("punchInBtn").addEventListener("click", function () {
-  document.getElementById("attendance-page").style.display = "none";
-  document.getElementById("step-page").style.display = "block";
-
-  hasPunchedIn = true;
-  localStorage.setItem("hasPunchedIn", "true");
-  localStorage.setItem("currentPage", "step");  // <== Tambahkan ini
-
-  document.getElementById("punchOutBtn").disabled = false;
-  document.getElementById("status").textContent = "Clocked In";
-  document.getElementById("status").classList.remove("bg-label-warning");
-  document.getElementById("status").classList.add("bg-label-success");
-  document.getElementById("punchInBtn").disabled = true;
-});
-
 initTimeSync().then(() => {
   updateClock();
-  countdownLoop();
-  restorePunchStatus();  // Restore punch state on page load
 });
 
-// TIMER JALAN LANGSUNG, TIDAK NUNGGU PROMISE
 setInterval(updateClock, 1000);
-setInterval(countdownLoop, 1000);
