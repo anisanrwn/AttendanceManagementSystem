@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         html += `
             <li><hr class="dropdown-divider my-1"></li>
-            <li><a class="dropdown-item text-center py-2 small" href="/notifications">View all notifications</a></li>
+            
         `;
         
         notificationDropdown.innerHTML = html;
