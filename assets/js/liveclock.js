@@ -1,6 +1,7 @@
 // Function to format time as HH:MM:SS
 const punchInTime = "08:00";
-const punchOutTime = "17:00";
+const punchOutTime = "16:45";
+
 function formatTime(ms) {
   const sec = Math.floor(Math.abs(ms) / 1000);
   const h = sec / 3600 | 0;
@@ -21,7 +22,7 @@ let serverOffset = 0;
 async function initTimeSync() {
   const serverDate = await getServerTime();
   const localDate = new Date();
-  serverOffset = serverDate - localDate; // in milliseconds
+  serverOffset = serverDate - localDate;
 }
 
 function getTrustedNow() {
@@ -57,7 +58,6 @@ punchInBtn.addEventListener("click", () => {
     document.getElementById("step3Container").style.display = "none";
     
     hasPunchedIn = true;
-
     punchInBtn.disabled = true;
     punchOutBtn.disabled = true;
 });

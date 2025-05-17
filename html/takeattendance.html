@@ -309,7 +309,6 @@
                           <div class="d-grid gap-2">
                             <p>We need access to your location to verify your attendance.</p>
                             <div class="d-flex justify-content-center align-items-center gap-2">
-                                <!-- Add this inside Step 2 and Step 3 cards -->
                                 <button id="backToAttendanceBtn" class="btn btn-secondary">Back to Attendance</button>
                                 <button class="btn btn-primary" id="allowLocationBtn">Allow Location Access</button>
                             </div>
@@ -341,16 +340,6 @@
                             
                             <div id="map"></div>
                             
-                            <!-- Location History -->
-                            <div class="card mt-3">
-                                <div class="card-body">
-                                    <h5 class="card-title">Location History</h5>
-                                    <div class="location-history" id="locationHistory">
-                                        <!-- Location history entries will be added here -->
-                                    </div>
-                                </div>
-                            </div>
-                            
                             <!-- Form for users outside of geofence -->
                             <div id="reasonForm" class="card mt-3">
                                 <div class="card-body">
@@ -363,7 +352,6 @@
                             </div>
                             
                             <div class="d-grid gap-2 mt-3">
-                              <!-- Add this inside Step 2 and Step 3 cards -->
                                 <button class="btn btn-outline-secondary mt-3" id="btn-back-step">Back</button>
                                 <button class="btn btn-primary" id="verifyLocationBtn" disabled>Next: Face Verification</button>
                             </div>
@@ -404,7 +392,8 @@
         <!--Welcome User-->
         <script src="../assets/js/scriptnabgreetuser.js"></script>
 
-        <script src="../assets/js/scriptyuyusta.js"></script>
+        <script src="../assets/js/liveclock.js"></script>
+        <script src="../assets/js/loctrack.js"></script>
 
         <!-- Script Filter + Export -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>

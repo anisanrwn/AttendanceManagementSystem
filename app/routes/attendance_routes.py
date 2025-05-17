@@ -12,6 +12,6 @@ router = APIRouter(prefix="/attendance", tags=["Attendance"])
 
 @router.get("/server-time")
 def get_server_time():
-    wib = timezone(timedelta(hours=7))  # GMT+7
+    wib = timezone(timedelta(hours=7))
     now_wib = datetime.now(wib)
     return {"serverTime": now_wib.isoformat()}
