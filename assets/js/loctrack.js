@@ -291,7 +291,7 @@ function goToStep(stepNumber) {
         // Load Google Maps API
         if (!window.google || !window.google.maps) {
             const script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCrXhjIujL3pWQ-yLJbApGG3_7_vNEc8Dc&libraries=geometry&callback=renderMap`;
+            script.src = `https://maps.googleapis.com/maps/api/js?key=laalallala&libraries=geometry&callback=renderMap`;
             script.async = true;
             script.defer = true;
             document.head.appendChild(script);
