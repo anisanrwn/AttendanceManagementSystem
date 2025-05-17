@@ -113,7 +113,6 @@ function positionSuccess(position) {
         lat: position.coords.latitude,
         lng: position.coords.longitude,
         accuracy: position.coords.accuracy,
-        timestamp: position.timestamp
     };
     
     // Add this position to history
@@ -210,7 +209,6 @@ function updateLocationUI(position) {
     document.getElementById('currentLat').textContent = position.lat.toFixed(6);
     document.getElementById('currentLng').textContent = position.lng.toFixed(6);
     document.getElementById('locationAccuracy').textContent = Math.round(position.accuracy);
-    document.getElementById('lastUpdated').textContent = new Date(position.timestamp).toLocaleTimeString();
     
     // Calculate distance from office if we have the map initialized
     if (map && google) {
@@ -228,7 +226,6 @@ function addToLocationHistory(position) {
         lat: position.lat,
         lng: position.lng,
         accuracy: position.accuracy,
-        timestamp: position.timestamp || Date.now()
     });
     
     // Limit array size
@@ -382,7 +379,6 @@ function updateUserLocation(position) {
         lat: position.coords.latitude,
         lng: position.coords.longitude,
         accuracy: position.coords.accuracy,
-        timestamp: position.timestamp
     };
     
     // Add to location history
