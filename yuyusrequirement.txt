@@ -17,3 +17,4 @@ python-dotenv
 pyjwt
 passlib
 python-jose[cryptography]
+pillow

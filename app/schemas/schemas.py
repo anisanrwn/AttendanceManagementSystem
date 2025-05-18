@@ -111,12 +111,10 @@ class AttendanceBase(BaseModel):
     clock_in_longitude: float
     clock_in_reason: Optional[str] = None
 
-class AttendanceCreate(BaseModel):
-    employee_id: int
+class AttendanceClockInSession(BaseModel):
     clock_in_latitude: float
     clock_in_longitude: float
-    attendance_date: date
-    image_base64: str  # from camera capture
+    image_base64: str
     clock_in_reason: Optional[str] = None
 
 class AttendanceClockOut(BaseModel):
