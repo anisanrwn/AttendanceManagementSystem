@@ -1,12 +1,8 @@
 import cv2
 import numpy as np
 import face_recognition
-<<<<<<< HEAD
-from typing import List, Tuple
-
-=======
 from PIL import Image
->>>>>>> 499223d8990bff62693fd2789f51dd6258ee2488
+
 
 def read_image(image_bytes: bytes):
     np_array = np.frombuffer(image_bytes, np.uint8)
