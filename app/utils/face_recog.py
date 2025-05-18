@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import face_recognition
+from PIL import Image
 
 def read_image(image_bytes: bytes):
     np_array = np.frombuffer(image_bytes, np.uint8)
@@ -15,18 +16,13 @@ def encode_face(img) -> list:
     else:
         raise ValueError("No face found in the image.")
 
-def find_best_match(known_encodings: List[np.ndarray], unknown_encoding: np.ndarray) -> Tuple[int, float]:
-    """
-    Cari indeks encoding terbaik dan jaraknya.
-    Return (best_match_index, distance)
-    """
-    face_distances = face_recognition.face_distance(known_encodings, unknown_encoding)
-    best_match_index = np.argmin(face_distances)
-    return best_match_index, face_distances[best_match_index]
+def verify_face(image: Image.Image, known_encoding: list) -> bool:
+    np_image = np.array(image)
+    face_locations = face_recognition.face_locations(np_image)
+    face_encodings = face_recognition.face_encodings(np_image, face_locations)
 
-def is_match(known_encoding: np.ndarray, unknown_encoding: np.ndarray, tolerance: float = 0.6) -> bool:
-    """
-    Bandingkan apakah dua encoding cocok (default tolerance 0.6)
-    """
-    results = face_recognition.compare_faces([known_encoding], unknown_encoding, tolerance=tolerance)
-    return results[0]
+    if not face_encodings:
+        return False
+
+    result = face_recognition.compare_faces([np.array(known_encoding)], face_encodings[0])
+    return result[0]
