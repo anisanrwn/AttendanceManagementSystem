@@ -74,17 +74,37 @@ class UserRolesRead(UserRolesBase):
         from_attributes = True
  
 class AttendanceBase(BaseModel):
-    employee_id: int
-    clock_in: time
-    clock_out: time
     attendance_date: date
-    attendance_status: str
+    clock_in_latitude: float
+    clock_in_longitude: float
+    clock_in_reason: Optional[str] = None
 
-class AttendanceCreate(AttendanceBase):
-    pass
+class AttendanceCreate(BaseModel):
+    employee_id: int
+    clock_in_latitude: float
+    clock_in_longitude: float
+    attendance_date: date
+    image_base64: str  # from camera capture
+    clock_in_reason: Optional[str] = None
 
-class AttendanceRead(AttendanceBase):
+class AttendanceClockOut(BaseModel):
+    employee_id: int
+    clock_out_latitude: float
+    clock_out_longitude: float
+    image_base64: str
+    clock_out_reason: Optional[str] = None
+
+
+class AttendanceOut(BaseModel):
     attendance_id: int
+    employee_id: int
+    attendance_date: date
+    clock_in: Optional[time]
+    clock_in_latitude: Optional[float]
+    clock_in_longitude: Optional[float]
+    clock_in_verified: bool
+    attendance_status: str
+    face_verified: bool
 
     class Config:
         from_attributes = True

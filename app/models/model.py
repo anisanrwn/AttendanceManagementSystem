@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, Text, LargeBinary, DateTime, Boolean, Index
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Float, Text, LargeBinary, DateTime, Boolean, Index, Time
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -37,14 +37,7 @@ class User(Base):
     activity_logs = relationship("ActivityLog", back_populates="user")
     notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
 
-
-
-    login_attempts = relationship(
-        "LoginAttempt",
-        back_populates="user",
-        cascade="all, delete-orphan",
-        order_by="desc(LoginAttempt.attempt_time)"
-    )
+    login_attempts = relationship("LoginAttempt", back_populates="user", cascade="all, delete-orphan", order_by="desc(LoginAttempt.attempt_time)")
 
 class Notification(Base):
     __tablename__ = 'notifications'
@@ -102,10 +95,26 @@ class Attendance(Base):
 
     attendance_id = Column(Integer, primary_key=True, index=True)
     employee_id = Column(Integer, ForeignKey('employees.employee_id'))
-    clock_in = Column(Time)
-    clock_out = Column(Time)
+    
+    # Clock in data
+    clock_in = Column(Time)  
+    clock_in_latitude = Column(Float)
+    clock_in_longitude = Column(Float)
+    clock_in_verified = Column(Boolean, default=False)
+    clock_in_reason = Column(Text, nullable=True)
+    
+    # Clock out data
+    clock_out = Column(Time, nullable=True) 
+    clock_out_latitude = Column(Float, nullable=True)
+    clock_out_longitude = Column(Float, nullable=True)
+    clock_out_verified = Column(Boolean, default=False)
+    clock_out_reason = Column(Text, nullable=True)
+    
     attendance_date = Column(Date)
-    attendance_status = Column(String(10))
+    attendance_status = Column(String(20))
+    
+    face_verified = Column(Boolean, default=False)
+    
     employee = relationship("Employee", back_populates="attendances")
 
 
