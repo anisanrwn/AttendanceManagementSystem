@@ -106,7 +106,26 @@
 .bg-light {
     animation: pulse 2s infinite;
 }
-   
+   .btn-elegant {
+  background-color: #2c3e50; /* Warna solid */
+  color: #fff; /* Warna teks */
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.btn-elegant:hover {
+  background-color: #1a252f; /* Warna saat hover */
+  color: #fff; /* Tetap putih saat hover */
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+}
+
   </style>
 </head>
 
@@ -270,59 +289,67 @@
                 <h4 class="fw-bold mt-3 mb-0"><span class="text-muted fw-light">Pages /</span> Permission Form</h4>
                 <h2 id="welcome-message"></h2>
 
-      <!-- Main Content -->
-<div class="center-card">
-    
-    <div class="card">
-      <div class="card-header" style="color: #5a6e82;">
-        Permission Attendance Form
+             <!-- Main Content - Bagian yang diubah -->
+            <div class="center-card">
+              <div class="card">
+                <div class="card-header" style="color: #5a6e82;">
+                  Permission Attendance Form
+                </div>
+                
+                <div class="card-body">
+                  <!-- Form yang diperbaiki -->
+                  <form id="permissionForm">
+                    <!-- Employee ID (disembunyikan, nanti diisi JavaScript) -->
+                    <input type="hidden" id="employee_id" name="employee_id">
+                    
+                    <!-- Request Date (disembunyikan, diisi otomatis) -->
+                    <input type="hidden" id="request_date" name="request_date">
+                    
+                    <!-- Start Date -->
+                    <div class="mb-3">
+                      <br>
+                      <label for="start_date" class="form-label">Tanggal Mulai</label>
+                      <input type="date" id="start_date" name="start_date" class="form-control" required>
+                    </div>
+                    
+                    <!-- End Date -->
+                    <div class="mb-3">
+                      <label for="end_date" class="form-label">Tanggal Selesai</label>
+                      <input type="date" id="end_date" name="end_date" class="form-control" required>
+                    </div>
+                    
+                    <!-- Permission Reason -->
+                    <div class="mb-3">
+                      <label for="permission_type" class="form-label">Alasan Izin</label>
+                      <select id="permission_type" name="permission_type" class="form-select" required>
+                        <option value="" selected disabled>-- Pilih Alasan --</option>
+                        <option value="family-urgent">Keluarga Darurat</option>
+                        <option value="sick-leave">Sakit</option>
+                        <option value="personal-business">Keperluan Pribadi</option>
+                        <option value="other">Lainnya</option>
+                      </select>
+                    </div>
+                    
+                    <!-- Additional Notes -->
+                    <div class="mb-3">
+                      <label for="reason" class="form-label">Keterangan Tambahan</label>
+                      <textarea id="reason" name="reason" class="form-control" rows="4" placeholder="Tulis keterangan tambahan..." required></textarea>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="d-grid">
+                      <button type="submit" class="btn btn-elegant">Kirim Permohonan</button>
+                    </div>
+                  </form>
+                  
+                  <!-- Pesan status -->
+                  <div id="messageBox" class="mt-3 alert alert-info" style="display: none;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      
-      <div class="card-body">
-  
-        <!-- Start Date -->
-        <div class="mb-3">
-            <br>
-          <label for="start-date" class="form-label">Start Date</label>
-          <input type="date" id="start-date" class="form-control" placeholder="Select start date" />
-        </div>
-  
-        <!-- End Date -->
-        <div class="mb-3">
-          <label for="end-date" class="form-label">End Date</label>
-          <input type="date" id="end-date" class="form-control" placeholder="Select end date" />
-        </div>
-  
-        <!-- Permission Reason -->
-        <div class="mb-3">
-          <label for="permission-reason" class="form-label">Permission Reason</label>
-          <select id="permission-reason" class="form-select">
-            <option selected disabled>-- Select Reason --</option>
-            <option value="family-urgent">Family Urgent</option>
-            <option value="sick-leave">Sick</option>
-            <option value="personal-business">Personal Business</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-  
-        <!-- Additional Notes -->
-        <div class="mb-3">
-          <label for="additional-notes" class="form-label">Additional Notes</label>
-          <textarea id="additional-notes" class="form-control" rows="4" placeholder="Write any additional notes..."></textarea>
-        </div>
-  
-        <!-- Submit -->
-        <div class="d-grid">
-          <button type="submit" class="btn btn-primary">Submit Permission</button>
-        </div>
-  
-      </div>
-    </div>
-  </div>
-  <!-- End Main Content -->
-
-      </div>
-      <!-- End Layout page -->
     </div>
   </div>
 
@@ -332,6 +359,7 @@
   <script src="../assets/vendor/js/bootstrap.js"></script>
   <script src="../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
   <script src="../assets/js/main.js"></script>
+  <script src="/assets/js/permission.js"></script>
 
   <!--Welcome User-->
   <script src="../assets/js/scriptnabgreetuser.js"></script>
@@ -339,5 +367,6 @@
   <!-- Vendors JS -->
   <script src="../assets/vendor/libs/apex-charts/apexcharts.js"></script>
   <script src="/assets/js/notifications.js"></script>
+  
 </body>
 </html>

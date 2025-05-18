@@ -60,9 +60,12 @@ class Notification(Base):
 
     user = relationship("User", back_populates="notifications")
 
+    roles = relationship("Roles", secondary="notification_roles", back_populates="notifications")
+
     __table_args__ = (
         Index('ix_notifications_user_read', 'user_id', 'is_read'),
     )
+
 
 
 class LoginAttempt(Base):
@@ -89,11 +92,20 @@ class Roles(Base):
     users = relationship("User", secondary="user_roles", back_populates="roles")
     locks = relationship("RoleLock", back_populates="role", cascade="all, delete-orphan")
 
+    notifications = relationship("Notification", secondary="notification_roles", back_populates="roles")
+
+
 
 class UserRoles(Base):
     __tablename__ = 'user_roles'
 
     user_id = Column(Integer, ForeignKey('user.user_id'), primary_key=True)
+    roles_id = Column(Integer, ForeignKey('roles.roles_id'), primary_key=True)
+
+class NotificationRoles(Base):
+    __tablename__ = 'notification_roles'
+
+    notification_id = Column(Integer, ForeignKey('notifications.notification_id'), primary_key=True)
     roles_id = Column(Integer, ForeignKey('roles.roles_id'), primary_key=True)
 
 
