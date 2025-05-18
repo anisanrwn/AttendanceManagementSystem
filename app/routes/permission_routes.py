@@ -1,57 +1,63 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
 from app.database import get_db
 from app.models import model as m
 from app.schemas import schemas as s
+from app.utils.auth import verify_token, get_current_user
 
 router = APIRouter()
 
 @router.post("/permissions/request")
-def request_permission(permission: s.PermissionCreate, db: Session = Depends(get_db)):
+async def request_permission(
+    permission: s.PermissionCreate, 
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    # Dapatkan employee_id dari user yang login
+    user = db.query(m.User).filter(m.User.user_id == current_user.user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Buat permission baru
     new_permission = m.Permission(
-        employee_id=permission.employee_id,
+        user_id=current_user.user_id,
+        employee_id=user.employee_id,
         permission_type=permission.permission_type,
-        request_date=permission.request_date,
+        request_date=permission.request_date or datetime.utcnow().date(),
         start_date=permission.start_date,
         end_date=permission.end_date,
         reason=permission.reason,
         permission_status="Pending"
     )
+    
     db.add(new_permission)
     db.commit()
     db.refresh(new_permission)
 
-    employee = db.query(m.User).filter(m.User.user_id == permission.employee_id).first()
-    if employee:
-        employee_name = f"{employee.fname} {employee.lname}"
-    else:
-        employee_name = f"Employee ID {permission.employee_id}"
+    # Kirim notifikasi ke admin
+    await send_notification_to_admins(db, user.employee_id)
+    
+    return {"message": "Permission request submitted successfully"}
 
-    users_with_role_2 = db.query(m.User).filter(m.User.role_id == 2).all()
+async def send_notification_to_admins(db: Session, employee_id: int):
+    employee = db.query(m.Employee).filter(m.Employee.employee_id == employee_id).first()
+    employee_name = f"{employee.first_name} {employee.last_name}" if employee else f"Employee ID {employee_id}"
 
-    if not users_with_role_2:
-        print("Tidak ada user dengan role_id=2 ditemukan!")
+    admin_users = db.query(m.User).join(m.UserRoles).filter(m.UserRoles.roles_id == 2).all()
 
-    for user in users_with_role_2:
-        try:
-            notification = m.Notification(
-                user_id=user.user_id,
-                title="Permintaan Izin Baru",
-                message=f"Ada permintaan izin baru dari {employee_name}.",
-                notification_type="permission",
-                created_at=datetime.utcnow()
-            )
-            db.add(notification)
-            print(f"Tambah notifikasi untuk user_id={user.user_id}")
-        except Exception as e:
-            print(f"Gagal tambah notifikasi untuk user_id={user.user_id}: {e}")
-
+    for admin in admin_users:
+        notification = m.Notification(
+            user_id=admin.user_id,
+            title="Permintaan Izin Baru",
+            message=f"Ada permintaan izin baru dari {employee_name}.",
+            notification_type="permission",
+            created_at=datetime.utcnow()
+        )
+        db.add(notification)
+    
     try:
         db.commit()
-        print("Commit notifikasi berhasil")
     except Exception as e:
-        print(f"Commit notifikasi gagal: {e}")
         db.rollback()
-
-    return {"message": "Permission request submitted and notifications sent to role_id 2 users."}
+        print(f"Error sending notifications: {e}")

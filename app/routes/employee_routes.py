@@ -4,7 +4,7 @@ from app.database import get_db
 from app.models import model as m
 from app.schemas import schemas as s
 from app.utils.logger import log_activity
-from app.utils.face_encoding import read_image, encode_face
+from app.utils.face_recog import read_image, encode_face
 import numpy as np
 from typing import Optional, List
 

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Time, Text, LargeBinary, DateTime, Boolean, Index
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Float, Text, LargeBinary, DateTime, Boolean, Index, Time
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -36,15 +36,8 @@ class User(Base):
     roles = relationship("Roles", secondary="user_roles", back_populates="users")
     activity_logs = relationship("ActivityLog", back_populates="user")
     notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
-
-
-
-    login_attempts = relationship(
-        "LoginAttempt",
-        back_populates="user",
-        cascade="all, delete-orphan",
-        order_by="desc(LoginAttempt.attempt_time)"
-    )
+    permissions = relationship("Permission", back_populates="user")
+    login_attempts = relationship("LoginAttempt", back_populates="user", cascade="all, delete-orphan", order_by="desc(LoginAttempt.attempt_time)")
 
 class Notification(Base):
     __tablename__ = 'notifications'
@@ -60,12 +53,9 @@ class Notification(Base):
 
     user = relationship("User", back_populates="notifications")
 
-    roles = relationship("Roles", secondary="notification_roles", back_populates="notifications")
-
     __table_args__ = (
         Index('ix_notifications_user_read', 'user_id', 'is_read'),
     )
-
 
 
 class LoginAttempt(Base):
@@ -92,20 +82,11 @@ class Roles(Base):
     users = relationship("User", secondary="user_roles", back_populates="roles")
     locks = relationship("RoleLock", back_populates="role", cascade="all, delete-orphan")
 
-    notifications = relationship("Notification", secondary="notification_roles", back_populates="roles")
-
-
 
 class UserRoles(Base):
     __tablename__ = 'user_roles'
 
     user_id = Column(Integer, ForeignKey('user.user_id'), primary_key=True)
-    roles_id = Column(Integer, ForeignKey('roles.roles_id'), primary_key=True)
-
-class NotificationRoles(Base):
-    __tablename__ = 'notification_roles'
-
-    notification_id = Column(Integer, ForeignKey('notifications.notification_id'), primary_key=True)
     roles_id = Column(Integer, ForeignKey('roles.roles_id'), primary_key=True)
 
 
@@ -114,10 +95,26 @@ class Attendance(Base):
 
     attendance_id = Column(Integer, primary_key=True, index=True)
     employee_id = Column(Integer, ForeignKey('employees.employee_id'))
-    clock_in = Column(Time)
-    clock_out = Column(Time)
+    
+    # Clock in data
+    clock_in = Column(Time)  
+    clock_in_latitude = Column(Float)
+    clock_in_longitude = Column(Float)
+    clock_in_verified = Column(Boolean, default=False)
+    clock_in_reason = Column(Text, nullable=True)
+    
+    # Clock out data
+    clock_out = Column(Time, nullable=True) 
+    clock_out_latitude = Column(Float, nullable=True)
+    clock_out_longitude = Column(Float, nullable=True)
+    clock_out_verified = Column(Boolean, default=False)
+    clock_out_reason = Column(Text, nullable=True)
+    
     attendance_date = Column(Date)
-    attendance_status = Column(String(10))
+    attendance_status = Column(String(20))
+    
+    face_verified = Column(Boolean, default=False)
+    
     employee = relationship("Employee", back_populates="attendances")
 
 
@@ -126,6 +123,7 @@ class Permission(Base):
 
     permissions_id = Column(Integer, primary_key=True, index=True)
     employee_id = Column(Integer, ForeignKey('employees.employee_id'))
+    user_id = Column(Integer, ForeignKey('user.user_id'), nullable=True)
     permission_type = Column(String(50))
     request_date = Column(Date)
     start_date = Column(Date)
@@ -135,6 +133,7 @@ class Permission(Base):
     approved_date = Column(Date)
 
     employee = relationship("Employee", back_populates="permissions")
+    user = relationship("User", back_populates="permissions")
 
 class ActivityLog(Base):
     __tablename__ = "activity_logs"

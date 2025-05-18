@@ -2,6 +2,38 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import date, time, datetime
 
+
+class PermissionBase(BaseModel):
+    permission_type: str
+    request_date: date | None = None
+    start_date: date
+    end_date: date
+    reason: str | None = None
+
+class PermissionCreate(PermissionBase):
+    pass
+
+class Permission(PermissionBase):
+    permissions_id: int
+    user_id: int | None
+    employee_id: int
+    permission_status: str
+    approved_date: date | None
+
+    class Config:
+        from_attributes = True
+
+class UserOut(BaseModel):
+    
+    user_id: int
+    fname: str
+    lname: str
+    email: str
+
+    class Config:
+        from_attributes = True
+
+
 class EmployeeBase(BaseModel):
     first_name: str
     last_name: str
@@ -74,40 +106,42 @@ class UserRolesRead(UserRolesBase):
         from_attributes = True
  
 class AttendanceBase(BaseModel):
-    employee_id: int
-    clock_in: time
-    clock_out: time
     attendance_date: date
-    attendance_status: str
+    clock_in_latitude: float
+    clock_in_longitude: float
+    clock_in_reason: Optional[str] = None
 
-class AttendanceCreate(AttendanceBase):
-    pass
-
-class AttendanceRead(AttendanceBase):
-    attendance_id: int
-
-    class Config:
-        from_attributes = True
-
-
-class PermissionBase(BaseModel):
+class AttendanceCreate(BaseModel):
     employee_id: int
-    permission_type: str
-    request_date: date
-    start_date: date
-    end_date: date
-    reason: str
-    permission_status: str
-    approved_date: Optional[date] = None
+    clock_in_latitude: float
+    clock_in_longitude: float
+    attendance_date: date
+    image_base64: str  # from camera capture
+    clock_in_reason: Optional[str] = None
 
-class PermissionCreate(PermissionBase):
-    pass
+class AttendanceClockOut(BaseModel):
+    employee_id: int
+    clock_out_latitude: float
+    clock_out_longitude: float
+    image_base64: str
+    clock_out_reason: Optional[str] = None
 
-class PermissionRead(PermissionBase):
-    permissions_id: int
+
+class AttendanceOut(BaseModel):
+    attendance_id: int
+    employee_id: int
+    attendance_date: date
+    clock_in: Optional[time]
+    clock_in_latitude: Optional[float]
+    clock_in_longitude: Optional[float]
+    clock_in_verified: bool
+    attendance_status: str
+    face_verified: bool
 
     class Config:
         from_attributes = True
+
+
 
    
 class UserLogin(BaseModel):

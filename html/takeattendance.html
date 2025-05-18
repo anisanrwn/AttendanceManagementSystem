@@ -31,6 +31,7 @@
 
     <!--extra css-->
     <link rel="stylesheet" href="../assets/css/scriptyuyusta.css" />
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Helpers -->
@@ -330,9 +331,9 @@
                                         </div>
                                         <div class="col-md-6">
                                             <p><strong>Accuracy:</strong> <span id="locationAccuracy">-</span> meters</p>
+                                            <p><strong>Distance from Office:</strong> <span id="distanceToOffice">-</span> meters</p
                                         </div>
                                     </div>
-                                    <p><strong>Distance from Office:</strong> <span id="distanceToOffice">-</span> meters</p>
                                     <div id="locationStatus" class="status-indicator mt-2">Checking your location...</div>
                                 </div>
                             </div>
@@ -356,13 +357,18 @@
                             </div>
                         </div>
 
-                        <div class="step-container" id="step3Container" style="display: none;">
-                          <h4 class="mb-4">Step 3: Face Recognition</h4>
-                          <div class="text-center">
-                            <video id="videoFeed" width="320" height="240" autoplay muted></video>
-                            <canvas id="canvasOverlay" width="320" height="240" style="position: absolute;"></canvas>
-                            <p class="mt-3 text-muted">Please face the camera for identification...</p>
-                          </div>
+                        <!-- Step 3: Face Recognition -->
+                        <div class="step-container" id="step3Container">
+                            <h4 class="mb-4">Step 3: Face Verification</h4>
+                            <div class="video-container mb-3">
+                                <video id="video" autoplay muted></video>
+                                <canvas id="videoOverlay"></canvas>
+                            </div>
+                            <div id="recognitionStatus" class="status-indicator">Initializing face recognition...</div>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary" id="startRecognitionBtn">Start Face Scan</button>
+                                <button class="btn btn-success" id="completeBtn" disabled>Complete Attendance</button>
+                            </div>
                         </div>
                       </div>
                     </div>

@@ -1,8 +1,8 @@
 // Configuration - These should be loaded from your backend
 const OFFICE_LOCATION = { lat: -6.473100484760882, lng: 106.85142504029916, }; 
 const GEOFENCE_RADIUS = 500; // meters
-const LOCATION_UPDATE_INTERVAL = 5000; // ms (5 seconds)
-const LOCATION_HISTORY_MAX = 20; // Maximum number of location entries to show
+const LOCATION_UPDATE_INTERVAL = 10000; // ms (10 seconds) - increased from 5s to reduce timeout issues
+const LOCATION_TIMEOUT = 30000; // ms (30 seconds) - increased timeout for geolocation
 
 // Global state
 let map = null;
@@ -11,8 +11,6 @@ let officeBoundary = null;
 let insideGeofence = false;
 let currentPosition = null;
 let locationWatchId = null;
-let locationHistoryArray = [];
-let locationUpdateTimeoutId = null;
 let userPath = null;
 let userPathCoordinates = [];
 let officeLocation = { lat: -6.473100484760882, lng: 106.85142504029916 }; // Default location
@@ -24,11 +22,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Set up event listeners
 function setupEventListeners() {
-    // Back to attendance button
-    document.getElementById('backToAttendanceBtn').addEventListener('click', () => {
-        document.getElementById('step-page').style.display = 'none';
-        document.getElementById('attendance-page').style.display = 'block';
-    });
     
     // Punch In button
     document.getElementById('punchInBtn').addEventListener('click', () => {
@@ -42,6 +35,8 @@ function setupEventListeners() {
     
     // Back button (to previous step)
     document.getElementById('btn-back-step').addEventListener('click', () => {
+        // Stop any ongoing location tracking when going back
+        stopLocationTracking();
         goToStep(1);
     });
     
@@ -49,8 +44,7 @@ function setupEventListeners() {
     document.getElementById('verifyLocationBtn').addEventListener('click', () => {
         if (insideGeofence || document.getElementById('reasonText').value.trim() !== '') {
             goToStep(3);
-            // Here you would initialize face recognition
-            // initializeFaceRecognition();
+
         } else {
             showAlert('warning', 'Please provide a reason why you are not in the designated area.');
         }
@@ -87,18 +81,21 @@ function updateProgressTracker(activeStep) {
 
 // Request access to device location
 function requestLocationAccess() {
+    // Reset and stop any previous location tracking
+    stopLocationTracking();
+    
     if (navigator.geolocation) {
         // Show loading state
         document.getElementById('allowLocationBtn').innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Getting Location...';
         document.getElementById('allowLocationBtn').disabled = true;
         
-        // Start with a one-time position request
+        // Start with a one-time position request with longer timeout
         navigator.geolocation.getCurrentPosition(
             positionSuccess,
             positionError,
             { 
                 enableHighAccuracy: true,
-                timeout: 10000,
+                timeout: LOCATION_TIMEOUT, // Increased timeout for initial request
                 maximumAge: 0
             }
         );
@@ -115,11 +112,12 @@ function positionSuccess(position) {
         accuracy: position.coords.accuracy,
     };
     
-    // Add this position to history
-    addToLocationHistory(currentPosition);
-    
     // Update UI with current position
     updateLocationUI(currentPosition);
+    
+    // Add to path coordinates
+    userPathCoordinates = []; // Clear previous path
+    userPathCoordinates.push({ lat: currentPosition.lat, lng: currentPosition.lng });
     
     goToStep(2);
     initializeMap();
@@ -147,7 +145,7 @@ function positionError(error) {
             message = "Location information is unavailable.";
             break;
         case error.TIMEOUT:
-            message = "The request to get user location timed out.";
+            message = "The request to get user location timed out. Please try again.";
             break;
         case error.UNKNOWN_ERROR:
             message = "An unknown error occurred.";
@@ -163,14 +161,14 @@ function startLocationTracking() {
         navigator.geolocation.clearWatch(locationWatchId);
     }
     
-    // Set up continuous location tracking with high accuracy
+    // Set up continuous location tracking with higher timeout
     locationWatchId = navigator.geolocation.watchPosition(
         updateUserLocation,
         positionError,
         { 
             enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
+            timeout: LOCATION_TIMEOUT, // Increased timeout
+            maximumAge: 5000 // Allow positions up to 5 seconds old
         }
     );
     
@@ -180,21 +178,16 @@ function startLocationTracking() {
 
 // Schedule next location update
 function scheduleLocationUpdate() {
-    // Clear any existing timeout
-    if (locationUpdateTimeoutId !== null) {
-        clearTimeout(locationUpdateTimeoutId);
-    }
-    
-    // Schedule next update
-    locationUpdateTimeoutId = setTimeout(() => {
+    // We'll use a separate timer for manual updates to ensure we get regular updates
+    setTimeout(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 updateUserLocation,
                 (error) => console.log('Scheduled location update error:', error),
                 { 
                     enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0
+                    timeout: LOCATION_TIMEOUT,
+                    maximumAge: 5000
                 }
             );
         }
@@ -219,26 +212,14 @@ function updateLocationUI(position) {
     }
 }
 
-// Add a position to location history
-function addToLocationHistory(position) {
-    // Add new position to the history array
-    locationHistoryArray.unshift({
-        lat: position.lat,
-        lng: position.lng,
-        accuracy: position.accuracy,
-    });
-    
-    // Limit array size
-    if (locationHistoryArray.length > LOCATION_HISTORY_MAX) {
-        locationHistoryArray = locationHistoryArray.slice(0, LOCATION_HISTORY_MAX);
-    }
-    
-    // Also add to path coordinates for drawing on map
+// Add a position to path coordinates for drawing on map
+function addToPathCoordinates(position) {
+    // Only add to path coordinates if significantly different from last point
     if (userPathCoordinates.length === 0 || 
         calculateDistance(
             userPathCoordinates[userPathCoordinates.length - 1],
             { lat: position.lat, lng: position.lng }
-        ) > 2) { // Only add points if they're more than 2 meters apart
+        ) > 5) { // Only add points if they're more than 5 meters apart (increased threshold)
         userPathCoordinates.push({ lat: position.lat, lng: position.lng });
         updateUserPath();
     }
@@ -263,14 +244,6 @@ function calculateDistance(point1, point2) {
 
 async function initializeMap() {
     const api_key = await fetchMapsApiKey();
-
-    if (!api_key) {
-        console.error("No API key available");
-        return;
-    }
-
-    console.log("Injecting Google Maps script with API key:", api_key);
-
     // Register global callback
     window.renderMap = renderMap;
 
@@ -281,15 +254,13 @@ async function initializeMap() {
     document.head.appendChild(script);
 }
 
-
 async function fetchMapsApiKey() {
     try {
         const response = await fetch('http://localhost:8000/api/maps-key');
         const data = await response.json();
-        console.log("MAPS KEY from backend fetch:", data); // 🟡 DEBUG LOG
         return data.api_key;
     } catch (error) {
-        console.error('Error fetching Maps API key:', error);
+        showAlert('warning', 'Could not fetch Maps API key. Using fallback.');
         return null;
     }
 }
@@ -381,8 +352,8 @@ function updateUserLocation(position) {
         accuracy: position.coords.accuracy,
     };
     
-    // Add to location history
-    addToLocationHistory(currentPosition);
+    // Add to path coordinates
+    addToPathCoordinates(currentPosition);
     
     // Update UI
     updateLocationUI(currentPosition);
@@ -468,11 +439,8 @@ function stopLocationTracking() {
         locationWatchId = null;
     }
     
-    // Clear location update timeout
-    if (locationUpdateTimeoutId !== null) {
-        clearTimeout(locationUpdateTimeoutId);
-        locationUpdateTimeoutId = null;
-    }
+    // Clear any pending timeouts
+    clearTimeout(window.locationUpdateTimeoutId);
 }
 
 // Show alert messages

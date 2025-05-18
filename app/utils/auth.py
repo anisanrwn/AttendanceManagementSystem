@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import model as m
 
-SECRET_KEY = "your-secret-key-here"  # Change this to a strong secret key
+SECRET_KEY = "your-secret-key-here"  # Ganti dengan secret key yang kuat
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 REFRESH_TOKEN_EXPIRE_DAYS = 30

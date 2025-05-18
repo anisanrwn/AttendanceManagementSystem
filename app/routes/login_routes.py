@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 from app.database import get_db
 from app.models import model as m
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from app.schemas import schemas as s
 from app.utils.verifpass import verify_password
 from user_agents import parse
@@ -13,6 +13,7 @@ from app.utils.auth import verify_token, get_current_user, create_access_token, 
 from fastapi.responses import StreamingResponse
 from fastapi.templating import Jinja2Templates
 from jose import jwt
+import pytz
 
 # JWT Configuration
 SECRET_KEY = "your-secret-key-here"  # Ganti dengan key yang aman
@@ -208,9 +209,18 @@ async def login_user(
 
     if attempt:
         if attempt.lockout_until and now < attempt.lockout_until:
+            lockout_utc = attempt.lockout_until
+            # pastikan lockout_until aware (punya info timezone)
+            if lockout_utc.tzinfo is None:
+                lockout_utc = lockout_utc.replace(tzinfo=timezone.utc)
+
+            # convert ke Asia/Jakarta dengan pytz
+            jakarta_tz = pytz.timezone("Asia/Jakarta")
+            lockout_local = lockout_utc.astimezone(jakarta_tz)
+
             raise HTTPException(
                 status_code=403,
-                detail=f"Akun dikunci. Silakan coba lagi setelah {attempt.lockout_until.strftime('%H:%M:%S')} UTC"
+                detail=f"Akun dikunci. Silakan coba lagi setelah {lockout_local.strftime('%H:%M:%S')} WIB"
             )
         if attempt.failed_attempts >= 10:
             raise HTTPException(
