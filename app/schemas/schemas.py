@@ -80,7 +80,7 @@ class RoleRead(RoleBase):
 class UserBase(BaseModel):
     username: str
     email: EmailStr
-
+    
 class UserCreate(UserBase):
     password: str
     roles: list[RoleRead]
@@ -112,6 +112,7 @@ class AttendanceBase(BaseModel):
     clock_in_reason: Optional[str] = None
 
 class AttendanceClockInSession(BaseModel):
+    employee_id: int  # tambahkan ini
     clock_in_latitude: float
     clock_in_longitude: float
     image_base64: str

@@ -5,7 +5,7 @@ from app.models import model as m
 from app.schemas import schemas as s
 from app.utils.logger import log_activity
 from app.utils.face_recog import read_image, encode_face
-import numpy as np
+import json
 from typing import Optional, List
 
 router = APIRouter(prefix="/employee", tags=["Employee"])
@@ -38,7 +38,11 @@ async def add_employee(
         img = read_image(image_bytes)
         encoding = encode_face(img)
 
-        encoding_bytes = np.array(encoding).tobytes()
+        if not encoding:
+            raise HTTPException(status_code=400, detail="No face detected in the uploaded image.")
+
+        # ✅ Convert encoding to JSON (safe to store as text)
+        encoding_json = json.dumps(encoding)
 
         employee = m.Employee(
             first_name=first_name,
@@ -48,14 +52,20 @@ async def add_employee(
             phone_number=phone_number,
             position=position,
             department=department,
-            face_encoding=encoding_bytes,
+            face_encoding=encoding_json,  # ✅ stored as JSON string
         )
 
         db.add(employee)
         db.commit()
         db.refresh(employee)
+
         log_activity(db, "Added employee", f"Employee {first_name} {last_name} added successfully")           
         return employee
+
+    except Exception as e:
+        db.rollback()
+        log_activity(db, "Add employee failed", str(e))
+        raise HTTPException(status_code=400, detail=f"Error processing request: {str(e)}")
     
     except Exception as e:
         db.rollback()
@@ -159,8 +169,13 @@ async def get_positions(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Failed to fetch positions")
     
 @router.get("/check_email/{email}")
-def check_email(email: str, db: Session = Depends(get_db)):
-    employee = db.query(m.Employee).filter(m.Employee.email == email).first()
+def check_email(email: str, exclude_id: Optional[int] = None, db: Session = Depends(get_db)):
+    query = db.query(m.Employee).filter(m.Employee.email == email)
+    if exclude_id:
+        query = query.filter(m.Employee.employee_id != exclude_id)
+    
+    employee = query.first()
     if employee:
         return {"available": False}
     return {"available": True}
+

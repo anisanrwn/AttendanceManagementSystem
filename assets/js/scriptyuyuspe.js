@@ -61,9 +61,14 @@ async function viewProfile(id) {
     }
 }
 
-async function isEmailAvail(email) {
+async function isEmailAvail(email, id = null) {
     try {
-        const response = await fetch(`http://localhost:8000/employee/check_email/${email}`);
+        let url = `http://localhost:8000/employee/check_email/${email}`;
+        if (id) {
+            url += `?exclude_id=${id}`;
+        }
+        
+        const response = await fetch(url);
         const result = await response.json();
         return result.available;
     } catch (error) {
@@ -71,6 +76,7 @@ async function isEmailAvail(email) {
         return false;
     }
 }
+
 // Add employee
 document.getElementById('submit').addEventListener('click', saveEmployee);
 async function saveEmployee(e) {
@@ -188,6 +194,9 @@ async function saveEditedEmployee(e) {
     e.preventDefault(); 
     const editEmployeeForm = document.getElementById('editEmployeeForm');
 
+    // Ambil employeeId terlebih dahulu sebelum dipakai
+    const employeeId = editEmployeeForm.getAttribute('data-employee-id');
+
     // manual validation
     const efirstName = document.getElementById('editfirst_name').value.trim();
     const elastName = document.getElementById('editlast_name').value.trim();
@@ -195,7 +204,8 @@ async function saveEditedEmployee(e) {
     const ephone = document.getElementById('editphone_number').value.trim();
     const eposition = document.getElementById('editposition').value.trim();
     const edepartment = document.getElementById('editdepartment').value.trim();
-    const eemailAvailable = await isEmailAvail(eemail);
+
+    const eemailAvailable = await isEmailAvail(eemail, employeeId);  // ✅ employeeId sudah diinisialisasi
     
     const eemailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const ephoneRegex = /^08[0-9]{8,11}$/;
@@ -220,7 +230,6 @@ async function saveEditedEmployee(e) {
         return;
     }
 
-    const employeeId = editEmployeeForm.getAttribute('data-employee-id');
     const formData = new FormData(editEmployeeForm);
 
     try {
@@ -254,7 +263,6 @@ async function saveEditedEmployee(e) {
         Swal.fire('Error!', `An error occurred: ${error.message}`, 'error');
     }
 }
-
 //delete employee
 async function deleteEmployee(id) {
     const confirmResult = await Swal.fire({

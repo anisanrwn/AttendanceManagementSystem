@@ -1,8 +1,7 @@
 import cv2
 import numpy as np
 import face_recognition
-from PIL import Image
-
+import base64
 
 def read_image(image_bytes: bytes):
     np_array = np.frombuffer(image_bytes, np.uint8)
@@ -17,13 +16,17 @@ def encode_face(img) -> list:
     else:
         raise ValueError("No face found in the image.")
 
-def verify_face(image: Image.Image, known_encoding: list) -> bool:
-    np_image = np.array(image)
-    face_locations = face_recognition.face_locations(np_image)
-    face_encodings = face_recognition.face_encodings(np_image, face_locations)
 
-    if not face_encodings:
-        return False
+def verify_face(image_base64: str, known_encoding: list) -> bool:
+    image_bytes = base64.b64decode(image_base64)
+    np_arr = np.frombuffer(image_bytes, np.uint8)
+    img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
-    result = face_recognition.compare_faces([np.array(known_encoding)], face_encodings[0])
+    rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    faces_encodings = face_recognition.face_encodings(rgb_img)
+
+    if not faces_encodings:
+        return False  # No face found
+
+    result = face_recognition.compare_faces([known_encoding], faces_encodings[0])
     return result[0]

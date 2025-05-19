@@ -356,20 +356,17 @@
                                 <button class="btn btn-primary" id="verifyLocationBtn" disabled>Next: Face Verification</button>
                             </div>
                         </div>
-
-                        <!-- Step 3: Face Recognition -->
-                        <div class="step-container" id="step3Container">
-                            <h4 class="mb-4">Step 3: Face Verification</h4>
-                            <div class="video-container mb-3">
-                                <video id="video" autoplay muted></video>
-                                <canvas id="videoOverlay"></canvas>
-                            </div>
-                            <div id="recognitionStatus" class="status-indicator">Initializing face recognition...</div>
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-primary" id="startRecognitionBtn">Start Face Scan</button>
-                                <button class="btn btn-success" id="completeBtn" disabled>Complete Attendance</button>
-                            </div>
+                      </div>
+                      <!-- Step 3: Face Recognition -->
+                      <div id="step3Container" class="step-container" style="display:none;">
+                        <h3>Step 3: Face Recognition</h3>
+                        <video id="faceVideo" class="video-style" autoplay muted playsinline width="320" height="240"></video>
+                        <div>
+                          <button id="startCameraBtn">Start Camera</button>
+                          <button id="captureFaceBtn" disabled>Capture & Verify Face</button>
                         </div>
+                        <p id="faceStatus"></p>
+                      </div>
                       </div>
                     </div>
                     <div class="layout-overlay layout-menu-toggle"></div>

@@ -53,14 +53,13 @@ let hasPunchedIn = false;
 punchInBtn.addEventListener("click", () => {
     attendancePage.style.display = "none";
     stepPage.style.display = "block";
-    document.getElementById("step1Container").classList.add("active-step");
-    document.getElementById("step2Container").classList.remove("active-step");
-    document.getElementById("step3Container").style.display = "none";
-    
+    goToStep(1); // ✅
+
     hasPunchedIn = true;
     punchInBtn.disabled = true;
     punchOutBtn.disabled = true;
 });
+
 
 backToAttendanceBtn.addEventListener("click", (e) => {
     e.preventDefault();

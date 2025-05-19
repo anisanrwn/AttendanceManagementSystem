@@ -157,6 +157,23 @@ async def delete_user(
         log_activity(db, "User deletion failed", str(e))
         raise HTTPException(status_code=500, detail="Failed to delete account")
 
+@router.put("/sync-email/{user_id}")
+def sync_email_from_employee(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(m.User).filter(m.User.user_id == user_id).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if not user.employee_id:
+        raise HTTPException(status_code=400, detail="User is not linked to an employee")
+    
+    employee = db.query(m.Employee).filter(m.Employee.id == user.employee_id).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    user.email = employee.email
+    db.commit()
+    return {"message": "Email synced from employee successfully"}
 
 @router.get("/check_email/{email}")
 def check_email_availability(email: str, exclude_id: Optional[int] = Query(None), db: Session = Depends(get_db)):

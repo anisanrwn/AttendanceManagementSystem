@@ -38,6 +38,7 @@ async function fetchUsers() {
             <td class="text-center">
                 <button class="btn btn-sm btn-warning" onclick="editAccount(${user.user_id})">Edit</button>
                 <button class="btn btn-sm btn-danger" onclick="deleteAccount(${user.user_id})">Delete</button>
+                <button class="btn btn-sm btn-info" onclick="syncAccount(${user.user_id})">Sync Email</button>
             </td>
         `;
         tableBody.appendChild(row);
@@ -249,6 +250,47 @@ async function deleteAccount(id) {
             Swal.fire('Error!', `An error occurred: ${error.message}`, 'error');
         }
     }
+}
+
+//sync email
+async function syncEmail(id) {
+  const confirmResult = await Swal.fire({
+    title: 'Sync Email from Employee?',
+    text: `This will update the user email based on the linked employee data.`,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#7f82ff',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, Sync it',
+    cancelButtonText: 'Cancel'
+  });
+
+  if (confirmResult.isConfirmed) {
+    try {
+      const response = await fetch(`http://localhost:8000/user/sync-email/${id}`, {
+        method: 'PUT'
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        Swal.fire({
+          title: 'Synced!',
+          text: result.message || 'Email successfully synced.',
+          icon: 'info',
+          timer: 1500,
+          showConfirmButton: false
+        });
+
+        // Refresh data
+        fetchUsers();
+      } else {
+        const errorData = await response.json();
+        Swal.fire('Error!', errorData.detail || 'Failed to sync email.', 'error');
+      }
+    } catch (error) {
+      Swal.fire('Error!', `An error occurred: ${error.message}`, 'error');
+    }
+  }
 }
 
 //edit account

@@ -16,7 +16,7 @@ class Employee(Base):
     phone_number = Column(String(13))
     position = Column(String(100))
     department = Column(String(100))
-    face_encoding = Column(LargeBinary)
+    face_encoding = Column(Text) 
 
     user = relationship("User", back_populates="employee", uselist=False)
     attendances = relationship("Attendance", back_populates="employee")
