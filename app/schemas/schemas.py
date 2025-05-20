@@ -180,3 +180,17 @@ class NotificationOut(BaseModel):
 
     class Config:
         from_attributes = True
+        
+class EmployeeResponse(BaseModel):
+    employee_id: int
+    first_name: Optional[str]
+    last_name: Optional[str]
+    nrp_id: Optional[int]
+    email: Optional[str]
+    phone_number: Optional[str]
+    position: Optional[str]
+    department: Optional[str]
+    face_encoding: Optional[str]
+
+    class Config:
+        from_attributes = True
