@@ -2,7 +2,6 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import date, time, datetime
 
-
 class PermissionBase(BaseModel):
     permission_type: str
     request_date: date | None = None
@@ -24,7 +23,6 @@ class Permission(PermissionBase):
         from_attributes = True
 
 class UserOut(BaseModel):
-    
     user_id: int
     fname: str
     lname: str
@@ -32,7 +30,6 @@ class UserOut(BaseModel):
 
     class Config:
         from_attributes = True
-
 
 class EmployeeBase(BaseModel):
     first_name: str
@@ -50,6 +47,7 @@ class UserLoginResponse(BaseModel):
     user_id: int
     email: str
     roles: List[str]
+    
 class EmployeeCreate(EmployeeBase):
     pass
 
@@ -112,19 +110,18 @@ class AttendanceBase(BaseModel):
     clock_in_reason: Optional[str] = None
 
 class AttendanceClockInSession(BaseModel):
-    employee_id: int  # tambahkan ini
+    employee_id: int
     clock_in_latitude: float
     clock_in_longitude: float
     image_base64: str
     clock_in_reason: Optional[str] = None
 
-class AttendanceClockOut(BaseModel):
+class AttendanceClockOutSession(BaseModel):
     employee_id: int
+    image_base64: str
     clock_out_latitude: float
     clock_out_longitude: float
-    image_base64: str
-    clock_out_reason: Optional[str] = None
-
+    clock_out_reason: str | None = None
 
 class AttendanceOut(BaseModel):
     attendance_id: int
@@ -137,12 +134,22 @@ class AttendanceOut(BaseModel):
     attendance_status: str
     face_verified: bool
 
+class AttendanceStatusResponse(BaseModel):
+    attendance_id: int
+    attendance_date: date
+    employee_id: int
+    clock_in: Optional[str]
+    clock_out: Optional[str]
+    totalHours: Optional[str]
+    attendance_status: str
+    clock_in_latitude: Optional[float]
+    clock_in_longitude: Optional[float]
+    clock_in_verified: Optional[bool]
+    face_verified: Optional[bool]
+    
     class Config:
         from_attributes = True
 
-
-
-   
 class UserLogin(BaseModel):
     email: EmailStr
     password: str

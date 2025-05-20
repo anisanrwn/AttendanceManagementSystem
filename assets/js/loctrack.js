@@ -1,8 +1,12 @@
-// Configuration - These should be loaded from your backend
+import { showAlert } from './alert.js';
+import { goToStep } from './attendance.js';
+export { insideGeofence, currentPosition };
+
+// Configuration
 const OFFICE_LOCATION = { lat: -6.473100484760882, lng: 106.85142504029916, }; 
-const GEOFENCE_RADIUS = 500; // meters
-const LOCATION_UPDATE_INTERVAL = 10000; // ms (10 seconds) - increased from 5s to reduce timeout issues
-const LOCATION_TIMEOUT = 30000; // ms (30 seconds) - increased timeout for geolocation
+const GEOFENCE_RADIUS = 500; 
+const LOCATION_UPDATE_INTERVAL = 10000; 
+const LOCATION_TIMEOUT = 30000; 
 
 // Global state
 let map = null;
@@ -14,79 +18,10 @@ let locationWatchId = null;
 let userPath = null;
 let userPathCoordinates = [];
 let officeLocation = { lat: -6.473100484760882, lng: 106.85142504029916 }; // Default location
-
-// Initialize the location tracking system
-document.addEventListener('DOMContentLoaded', function() {
-    setupEventListeners();
-});
-
-// Set up event listeners
-function setupEventListeners() {
-    
-    // Punch In button
-    document.getElementById('punchInBtn').addEventListener('click', () => {
-        document.getElementById('attendance-page').style.display = 'none';
-        document.getElementById('step-page').style.display = 'block';
-        goToStep(1);
-    });
-    
-    // Allow location access
-    document.getElementById('allowLocationBtn').addEventListener('click', requestLocationAccess);
-    
-    // Back button (to previous step)
-    document.getElementById('btn-back-step').addEventListener('click', () => {
-        // Stop any ongoing location tracking when going back
-        stopLocationTracking();
-        goToStep(1);
-    });
-    
-    // Verify location button
-    document.getElementById('verifyLocationBtn').addEventListener('click', () => {
-        if (insideGeofence || document.getElementById('reasonText').value.trim() !== '') {
-            goToStep(3);
-            setupFaceRecognition();
-        } else {
-            showAlert('warning', 'Please provide a reason why you are not in the designated area.');
-        }
-    });
-}
-
-function goToStep(stepNumber) {
-  console.log("Going to step", stepNumber); // ✅ DEBUG
-
-  document.querySelectorAll('.step-container').forEach(container => {
-    container.classList.remove('active-step');
-    container.style.display = 'none';
-  });
-
-  const currentStepContainer = document.getElementById(`step${stepNumber}Container`);
-  if (!currentStepContainer) {
-    alert(`step${stepNumber}Container NOT FOUND!`);
-    return;
-  }
-
-  currentStepContainer.classList.add('active-step');
-  currentStepContainer.style.display = 'block';
-  console.log("Showing:", currentStepContainer.id); // ✅ DEBUG
-
-  updateProgressTracker(stepNumber);
-}
-
-
-function updateProgressTracker(activeStep) {
-    // Reset all steps
-    document.querySelectorAll('.progress-step').forEach((step, index) => {
-        step.classList.remove('active', 'completed');
-        if (index + 1 < activeStep) {
-            step.classList.add('completed');
-        } else if (index + 1 === activeStep) {
-            step.classList.add('active');
-        }
-    });
-}
+let locationUpdateTimeoutId = null;
 
 // Request access to device location
-function requestLocationAccess() {
+export function requestLocationAccess() {
     // Reset and stop any previous location tracking
     stopLocationTracking();
     
@@ -157,7 +92,7 @@ function positionError(error) {
             message = "An unknown error occurred.";
             break;
     }
-    showAlert('danger', message);
+    showAlert('error', message);
 }
 
 // Start continuous location tracking
@@ -184,8 +119,7 @@ function startLocationTracking() {
 
 // Schedule next location update
 function scheduleLocationUpdate() {
-    // We'll use a separate timer for manual updates to ensure we get regular updates
-    setTimeout(() => {
+    locationUpdateTimeoutId = setTimeout(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 updateUserLocation,
@@ -437,117 +371,14 @@ function checkGeofence() {
     document.getElementById('verifyLocationBtn').disabled = false;
 }
 
-// Stop location tracking
-function stopLocationTracking() {
-    // Clear location watch
+export function stopLocationTracking() {
     if (locationWatchId !== null) {
         navigator.geolocation.clearWatch(locationWatchId);
         locationWatchId = null;
     }
     
-    // Clear any pending timeouts
-    clearTimeout(window.locationUpdateTimeoutId);
-}
-
-// Show alert messages
-function showAlert(type, message) {
-    // Create alert element
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-    alertDiv.role = 'alert';
-    
-    // Add message
-    alertDiv.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    `;
-    
-    // Insert at top of container
-    const container = document.querySelector('.card-body');
-    container.insertBefore(alertDiv, container.firstChild);
-    
-    // Auto dismiss after 5 seconds
-    setTimeout(() => {
-        try {
-            const bsAlert = new bootstrap.Alert(alertDiv);
-            bsAlert.close();
-        } catch (e) {
-            // Fallback if bootstrap alert is not available
-            alertDiv.remove();
-        }
-    }, 5000);
-}
-
-function setupFaceRecognition() {
-  const video = document.getElementById('faceVideo');
-  const startCameraBtn = document.getElementById('startCameraBtn');
-  const captureFaceBtn = document.getElementById('captureFaceBtn');
-  const faceStatus = document.getElementById('faceStatus');
-  let stream = null;
-
-  startCameraBtn.onclick = async () => {
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      video.srcObject = stream;
-      captureFaceBtn.disabled = false;
-      faceStatus.textContent = "Camera started. Please position your face.";
-    } catch (err) {
-      faceStatus.textContent = "Could not access camera: " + err.message;
+    if (locationUpdateTimeoutId !== null) {
+        clearTimeout(locationUpdateTimeoutId);
+        locationUpdateTimeoutId = null;
     }
-  };
-
-  captureFaceBtn.onclick = async () => {
-    if (!stream) {
-      faceStatus.textContent = "Camera not started yet.";
-      return;
-    }
-    // Capture frame dari video
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth || 320;
-    canvas.height = video.videoHeight || 240;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const imageBase64 = canvas.toDataURL('image/jpeg').split(',')[1]; // tanpa prefix
-
-    // Kirim data ke backend
-    faceStatus.textContent = "Verifying face...";
-    
-    // Ambil lokasi terakhir dari global currentPosition
-    const lat = currentPosition?.lat || 0;
-    const lng = currentPosition?.lng || 0;
-
-    // Ambil employee_id dari sessionStorage (pastikan kamu set ini saat login)
-    const employeeId = sessionStorage.getItem('employee_id');
-    if (!employeeId) {
-      faceStatus.textContent = "Session expired, please login again.";
-      return;
-    }
-
-    try {
-      const response = await fetch('http://localhost:8000/attendance/clockin', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          employee_id: parseInt(employeeId),
-          image_base64: imageBase64,
-          clock_in_latitude: lat,
-          clock_in_longitude: lng,
-          clock_in_reason: ''
-        }),
-      });
-      const data = await response.json();
-
-      if (response.ok && data.face_verified) {
-        faceStatus.textContent = "Face verified! Attendance recorded.";
-        // Optional: stop camera stream after success
-        stream.getTracks().forEach(track => track.stop());
-        captureFaceBtn.disabled = true;
-        startCameraBtn.disabled = true;
-      } else {
-        faceStatus.textContent = "Face not recognized. Please try again.";
-      }
-    } catch (error) {
-      faceStatus.textContent = "Error verifying face: " + error.message;
-    }
-  };
 }

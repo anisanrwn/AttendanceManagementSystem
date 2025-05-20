@@ -297,38 +297,25 @@
     </h5>
   
     <div class="table-responsive text-nowrap">
-        <table class="table" id="attendanceTable">
+        <table class="table" id="allAttendanceTable">
           <thead>
             <tr>
-              <th class="text-center">Tanggal</th>
+              <th class="text-center">Date</th>
+              <th class="text-center">Name</th>
               <th class="text-center">Punch In</th>
+              <th class="text-center">Punch In Area</th>
+              <th class="text-center">Punch In Reason</th>
               <th class="text-center">Punch Out</th>
-              <th class="text-center">Production</th>
+              <th class="text-center">Punch Out Area</th>
+              <th class="text-center">Punch Out Reason</th>
+              <th class="text-center">Face Verified</th>
+              <th class="text-center">Working Hour</th>
+              <th class="text-center">Late</th>
               <th class="text-center">Overtime</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td class="text-center">2025-04-25</td>
-              <td class="text-center">08:00</td>
-              <td class="text-center">17:00</td>
-              <td class="text-center">8 Jam</td>
-              <td class="text-center">2 Jam</td>
-            </tr>
-            <tr>
-              <td class="text-center">2025-05-01</td>
-              <td class="text-center">08:10</td>
-              <td class="text-center">17:20</td>
-              <td class="text-center">8 Jam</td>
-              <td class="text-center">2 Jam</td>
-            </tr>
-            <tr>
-              <td class="text-center">2024-04-26</td>
-              <td class="text-center">08:15</td>
-              <td class="text-center">17:10</td>
-              <td class="text-center">7.5 Jam</td>
-              <td class="text-center">2.5 Jam</td>
-            </tr>
+           
           </tbody>
         </table>
       </div>
@@ -364,35 +351,8 @@
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script src="/assets/js/notifications.js"></script>
+    <script src="/assets/js/recap.js"></script>
     <!-- Script Filter + Export -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
-<script>
-  document.getElementById('filterButton').addEventListener('click', function() {
-    var month = document.getElementById('filterMonth').value;
-    var year = document.getElementById('filterYear').value;
-    var rows = document.querySelectorAll('#attendanceTable tbody tr');
-
-    rows.forEach(function(row) {
-      var dateText = row.cells[0].textContent.trim();
-      var date = new Date(dateText);
-      var showRow = true;
-
-      if (month && (String(date.getMonth() + 1).padStart(2, '0') !== month)) {
-        showRow = false;
-      }
-      if (year && date.getFullYear().toString() !== year) {
-        showRow = false;
-      }
-
-      row.style.display = showRow ? '' : 'none';
-    });
-  });
-
-  document.getElementById('exportButton').addEventListener('click', function() {
-    var table = document.getElementById('attendanceTable');
-    var wb = XLSX.utils.table_to_book(table, {sheet: "Attendance"});
-    XLSX.writeFile(wb, 'Attendance.xlsx');
-  });
-</script>
   </body>
 </html>

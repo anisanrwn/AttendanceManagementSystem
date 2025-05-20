@@ -17,7 +17,7 @@ def encode_face(img) -> list:
         raise ValueError("No face found in the image.")
 
 
-def verify_face(image_base64: str, known_encoding: list) -> bool:
+def verify_face(image_base64, known_encoding, threshold=0.6):
     image_bytes = base64.b64decode(image_base64)
     np_arr = np.frombuffer(image_bytes, np.uint8)
     img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
@@ -26,7 +26,10 @@ def verify_face(image_base64: str, known_encoding: list) -> bool:
     faces_encodings = face_recognition.face_encodings(rgb_img)
 
     if not faces_encodings:
-        return False  # No face found
+        return False, None  # Tidak ada wajah terdeteksi
 
-    result = face_recognition.compare_faces([known_encoding], faces_encodings[0])
-    return result[0]
+    unknown_encoding = faces_encodings[0]
+    distance = np.linalg.norm(np.array(known_encoding) - np.array(unknown_encoding))
+    is_verified = distance <= threshold
+
+    return is_verified, distance

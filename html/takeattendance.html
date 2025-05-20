@@ -277,7 +277,7 @@
                                 <li class="list-group-item d-flex justify-content-between">Punch Out: <strong id="outTime">--:--</strong></li>
                                 <li class="list-group-item d-flex justify-content-between">Working Hour: <strong id="totalHours">--</strong></li>
                                 <li class="list-group-item d-flex justify-content-between">Status: 
-                                  <span id="status" class="badge bg-label-warning">Belum Absen</span>
+                                  <span id="status" class="badge bg-label-warning">Absent</span>
                                 </li>
                               </ul>
                             </div>
@@ -301,7 +301,6 @@
                           <div class="progress-step active">1</div>
                           <div class="progress-step">2</div>
                           <div class="progress-step">3</div>
-                          <div class="progress-step">4</div>
                         </div>
 
 
@@ -341,7 +340,7 @@
                             <div id="map"></div>
                             
                             <!-- Form for users outside of geofence -->
-                            <div id="reasonForm" class="card mt-3">
+                            <div id="reasonForm">
                                 <div class="card-body">
                                     <h5 class="card-title">Please explain why you're not in the designated area</h5>
                                     <div class="mb-3">
@@ -350,22 +349,19 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="d-grid gap-2 mt-3">
-                                <button class="btn btn-outline-secondary mt-3" id="btn-back-step">Back</button>
-                                <button class="btn btn-primary" id="verifyLocationBtn" disabled>Next: Face Verification</button>
-                            </div>
-                        </div>
+                          </div>
+                          <div class="d-flex justify-content-center align-items-center gap-2">
+                              <button class="btn btn-secondary" id="btn-back-step">Back</button>
+                              <button class="btn btn-primary" id="verifyLocationBtn" disabled>Next: Face Verification</button>
+                          </div>
                       </div>
                       <!-- Step 3: Face Recognition -->
                       <div id="step3Container" class="step-container" style="display:none;">
                         <h3>Step 3: Face Recognition</h3>
-                        <video id="faceVideo" class="video-style" autoplay muted playsinline width="320" height="240"></video>
-                        <div>
-                          <button id="startCameraBtn">Start Camera</button>
-                          <button id="captureFaceBtn" disabled>Capture & Verify Face</button>
+                        <video id="faceVideo" class="video-style" autoplay muted playsinline width="720" height="480"></video>
+                        <div class="d-flex justify-content-center align-items-center gap-2">
+                          <button class="btn btn-primary" id="captureFaceBtn" disabled>Capture & Verify Face</button>
                         </div>
-                        <p id="faceStatus"></p>
                       </div>
                       </div>
                     </div>
@@ -393,9 +389,10 @@
 
         <!--Welcome User-->
         <script src="../assets/js/scriptnabgreetuser.js"></script>
+        <script type="module" src="../assets/js/attendance.js"></script>
+        <script type="module" src="../assets/js/loctrack.js"></script>
+        <script type="module" src="../assets/js/facerecog.js"></script>
 
-        <script src="../assets/js/liveclock.js"></script>
-        <script src="../assets/js/loctrack.js"></script>
 
         <!-- Script Filter + Export -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>

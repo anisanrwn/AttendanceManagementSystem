@@ -89,7 +89,6 @@ class UserRoles(Base):
     user_id = Column(Integer, ForeignKey('user.user_id'), primary_key=True)
     roles_id = Column(Integer, ForeignKey('roles.roles_id'), primary_key=True)
 
-
 class Attendance(Base):
     __tablename__ = 'attendance'
 
@@ -102,13 +101,15 @@ class Attendance(Base):
     clock_in_longitude = Column(Float)
     clock_in_verified = Column(Boolean, default=False)
     clock_in_reason = Column(Text, nullable=True)
-    
+    clock_in_distance = Column(Float, nullable=True)
+
     # Clock out data
     clock_out = Column(Time, nullable=True) 
     clock_out_latitude = Column(Float, nullable=True)
     clock_out_longitude = Column(Float, nullable=True)
     clock_out_verified = Column(Boolean, default=False)
     clock_out_reason = Column(Text, nullable=True)
+    clock_out_distance = Column(Float, nullable=True)
     
     attendance_date = Column(Date)
     attendance_status = Column(String(20))
@@ -116,7 +117,6 @@ class Attendance(Base):
     face_verified = Column(Boolean, default=False)
     
     employee = relationship("Employee", back_populates="attendances")
-
 
 class Permission(Base):
     __tablename__ = 'permissions'

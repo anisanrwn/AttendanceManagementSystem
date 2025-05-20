@@ -1,51 +1,53 @@
-  #map {
-            height: 400px;
-            width: 100%;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-       .video-style {
+#map {
+    height: 400px;
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.video-style {
     width: 100%;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-        #canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: none;
-        }
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        .step-container {
-            display: none;
-        }
-        .active-step {
-            display: block;
-        }
-        .status-indicator {
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-        .inside-geofence {
-            background-color: #1cc88a;
-            color: white;
-        }
-        .outside-geofence {
-            background-color: #e74a3b;
-            color: white;
-        }
-        #reasonForm {
-            display: none;
-        }
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+        
+.step-container {
+    display: none;
+}
+        
+.active-step {
+    display: block;
+}
+        
+.status-indicator {
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+        
+.inside-geofence {
+    background-color: #1cc88a;
+    color: white;
+}
+        
+.outside-geofence {
+    background-color: #e74a3b;
+    color: white;
+}
+        
+#reasonForm {
+    display: none;
+}
+
 .progress-tracker {
   display: flex;
   justify-content: space-between;
@@ -56,12 +58,11 @@
   padding: 0 20px;
 }
 
-/* Garis abu di belakang step */
 .progress-tracker::before {
   content: '';
   position: absolute;
   top: 50%;
-  left: calc(15px + 20px); /* 15px = half step circle (30px), 20px = padding */
+  left: calc(15px + 20px); 
   right: calc(15px + 20px);
   height: 4px;
   background-color: #ddd;
@@ -69,34 +70,38 @@
   transform: translateY(-50%);
 }
 
-        .progress-step {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background-color: #dddddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1;
-            color: #666;
-        }
-        .progress-step.active {
-            background-color: #4e73df;
-            color: white;
-        }
-        .progress-step.completed {
-            background-color: #1cc88a;
-            color: white;
-        }
-        .progress-line {
-            position: absolute;
-            height: 3px;
-            background-color: #dddddd;
-            top: 15px;
-            left: 40px;
-            right: 40px;
-            z-index: 0;
-        }
+.progress-step {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #dddddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    color: #666;
+}
+
+.progress-step.active {
+    background-color: #4e73df;
+    color: white;
+}
+
+.progress-step.completed {
+    background-color: #1cc88a;
+    color: white;
+}
+
+.progress-line {
+    position: absolute;
+    height: 3px;
+    background-color: #dddddd;
+    top: 15px;
+    left: 40px;
+    right: 40px;
+    z-index: 0;
+}
+
         .video-container {
             position: relative;
             width: 100%;

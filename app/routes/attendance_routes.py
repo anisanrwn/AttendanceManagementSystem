@@ -5,9 +5,12 @@ from app.models import model as m
 from app.schemas import schemas as s
 from app.utils.face_recog import verify_face
 import json
-from datetime import datetime, timedelta, timezone, date
+from datetime import datetime, timedelta, timezone, date, time
 
 router = APIRouter(prefix="/attendance", tags=["Attendance"])
+
+OFFICE_START = time(8, 0, 0)  # jam 08:00:00
+OFFICE_END = time(17, 0, 0)   # jam 17:00:00
 
 @router.get("/server-time")
 def get_server_time():
@@ -18,7 +21,7 @@ def get_server_time():
 
 @router.post("/clockin", response_model=s.AttendanceOut)
 def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depends(get_db)):
-    employee_id = int(payload.dict().get("employee_id"))  # From session in JS
+    employee_id = int(payload.dict().get("employee_id"))
 
     # Ambil data employee
     employee = db.query(m.Employee).filter(m.Employee.employee_id == employee_id).first()
@@ -29,8 +32,15 @@ def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depen
         raise HTTPException(status_code=400, detail="Employee has no face encoding")
 
     # Verifikasi wajah
-    known_encoding = json.loads(employee.face_encoding)  # encoding dari DB
-    is_verified = verify_face(payload.image_base64, known_encoding)
+    known_encoding = json.loads(employee.face_encoding)
+    is_verified, distance = verify_face(payload.image_base64, known_encoding)
+
+    # Kalau wajah tidak dikenali, hentikan proses
+    if not is_verified:
+        raise HTTPException(
+            status_code=400,
+            detail="Face not recognized",
+        )
 
     # Cek sudah absen hari ini atau belum
     today = date.today()
@@ -50,9 +60,10 @@ def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depen
         clock_in_longitude=payload.clock_in_longitude,
         clock_in_reason=payload.clock_in_reason,
         clock_in_verified=True,
+        clock_in_distance=distance,
         face_verified=is_verified,
         attendance_date=today,
-        attendance_status="Present" if is_verified else "Unverified"
+        attendance_status="Punch In" if is_verified else "Absent"
     )
 
     db.add(attendance)
@@ -60,3 +71,163 @@ def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depen
     db.refresh(attendance)
 
     return attendance
+
+@router.post("/clockout", response_model=s.AttendanceOut)
+def clock_out_attendance(payload: s.AttendanceClockOutSession, db: Session = Depends(get_db)):
+    employee_id = int(payload.employee_id)
+
+    # Ambil data employee
+    employee = db.query(m.Employee).filter(m.Employee.employee_id == employee_id).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+
+    if not employee.face_encoding:
+        raise HTTPException(status_code=400, detail="Employee has no face encoding")
+
+    # Verifikasi wajah
+    known_encoding = json.loads(employee.face_encoding)
+    is_verified, distance = verify_face(payload.image_base64, known_encoding)
+
+    if not is_verified:
+        raise HTTPException(
+            status_code=400,
+            detail="Face not recognized",
+        )
+
+    # Cek record attendance hari ini, harus ada clock in sebelumnya
+    today = date.today()
+    attendance = db.query(m.Attendance).filter(
+        m.Attendance.employee_id == employee_id,
+        m.Attendance.attendance_date == today
+    ).first()
+
+    if not attendance:
+        raise HTTPException(status_code=400, detail="Clock in record not found for today")
+
+    if attendance.clock_out is not None:
+        raise HTTPException(status_code=400, detail="Already clocked out today")
+
+    # Update record clock out
+    attendance.clock_out = datetime.now().time()
+    attendance.clock_out_latitude = payload.clock_out_latitude
+    attendance.clock_out_longitude = payload.clock_out_longitude
+    attendance.clock_out_reason = payload.clock_out_reason
+    attendance.clock_out_verified = True
+    attendance.face_verified = attendance.face_verified and is_verified 
+    attendance.attendance_status = "Punch Out" if is_verified else "Absent"
+    attendance.clock_out_distance = distance  
+
+    db.commit()
+    db.refresh(attendance)
+
+    return attendance
+
+def format_time(dt: datetime | None):
+    if not dt:
+        return None
+    return dt.strftime('%H:%M')
+
+@router.get('/attendance-status', response_model=s.AttendanceStatusResponse | None)
+def get_attendance_status(employee_id: int, db: Session = Depends(get_db)):
+    employee = db.query(m.Employee).filter(m.Employee.employee_id == employee_id).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail='Employee not found')
+
+    attendance = (
+        db.query(m.Attendance)
+        .filter(m.Attendance.employee_id == employee.employee_id)
+        .order_by(m.Attendance.attendance_id.desc())
+        .first()
+    )
+
+    if not attendance:
+        return None
+
+    return {
+        "attendance_id": attendance.attendance_id,
+        "attendance_date": attendance.attendance_date,
+        "employee_id": employee_id,
+        "clock_in": format_time(attendance.clock_in),
+        "clock_out": format_time(attendance.clock_out),
+        "totalHours": calculate_total_hours(attendance.clock_in, attendance.clock_out),
+        "attendance_status": attendance.attendance_status,
+        "clock_in_latitude": attendance.clock_in_latitude,
+        "clock_in_longitude": attendance.clock_in_longitude,
+        "clock_in_verified": attendance.clock_in_verified,
+        "face_verified": attendance.face_verified,
+    }
+
+@router.get("/recap")
+def view_attendance(employee_id: int, db: Session = Depends(get_db)):
+    records = (
+        db.query(m.Attendance)
+        .filter(m.Attendance.employee_id == employee_id)
+        .order_by(m.Attendance.attendance_date.desc())
+        .all()
+    )
+    
+    result = []
+    for rec in records:
+        result.append({
+            "date": rec.attendance_date.isoformat(),
+            "punch_in": rec.clock_in.strftime('%H:%M') if rec.clock_in else None,
+            "punch_out": rec.clock_out.strftime('%H:%M') if rec.clock_out else None,
+            "totalHours": calculate_total_hours(rec.clock_in, rec.clock_out),
+            "late" : calculate_late(rec.clock_in, OFFICE_START) if rec.clock_in else None,
+            "overtime" : calculate_overtime(rec.clock_out, OFFICE_END) if rec.clock_out else None,
+        })
+
+    return {"attendance": result}
+
+@router.get("/recap/all")
+def view_all_attendance(db: Session = Depends(get_db)):
+    records = (
+        db.query(m.Attendance)
+        .join(m.Employee)
+        .order_by(m.Attendance.attendance_date.desc())
+        .all()
+    )
+
+    result = []
+    for rec in records:
+        employee = rec.employee
+        result.append({
+            "attendance_id": rec.attendance_id,
+            "attendance_date": rec.attendance_date.isoformat(),
+            "employee_id": employee.employee_id,
+            "employee_name": f"{employee.first_name} {employee.last_name}".strip(),
+            "clock_in": rec.clock_in.strftime('%H:%M') if rec.clock_in else None,
+            "clock_out": rec.clock_out.strftime('%H:%M') if rec.clock_out else None,
+            "clock_in_reason": rec.clock_in_reason,
+            "clock_out_reason": rec.clock_out_reason,
+            "clock_in_distance": rec.clock_in_distance,
+            "clock_out_distance": rec.clock_out_distance,
+            "clock_in_verified": rec.clock_in_verified,
+            "clock_out_verified": rec.clock_out_verified,
+            "face_verified": rec.face_verified,
+            "totalHours": calculate_total_hours(rec.clock_in, rec.clock_out),
+            "late": calculate_late(rec.clock_in, OFFICE_START) if rec.clock_in else None,
+            "overtime": calculate_overtime(rec.clock_out, OFFICE_END) if rec.clock_out else None,
+        })
+
+    return {"attendance": result}
+
+def calculate_total_hours(clock_in, clock_out):
+    if not clock_in or not clock_out:
+        return None
+    in_dt = datetime.combine(date.today(), clock_in)
+    out_dt = datetime.combine(date.today(), clock_out)
+    duration = out_dt - in_dt
+    return str(duration).split('.')[0]  
+
+def calculate_late(clock_in: time, office_start: time) -> int:
+    in_dt = datetime.combine(date.today(), clock_in)
+    office_start_dt = datetime.combine(date.today(), office_start)
+    late_seconds = max(0, (in_dt - office_start_dt).total_seconds())
+    return round(late_seconds / 60)  # menit
+
+def calculate_overtime(clock_out: time, office_end: time) -> int:
+    out_dt = datetime.combine(date.today(), clock_out)
+    office_end_dt = datetime.combine(date.today(), office_end)
+    overtime_seconds = max(0, (out_dt - office_end_dt).total_seconds())
+    return round(overtime_seconds / 60)  # menit

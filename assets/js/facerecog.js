@@ -1,73 +1,85 @@
-function setupFaceRecognition() {
+import { showAlert } from './alert.js';
+import { currentPosition } from './loctrack.js';
+
+export async function startFaceRecognition() {
   const video = document.getElementById('faceVideo');
-  const startCameraBtn = document.getElementById('startCameraBtn');
-  const captureFaceBtn = document.getElementById('captureFaceBtn');
-  const faceStatus = document.getElementById('faceStatus');
-  let stream = null;
+  
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
 
-  startCameraBtn.onclick = async () => {
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      video.srcObject = stream;
-      captureFaceBtn.disabled = false;
-      faceStatus.textContent = "Camera started. Please position your face.";
-    } catch (err) {
-      faceStatus.textContent = "Could not access camera: " + err.message;
-    }
+    document.getElementById('captureFaceBtn').disabled = false;
+
+    showAlert('info', 'Camera started. Please position your face.');
+    return stream;
+  } catch (err) {
+    showAlert('error', 'Could not access camera: ' + err.message);
+    return null;
+  }
+}
+
+export async function captureAndVerifyFace(stream, locationPayload, attendanceAction) {
+  console.log('Attendance Action:', attendanceAction);
+  const video = document.getElementById('faceVideo');
+  
+  if (!stream) {
+    showAlert('error', 'Camera not started yet.');
+    return null;
+  }
+
+  // Capture frame from video
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 320;
+  canvas.height = video.videoHeight || 240;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const imageBase64 = canvas.toDataURL('image/jpeg').split(',')[1];
+
+  const lat = locationPayload?.lat || null;
+  const lng = locationPayload?.lng || null;
+  const reason = locationPayload?.reason || '';
+  const employeeId = sessionStorage.getItem('employee_id');
+
+  if (!employeeId) {
+    showAlert('error', 'Session expired, please login again.');
+    return null;
+  }
+
+  // Tentukan endpoint dan payload berdasarkan action (clock_in / clock_out)
+  const endpoint = attendanceAction === 'clock_in' ? '/clockin' : '/clockout';
+  const bodyPayload = {
+    employee_id: parseInt(employeeId),
+    image_base64: imageBase64,
   };
 
-  captureFaceBtn.onclick = async () => {
-    if (!stream) {
-      faceStatus.textContent = "Camera not started yet.";
-      return;
-    }
-    // Capture frame dari video
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth || 320;
-    canvas.height = video.videoHeight || 240;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const imageBase64 = canvas.toDataURL('image/jpeg').split(',')[1]; // tanpa prefix
+  if (attendanceAction === 'clock_in') {
+    bodyPayload.clock_in_latitude = lat;
+    bodyPayload.clock_in_longitude = lng;
+    bodyPayload.clock_in_reason = reason;
+  } else {
+    bodyPayload.clock_out_latitude = lat;
+    bodyPayload.clock_out_longitude = lng;
+    bodyPayload.clock_out_reason = reason;
+  }
 
-    // Kirim data ke backend
-    faceStatus.textContent = "Verifying face...";
-    
-    // Ambil lokasi terakhir dari global currentPosition
-    const lat = currentPosition?.lat || 0;
-    const lng = currentPosition?.lng || 0;
+  try {
+    const response = await fetch(`http://localhost:8000/attendance${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bodyPayload),
+    });
 
-    // Ambil employee_id dari sessionStorage (pastikan kamu set ini saat login)
-    const employeeId = sessionStorage.getItem('employee_id');
-    if (!employeeId) {
-      faceStatus.textContent = "Session expired, please login again.";
-      return;
+    const data = await response.json();
+
+    if (response.ok && data.face_verified) {
+      showAlert('success', `${attendanceAction.replace('_', ' ')} berhasil.`);
+    } else {
+      showAlert('error', 'Face not recognized. Please try again.');
     }
 
-    try {
-      const response = await fetch('http://localhost:8000/attendance/clockin', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          employee_id: parseInt(employeeId),
-          image_base64: imageBase64,
-          clock_in_latitude: lat,
-          clock_in_longitude: lng,
-          clock_in_reason: ''
-        }),
-      });
-      const data = await response.json();
-
-      if (response.ok && data.face_verified) {
-        faceStatus.textContent = "Face verified! Attendance recorded.";
-        // Optional: stop camera stream after success
-        stream.getTracks().forEach(track => track.stop());
-        captureFaceBtn.disabled = true;
-        startCameraBtn.disabled = true;
-      } else {
-        faceStatus.textContent = "Face not recognized. Please try again.";
-      }
-    } catch (error) {
-      faceStatus.textContent = "Error verifying face: " + error.message;
-    }
-  };
+    return { response, data, stream };
+  } catch (error) {
+    showAlert('error', 'Error verifying face: ' + error.message);
+    return null;
+  }
 }
