@@ -38,7 +38,8 @@ async function fetchUsers() {
             <td class="text-center">
                 <button class="btn btn-sm btn-warning" onclick="editAccount(${user.user_id})">Edit</button>
                 <button class="btn btn-sm btn-danger" onclick="deleteAccount(${user.user_id})">Delete</button>
-                <button class="btn btn-sm btn-info" onclick="syncAccount(${user.user_id})">Sync Email</button>
+                <button class="btn btn-sm btn-info" onclick="syncEmail(${user.user_id})">Sync Email</button>
+
             </td>
         `;
         tableBody.appendChild(row);
@@ -276,7 +277,7 @@ async function syncEmail(id) {
         Swal.fire({
           title: 'Synced!',
           text: result.message || 'Email successfully synced.',
-          icon: 'info',
+          icon: 'success',
           timer: 1500,
           showConfirmButton: false
         });
