@@ -11,9 +11,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: formData,
             });
 
-            if (!response.ok) {
+              if (!response.ok) {
                 const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
-                alert(errorData.detail || "Login failed, please try again");
+                if (errorData.detail === "Your role is currently locked. Please contact an administrator.") {
+                    // Redirect to the account settings page
+                      window.location.href = "../html/pages-misc-under-maintenance.html";
+                } else {
+                    alert(errorData.detail || "Login failed, please try again");
+                }
                 return;
             }
 

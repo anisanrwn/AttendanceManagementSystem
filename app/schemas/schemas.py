@@ -2,6 +2,17 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import date, time, datetime
 
+class RoleLockStatus(BaseModel):
+    roles_id: int
+    roles_name: str
+    status: bool  # True = active, False = locked
+class ManageRoleLock(BaseModel):
+    role_id: int
+    action: str  # "lock" or "unlock"
+    start_date: str  # ISO format datetime
+    end_date: str  # ISO format datetime
+    reason: Optional[str] = None
+    
 class PermissionBase(BaseModel):
     permission_type: str
     request_date: date | None = None

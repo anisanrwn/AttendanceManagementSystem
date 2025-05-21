@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.routes import employee_routes, user_routes, login_routes, locksystem_routes, attendance_routes, maps_routes, permission_routes, profile_routes
 
 # Initialize FastAPI app
@@ -20,6 +21,8 @@ main_app.add_middleware(
     SessionMiddleware,
     secret_key="9320f42d3712059ded88a848d7d44dced91d3667e5183efd",  # Your secret key here
 )
+
+main_app.mount("/html", StaticFiles(directory="html"), name="html")
 
 # Include route handlers (routers) for various functionalities
 main_app.include_router(employee_routes.router)

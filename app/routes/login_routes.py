@@ -227,6 +227,17 @@ async def login_user(
                 status_code=403,
                 detail="IP Anda telah diblokir karena terlalu banyak percobaan login yang gagal."
             )
+ # Check if the user's role is locked
+    if user:
+        current_time = datetime.utcnow()
+        locks = db.query(m.RoleLock).filter(
+            m.RoleLock.role_id.in_([role.roles_id for role in user.roles]),
+            m.RoleLock.start_date <= current_time,
+            m.RoleLock.end_date >= current_time
+        ).all()
+
+        if locks:
+            raise HTTPException(status_code=403, detail="Your role is currently locked. Please contact an administrator.")
 
     if not user or not verify_password(password, user.password):
         if attempt and (now - attempt.attempt_time) < timedelta(minutes=30):
