@@ -70,14 +70,16 @@ def mark_absent_for_missing_days(db: Session, employee_id: int):
         )
         
         if not attendance_exist:
-            status = "Permit" if permission_exist else "Absent"
+            attendance_status = "Permit" if permission_exist else "Absent"
             new_attendance = m.Attendance(
                 employee_id=employee_id,
                 attendance_date=current_date,
-                status=status,
-                clock_in_time=None,
-                clock_out_time=None
-                # tambahkan field lain sesuai model kamu
+                attendance_status=attendance_status,
+                clock_in=None,
+                clock_out=None,
+                clock_in_verified=False,
+                clock_out_verified=False,
+                face_verified=False
             )
             db.add(new_attendance)
         
