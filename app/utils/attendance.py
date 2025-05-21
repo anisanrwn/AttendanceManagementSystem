@@ -1,0 +1,88 @@
+from datetime import datetime, date, time,  timedelta
+from sqlalchemy.orm import Session
+from app.models import model as m
+import pytz
+
+wib = pytz.timezone("Asia/Jakarta")
+
+def format_time(dt: datetime | None):
+    if not dt:
+        return None
+    return dt.strftime('%H:%M')
+
+def calculate_total_hours(clock_in, clock_out):
+    if not clock_in or not clock_out:
+        return None
+    in_dt = datetime.combine(date.today(), clock_in)
+    out_dt = datetime.combine(date.today(), clock_out)
+    duration = out_dt - in_dt
+    return str(duration).split('.')[0]  
+
+def calculate_late(clock_in: time, office_start: time) -> int:
+    in_dt = datetime.combine(date.today(), clock_in)
+    office_start_dt = datetime.combine(date.today(), office_start)
+    late_seconds = max(0, (in_dt - office_start_dt).total_seconds())
+    return round(late_seconds / 60)  # menit
+
+def calculate_overtime(clock_out: time, office_end: time) -> int:
+    out_dt = datetime.combine(date.today(), clock_out)
+    office_end_dt = datetime.combine(date.today(), office_end)
+    overtime_seconds = max(0, (out_dt - office_end_dt).total_seconds())
+    return round(overtime_seconds / 60)  # menit
+
+def mark_absent_for_missing_days(db: Session, employee_id: int):
+    today = datetime.now(wib).date()
+    
+    # Ambil absensi terakhir dan tanggal terakhir absensi
+    last_attendance = (
+        db.query(m.Attendance)
+        .filter(m.Attendance.employee_id == employee_id)
+        .order_by(m.Attendance.attendance_date.desc())
+        .first()
+    )
+    
+    # Jika belum pernah absen, bisa skip atau isi dari tanggal tertentu
+    last_date = last_attendance.attendance_date if last_attendance else today - timedelta(days=1)
+    
+    # Cek hari-hari dari last_date+1 sampai kemarin
+    current_date = last_date + timedelta(days=1)
+    while current_date < today:
+        # Cek apakah ada permission (izin) yang cover tanggal ini
+        permission_exist = (
+            db.query(m.Permission)
+            .filter(
+                m.Permission.employee_id == employee_id,
+                m.Permission.permission_status == "Approved",
+                m.Permission.start_date <= current_date,
+                m.Permission.end_date >= current_date
+            )
+            .first()
+        )
+        
+        # Cek apakah sudah ada attendance di tanggal ini
+        attendance_exist = (
+            db.query(m.Attendance)
+            .filter(
+                m.Attendance.employee_id == employee_id,
+                m.Attendance.attendance_date == current_date
+            )
+            .first()
+        )
+        
+        if not attendance_exist:
+            attendance_status = "Permit" if permission_exist else "Absent"
+            new_attendance = m.Attendance(
+                employee_id=employee_id,
+                attendance_date=current_date,
+                attendance_status=attendance_status,
+                clock_in=None,
+                clock_out=None,
+                clock_in_verified=False,
+                clock_out_verified=False,
+                face_verified=False
+            )
+            db.add(new_attendance)
+        
+        current_date += timedelta(days=1)
+    
+    db.commit()

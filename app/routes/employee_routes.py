@@ -52,7 +52,7 @@ async def add_employee(
             phone_number=phone_number,
             position=position,
             department=department,
-            face_encoding=encoding_json,  # ✅ stored as JSON string
+            face_encoding=encoding_json,
         )
 
         db.add(employee)
