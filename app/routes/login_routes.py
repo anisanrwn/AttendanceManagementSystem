@@ -1,19 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException, Form, Request, status, Response, Body
+from fastapi import APIRouter, Depends, HTTPException, Form, Request, Body
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 from app.database import get_db
 from app.models import model as m
 from datetime import datetime, timedelta, timezone
-from app.schemas import schemas as s
 from app.utils.verifpass import verify_password
 from user_agents import parse
 import json
 import asyncio
-from app.utils.auth import verify_token, get_current_user, create_access_token, create_refresh_token
+from app.utils.auth import verify_token, create_access_token, create_refresh_token
 from fastapi.responses import StreamingResponse
 from fastapi.templating import Jinja2Templates
 from jose import jwt
 import pytz
+from app.utils.attendance import mark_absent_for_missing_days
 
 # JWT Configuration
 SECRET_KEY = "your-secret-key-here"  # Ganti dengan key yang aman
@@ -256,6 +256,7 @@ async def login_user(
             attempt.lockout_until = now + timedelta(hours=1)
 
         db.commit()
+        mark_absent_for_missing_days(db, user.employee_id)
         raise HTTPException(status_code=401, detail="Email atau password salah.")
 
     # Generate tokens

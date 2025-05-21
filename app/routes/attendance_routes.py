@@ -4,6 +4,8 @@ from app.database import get_db
 from app.models import model as m
 from app.schemas import schemas as s
 from app.utils.face_recog import verify_face
+from app.utils.attendance import ( format_time, calculate_total_hours,calculate_late, calculate_overtime,)
+
 import json
 from datetime import datetime, timedelta, timezone, date, time
 
@@ -122,26 +124,36 @@ def clock_out_attendance(payload: s.AttendanceClockOutSession, db: Session = Dep
 
     return attendance
 
-def format_time(dt: datetime | None):
-    if not dt:
-        return None
-    return dt.strftime('%H:%M')
-
 @router.get('/attendance-status', response_model=s.AttendanceStatusResponse | None)
 def get_attendance_status(employee_id: int, db: Session = Depends(get_db)):
     employee = db.query(m.Employee).filter(m.Employee.employee_id == employee_id).first()
     if not employee:
         raise HTTPException(status_code=404, detail='Employee not found')
 
+    today = date.today()
     attendance = (
         db.query(m.Attendance)
-        .filter(m.Attendance.employee_id == employee.employee_id)
-        .order_by(m.Attendance.attendance_id.desc())
+        .filter(
+            m.Attendance.employee_id == employee.employee_id,
+            m.Attendance.attendance_date == today
+        )
         .first()
     )
 
     if not attendance:
-        return None
+        return {
+            "attendance_id": None,
+            "attendance_date": today,
+            "employee_id": employee_id,
+            "clock_in": None,
+            "clock_out": None,
+            "totalHours": "--",
+            "attendance_status": "Absent",
+            "clock_in_latitude": None,
+            "clock_in_longitude": None,
+            "clock_in_verified": False,
+            "face_verified": False,
+        }
 
     return {
         "attendance_id": attendance.attendance_id,
@@ -211,23 +223,3 @@ def view_all_attendance(db: Session = Depends(get_db)):
         })
 
     return {"attendance": result}
-
-def calculate_total_hours(clock_in, clock_out):
-    if not clock_in or not clock_out:
-        return None
-    in_dt = datetime.combine(date.today(), clock_in)
-    out_dt = datetime.combine(date.today(), clock_out)
-    duration = out_dt - in_dt
-    return str(duration).split('.')[0]  
-
-def calculate_late(clock_in: time, office_start: time) -> int:
-    in_dt = datetime.combine(date.today(), clock_in)
-    office_start_dt = datetime.combine(date.today(), office_start)
-    late_seconds = max(0, (in_dt - office_start_dt).total_seconds())
-    return round(late_seconds / 60)  # menit
-
-def calculate_overtime(clock_out: time, office_end: time) -> int:
-    out_dt = datetime.combine(date.today(), clock_out)
-    office_end_dt = datetime.combine(date.today(), office_end)
-    overtime_seconds = max(0, (out_dt - office_end_dt).total_seconds())
-    return round(overtime_seconds / 60)  # menit
