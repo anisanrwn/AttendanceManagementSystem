@@ -77,10 +77,10 @@ Pilih:
 3. Storage: ketik 13 (Google Drive)
 4. Ikuti langkah login Google (akan buka link, login, copy token)
 Client id 
-149842167650-c0npkckjg9h3t7l57djsd7jvvit6naht.apps.googleusercontent.com
+<<digrub>>
 
 Client secret
-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
+<<digrub>>
 
 bis tu ad prtnyaan yg gunain web remote pilih itu nnti bakal diarahin kelink gtu, nah nnti bilang aku email yg mau dipake biar aku masukin sebagai test user
 
