@@ -71,6 +71,11 @@
     padding: 3px 6px;
 }
 
+.btn-rounded {
+  border-radius: 12px !important;
+}
+
+
 /* Animasi untuk notifikasi baru */
 @keyframes pulse {
     0% { background-color: rgba(248, 249, 250, 1); }
@@ -122,7 +127,7 @@
                   <div data-i18n="Basic">Profile Employee</div>
                 </a>
               </li>
-              <li class="menu-item">
+              <li class="menu-item active">
                 <a href="PermissionList.html" class="menu-link">
                   <i class="menu-icon tf-icons bx bx-id-card"></i> <!-- ganti jadi id card -->
                   <div data-i18n="Basic">Permission List</div>
@@ -232,13 +237,6 @@
             </li>
             <li><div class="dropdown-divider"></div></li>
             <li>
-              <a class="dropdown-item" href="pages-account-settings-account.html">
-                <i class="bx bx-user me-2"></i>
-                <span class="align-middle">My Profile</span>
-              </a>
-            </li>
-            <li><div class="dropdown-divider"></div></li>
-            <li>
               <a class="dropdown-item" href="Login.html">
                 <i class="bx bx-power-off me-2"></i>
                 <span class="align-middle">Log Out</span>
@@ -292,41 +290,22 @@
     </h5>
   
     <div class="table-responsive text-nowrap">
-      <table class="table" id="permissionTable">
+      <table class="table" id="permission-table">
         <thead>
           <tr>
             <th class="text-center">Employee Name</th>
+            <th class="text-center">Request Date</th>
             <th class="text-center">Start Date</th>
             <th class="text-center">End Date</th>
             <th class="text-center">Permission Reason</th>
             <th class="text-center">Additional Notes</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Approved Date</th>
             <th class="text-center">Action</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Example Data -->
-          <tr>
-            <td class="text-center">John Doe</td>
-            <td class="text-center">2025-05-01</td>
-            <td class="text-center">2025-05-03</td>
-            <td class="text-center">Medical Leave</td>
-            <td class="text-center">Need rest due to illness</td>
-            <td class="text-center">
-              <button class="btn btn-success btn-sm me-1" onclick="handlePermission('accept', 'John Doe')">Accept</button>
-              <button class="btn btn-danger btn-sm" onclick="handlePermission('reject', 'John Doe')">Reject</button>
-            </td>
-          </tr>
-          <tr>
-            <td class="text-center">Jane Smith</td>
-            <td class="text-center">2025-05-05</td>
-            <td class="text-center">2025-05-06</td>
-            <td class="text-center">Family Matter</td>
-            <td class="text-center">Family event out of town</td>
-            <td class="text-center">
-              <button class="btn btn-success btn-sm me-1" onclick="handlePermission('accept', 'Jane Smith')">Accept</button>
-              <button class="btn btn-danger btn-sm" onclick="handlePermission('reject', 'Jane Smith')">Reject</button>
-            </td>
-          </tr>
+       <tbody id="permission-body">
+            <!-- Isi data akan di-generate oleh JS -->
         </tbody>
       </table>
     </div>
@@ -361,57 +340,13 @@
     <!-- Page JS -->
     <script src="../assets/js/dashboards-analytics.js"></script>
     <script src="/assets/js/notifications.js"></script>
+    <script src="../assets/js/permission_list.js"></script>
     
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <!-- Script Filter + Export -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
 <script>
- document.getElementById('filterButton').addEventListener('click', function() {
-    var month = document.getElementById('filterMonth').value;
-    var year = document.getElementById('filterYear').value;
-    var rows = document.querySelectorAll('#permissionTable tbody tr');
-
-    rows.forEach(function(row) {
-      var startDateText = row.cells[1].textContent.trim(); // kolom Start Date
-      var date = new Date(startDateText);
-      var showRow = true;
-
-      if (month && (String(date.getMonth() + 1).padStart(2, '0') !== month)) {
-        showRow = false;
-      }
-      if (year && date.getFullYear().toString() !== year) {
-        showRow = false;
-      }
-
-      row.style.display = showRow ? '' : 'none';
-    });
-});
-  document.getElementById('exportButton').addEventListener('click', function() {
-    var table = document.getElementById('attendanceTable');
-    var wb = XLSX.utils.table_to_book(table, {sheet: "Attendance"});
-    XLSX.writeFile(wb, 'Attendance.xlsx');
-  });
-  function handlePermission(action, employeeName) {
-  let toast = document.getElementById('notificationToast');
-
-  if (action === 'accept') {
-    toast.className = 'alert alert-success';
-    toast.innerText = 'Permission request accepted for ' + employeeName;
-  } else if (action === 'reject') {
-    toast.className = 'alert alert-danger';
-    toast.innerText = 'Permission request rejected for ' + employeeName;
-  }
-
-  toast.style.display = 'block';
-
-  // Hide after 3 seconds
-  setTimeout(() => {
-    toast.style.display = 'none';
-  }, 3000);
-
-  // TODO: Tambahkan AJAX request di sini kalau mau update ke database
-}
 </script>
   </body>
 </html>

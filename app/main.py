@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
-from app.routes import employee_routes, user_routes, login_routes, locksystem_routes, attendance_routes, maps_routes, permission_routes, profile_routes
+from app.routes import employee_routes, permissionlist_routes, user_routes, login_routes, locksystem_routes, attendance_routes, maps_routes, permission_routes, profile_routes
 
 # Run backup.js in separate thread
 def run_backup():
@@ -50,3 +50,4 @@ main_app.include_router(attendance_routes.router)
 main_app.include_router(maps_routes.router)
 main_app.include_router(permission_routes.router)
 main_app.include_router(profile_routes.router)
+main_app.include_router(permissionlist_routes.router)

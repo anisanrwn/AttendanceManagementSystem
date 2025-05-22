@@ -212,3 +212,27 @@ class EmployeeResponse(BaseModel):
 
     class Config:
         from_attributes = True
+        
+class PermissionResponse(BaseModel):
+    permissions_id: int
+    employee_id: int
+    employee_name: str
+    user_id: Optional[int]
+    permission_type: str
+    request_date: Optional[date]
+    start_date: date
+    end_date: date
+    reason: str
+    permission_status: str
+    approved_date: Optional[date]
+    user_email: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+class PermissionUpdate(BaseModel):
+    permission_status: str
+    approved_date: Optional[date] = None
+
+class PermissionListResponse(BaseModel):
+    permissions: list[PermissionResponse]
