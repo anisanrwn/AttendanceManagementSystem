@@ -63,4 +63,49 @@ biar tau dan ga kaget tiba" duar folder segaban dengan python segaban ygy
 
 anjay berasa developer beut cuy buat readme aowkkwkw mari kita menggila bersama gezzz demi luluz ygy semangat oll terima gaji kalau masih gapaham tanya gpt aja ya karena ini dah mudah dipahami menurut ku yea.
 
+TUTOR TEST AUTOMATED BACKUP
 
+cd backup
+download rclone (usahakan rclone terbaca diterminal vscode) 
+https://rclone.org/downloads/
+lalu type diterminal .\rclone.exe config
+lalu ikutin ini
+Pilih:
+1. n → buat remote baru
+2. Nama remote: gdrive (bebas, tapi nanti pakai ini)
+3. Storage: ketik 13 (Google Drive)
+4. Ikuti langkah login Google (akan buka link, login, copy token)
+Client id 
+149842167650-c0npkckjg9h3t7l57djsd7jvvit6naht.apps.googleusercontent.com
+
+Client secret
+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
+
+bis tu ad prtnyaan yg gunain web remote pilih itu nnti bakal diarahin kelink gtu, nah nnti bilang aku email yg mau dipake biar aku masukin sebagai test user
+
+bis tu download ini usahakan terbaca jg di vscode
+https://www.postgresql.org/download/
+
+trus type
+
+node backup.js
+
+output akan kek gni
+PS D:\DOWNLOAD\CAPSTONE\AttendanceManagementSystem\backup> node backup.js
+>>
+Automated backup dimulai, interval 5 menit...
+Mulai backup database ke file: D:\DOWNLOAD\CAPSTONE\AttendanceManagementSystem\backup\db_backups\backup-2025-05-22T16-08-56-316Z.sql
+Backup database selesai.
+Upload backup ke Google Drive: gdrive:AttendanceBackup
+Upload berhasil:
+Backup dan upload selesai pada 5/22/2025, 11:09:05 PM
+Mulai backup database ke file: D:\DOWNLOAD\CAPSTONE\AttendanceManagementSystem\backup\db_backups\backup-2025-05-22T16-13-56-336Z.sql
+Backup database selesai.
+Upload backup ke Google Drive: gdrive:AttendanceBackup
+Upload berhasil: 
+Backup dan upload selesai pada 5/22/2025, 11:14:05 PM
+Mulai backup database ke file: D:\DOWNLOAD\CAPSTONE\AttendanceManagementSystem\backup\db_backups\backup-2025-05-22T16-18-56-325Z.sql
+Backup database selesai.
+Upload backup ke Google Drive: gdrive:AttendanceBackup
+Upload berhasil: 
+Backup dan upload selesai pada 5/22/2025, 11:19:02 PM
