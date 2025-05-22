@@ -1,11 +1,28 @@
+import subprocess
+import threading
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.routes import employee_routes, user_routes, login_routes, locksystem_routes, attendance_routes, maps_routes, permission_routes, profile_routes
 
+# Run backup.js in separate thread
+def run_backup():
+    script_path = os.path.join("backup", "backup.js")
+    subprocess.call(["node", script_path])
+
+def start_backup_service():
+    thread = threading.Thread(target=run_backup)
+    thread.daemon = True
+    thread.start()
+
 # Initialize FastAPI app
 main_app = FastAPI()
+
+@main_app.on_event("startup")
+async def startup_event():
+    start_backup_service()
 
 # Add CORS middleware to allow requests from specific origins
 main_app.add_middleware(

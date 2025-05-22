@@ -69,7 +69,8 @@ function runBackup() {
   });
 }
 
-// Jalankan backup tiap 5 menit
-console.log('Automated backup dimulai, interval 5 menit...');
+// Jalankan backup tiap 1 hari
+console.log('Automated backup dimulai, interval 1 hari...');
 runBackup();
-setInterval(runBackup, 5 * 60 * 1000);
+setInterval(runBackup, 24 * 60 * 60 * 1000);
+
