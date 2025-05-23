@@ -257,7 +257,7 @@ async function saveUserChanges() {
     const eusernameAvailable = await isUsernameAvailable(eusername, userId);
     const eemailAvailable = await isEmailAvailable(eemail, userId);    
     const eemailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const epassRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const epassRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/
 
     if (!eusername || !eemail || !erole) {
         Swal.fire('Error!', 'Please fill in all required fields.', 'error');
@@ -280,7 +280,7 @@ async function saveUserChanges() {
     }
 
     if (epassword && !epassRegex.test(epassword)) {
-        Swal.fire("Error", "Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and symbols.", "error");
+        Swal.fire("Error", "Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and symbols (.@$!%*?&).", "error");
         return;
     }
 
