@@ -41,7 +41,6 @@ async def add_employee(
         if not encoding:
             raise HTTPException(status_code=400, detail="No face detected in the uploaded image.")
 
-        # ✅ Convert encoding to JSON (safe to store as text)
         encoding_json = json.dumps(encoding)
 
         employee = m.Employee(
