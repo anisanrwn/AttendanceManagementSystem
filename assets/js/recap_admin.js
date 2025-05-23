@@ -1,37 +1,4 @@
-async function fetchAttendance() {
-  const employeeId = sessionStorage.getItem('employee_id');
-
-  try {
-    const response = await fetch(`http://localhost:8000/attendance/recap?employee_id=${employeeId}`);
-    if (!response.ok) throw new Error("Failed to fetch attendance data");
-    
-    const data = await response.json();
-    const attendance = data.attendance || [];
-    
-    const tableBody = document.getElementById("attendanceTable").getElementsByTagName('tbody')[0];
-    tableBody.innerHTML = '';
-    
-    attendance.forEach(record => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td class="text-center">${record.date || '-'}</td>
-        <td class="text-center">${record.attendance_status || '-'}</td>
-        <td class="text-center">${record.punch_in || '-'}</td>
-        <td class="text-center">${record.punch_out || '-'}</td>
-        <td class="text-center">${record.totalHours || '-'}</td>
-        <td class="text-center">${record.late !== null && record.late !== undefined ? record.late + ' mins' : '-'}</td>
-        <td class="text-center">${record.overtime !== null && record.overtime !== undefined ? record.overtime + ' mins' : '-'}</td>
-      `;
-      tableBody.appendChild(row);
-    });
-    populateFilters();
-  } catch (error) {
-    console.error("Error fetching attendance:", error);
-  }
-}
-
-fetchAttendance();
-
+fetchAllAttendance();
 
 async function fetchAllAttendance() {
   try {
@@ -75,6 +42,7 @@ async function fetchAllAttendance() {
       `;
       tableBody.appendChild(row);
     });
+
     populateFilters();
 
   } catch (error) {
