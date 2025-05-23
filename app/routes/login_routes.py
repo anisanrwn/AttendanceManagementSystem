@@ -259,7 +259,8 @@ async def login_user(
                     user_id=user.user_id,
                     title="Percobaan Login Gagal",
                     message="Terdeteksi 5 kali percobaan login gagal. Akun Anda dikunci sementara.",
-                    notification_type="failed_login"
+                    notification_type="failed_login",
+                    created_at=datetime.utcnow() + timedelta(hours=7)
                 )
                 db.add(notification)
 
@@ -302,7 +303,9 @@ async def login_user(
                 user_id=user.user_id,
                 title="Login dari Perangkat Baru",
                 message=f"Login terdeteksi dari IP: {ip_address}, Perangkat: {browser_name}",
-                notification_type="new_device"
+                notification_type="new_device",
+                created_at=datetime.utcnow() + timedelta(hours=7)
+
             )
             db.add(notification)
 

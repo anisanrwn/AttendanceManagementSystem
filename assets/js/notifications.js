@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
         apiBaseUrl: 'http://127.0.0.1:8000',
         maxNotifications: 20,
         reconnectDelay: 5000,
-        notificationSound: '/sounds/notification.mp3' // Optional
+        
     };
 
     // State management
@@ -343,46 +343,42 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Notification sound error:', error);
         }
     }
-
-    // 5. Utility Functions
+    
 function formatTimeAgo(dateString) {
-    const date = new Date(dateString);
     const now = new Date();
-
-    // Hitung selisih dalam detik
-    const seconds = Math.floor((now - date) / 1000);
-
-    // Jika kurang dari 1 menit
-    if (seconds < 60) return 'Just now';
-
-    // Jika kurang dari 1 jam
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-
-    // Jika kurang dari 1 hari
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-
-    // Jika lebih dari 1 hari, tampilkan waktu dengan jam WIB
-    // WIB = UTC+7, jadi kita tambahkan 7 jam ke waktu UTC
-    const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
-    const wibTime = new Date(utc + (7 * 3600000));
-
-    // Format jam dan menit dengan leading zero
-    const hours = wibTime.getHours().toString().padStart(2, '0');
-    const minutes = wibTime.getMinutes().toString().padStart(2, '0');
-
-    return `${hours}:${minutes} WIB`;
+    const date = new Date(dateString);
+    
+    // Mengonversi waktu ke zona waktu Jakarta
+    const jakartaTime = new Date(date.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
+    const diffInSeconds = Math.floor((now - jakartaTime) / 1000);
+    if (isNaN(diffInSeconds)) return '';
+    const intervals = [
+        { label: 'year', seconds: 31536000 },
+        { label: 'month', seconds: 2592000 },
+        { label: 'day', seconds: 86400 },
+        { label: 'hour', seconds: 3600 },
+        { label: 'minute', seconds: 60 },
+        { label: 'second', seconds: 1 }
+    ];
+    for (const interval of intervals) {
+        const count = Math.floor(diffInSeconds / interval.seconds);
+        if (count >= 1) {
+            return `${count} ${interval.label}${count !== 1 ? 's' : ''} ago`;
+        }
+    }
+    return 'just now';
 }
 
 
+   // Escape HTML to prevent XSS
     function escapeHtml(unsafe) {
-        return unsafe
-            .toString()
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 
   
 

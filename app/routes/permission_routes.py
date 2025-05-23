@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.database import get_db
 from app.models import model as m
 from app.schemas import schemas as s
@@ -52,7 +52,7 @@ async def send_notification_to_admins(db: Session, employee_id: int):
             title="Permintaan Izin Baru",
             message=f"Ada permintaan izin baru dari {employee_name}.",
             notification_type="permission",
-            created_at=datetime.utcnow()
+            created_at=datetime.utcnow() + timedelta(hours=7)
         )
         db.add(notification)
     

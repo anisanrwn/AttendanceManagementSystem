@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 17.4
+-- Dumped from database version 17.5
 -- Dumped by pg_dump version 17.5
 
 SET statement_timeout = 0;
@@ -675,6 +675,7 @@ COPY public.activity_logs (log_id, user_id, action, detail, ip_address, "timesta
 202	\N	Updated user	User yuyus updated successfully	\N	2025-05-23 07:24:17.959883+00
 203	\N	Updated user	User yuyusdaily updated successfully	\N	2025-05-23 07:24:26.3145+00
 204	\N	Updated user	User superadmin updated successfully	\N	2025-05-23 07:33:12.034039+00
+205	\N	Updated user	User HR updated successfully	\N	2025-05-23 11:18:51.428851+00
 \.
 
 
@@ -694,8 +695,11 @@ COPY public.alembic_version (version_num) FROM stdin;
 COPY public.attendance (attendance_id, employee_id, clock_in, clock_in_latitude, clock_in_longitude, clock_in_verified, clock_in_reason, clock_in_distance, clock_out, clock_out_latitude, clock_out_longitude, clock_out_verified, clock_out_reason, clock_out_distance, attendance_date, attendance_status, face_verified) FROM stdin;
 1	2	16:38:30.727058	-6.4752909	106.8451365	t	hehe	0.4648282977199178	16:38:51.040772	-6.4752909	106.8451365	t	hehe	0.4502138623306672	2025-05-20	Punch Out	t
 2	12	16:39:39.879565	-6.4752909	106.8451365	t	jalan jalan	0.4839334597933803	16:42:21.299762	-6.4733745	106.8514453	t	hehe	0.37135605428832275	2025-05-20	Punch Out	t
-5	2	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	2025-05-21	Permit	f
-6	2	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	2025-05-22	Permit	f
+9	2	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	2025-05-21	Permit	f
+10	2	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	2025-05-22	Absent	f
+11	12	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	2025-05-21	Absent	f
+12	12	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	2025-05-22	Absent	f
+13	12	15:33:47.623766	-6.4789583	106.8480867	t	WFC	0.5371653274527223	16:24:24.134744	-6.4789583	106.8480867	t	pulang cevat	0.4242470229937264	2025-05-23	Punch Out	t
 \.
 
 
@@ -1339,6 +1343,7 @@ COPY public.login_attempts ("logAtt_id", user_id, email, ip_address, attempt_tim
 614	1	nabilalb2004@gmail.com	127.0.0.1	2025-05-22 22:10:12.861012	t	Edge 136.0.0	0	\N
 615	4	nabila.libasutaqwa@student.president.ac.id	127.0.0.1	2025-05-22 22:10:43.539198	t	Edge 136.0.0	0	\N
 616	\N	adelaideufrasia@gmail.com	127.0.0.1	2025-05-23 06:51:57.478757	f	Opera 118.0.0	1	\N
+636	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 10:47:47.865474	t	Chrome 136.0.0	0	\N
 617	19	adelaideufrasia@gmail.com	127.0.0.1	2025-05-23 07:25:14.046658	f	Opera 118.0.0	3	\N
 618	6	yustinayunita86@gmail.com	127.0.0.1	2025-05-23 07:25:56.414688	t	Opera 118.0.0	0	\N
 619	6	yustinayunita86@gmail.com	127.0.0.1	2025-05-23 07:28:40.562983	t	Opera 118.0.0	0	\N
@@ -1348,6 +1353,70 @@ COPY public.login_attempts ("logAtt_id", user_id, email, ip_address, attempt_tim
 623	19	adelaideufrasia@gmail.com	127.0.0.1	2025-05-23 07:56:48.259554	t	Opera 118.0.0	0	\N
 624	19	adelaideufrasia@gmail.com	127.0.0.1	2025-05-23 08:07:59.126201	t	Opera 118.0.0	0	\N
 625	6	yustinayunita86@gmail.com	127.0.0.1	2025-05-23 08:08:21.071065	t	Opera 118.0.0	0	\N
+626	6	yustinayunita86@gmail.com	127.0.0.1	2025-05-23 08:12:54.549214	t	Opera 118.0.0	0	\N
+627	6	yustinayunita86@gmail.com	127.0.0.1	2025-05-23 08:20:34.390533	t	Opera 118.0.0	0	\N
+628	21	yustinayunitayy@gmail.com	127.0.0.1	2025-05-23 08:33:10.844545	t	Opera 118.0.0	0	\N
+637	\N	yuyus@gmail.com	127.0.0.1	2025-05-23 10:51:24.381794	f	Edge 136.0.0	2	\N
+638	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 10:51:38.363652	t	Edge 136.0.0	0	\N
+629	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 10:30:27.507701	f	Edge 136.0.0	5	2025-05-23 10:35:53.158504
+630	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 10:31:27.136595	t	Chrome 136.0.0	0	\N
+631	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 10:35:59.889201	t	Chrome 136.0.0	0	\N
+632	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 10:39:47.329061	t	Edge 136.0.0	0	\N
+633	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 10:40:37.965096	t	Edge 136.0.0	0	\N
+634	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 10:44:24.762037	t	Edge 136.0.0	0	\N
+635	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 10:46:41.117435	t	Edge 136.0.0	0	\N
+639	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 10:52:05.584535	t	Chrome 136.0.0	0	\N
+640	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 10:55:18.941214	t	Edge 136.0.0	0	\N
+641	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 10:55:47.815169	t	Chrome 136.0.0	0	\N
+642	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 11:00:17.63766	t	Edge 136.0.0	0	\N
+643	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 11:06:15.533358	t	Edge 136.0.0	0	\N
+644	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 11:06:54.733261	t	Chrome 136.0.0	0	\N
+645	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 11:12:16.028687	t	Edge 136.0.0	0	\N
+646	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 11:15:41.387979	t	Edge 136.0.0	0	\N
+647	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 11:16:14.120105	t	Chrome 136.0.0	0	\N
+648	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 11:17:02.908076	t	Chrome 136.0.0	0	\N
+649	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 11:17:39.367302	t	Chrome 136.0.0	0	\N
+650	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 11:18:59.107738	t	Chrome 136.0.0	0	\N
+651	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 11:19:25.709286	t	Chrome 136.0.0	0	\N
+652	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 11:30:39.697751	t	Edge 136.0.0	0	\N
+653	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 11:31:02.41007	t	Chrome 136.0.0	0	\N
+654	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 11:31:57.699808	t	Edge 136.0.0	0	\N
+655	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 11:32:31.062794	t	Chrome 136.0.0	0	\N
+656	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 11:38:29.497034	t	Chrome 136.0.0	0	\N
+657	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 11:38:30.341271	t	Chrome 136.0.0	0	\N
+658	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 11:38:31.058401	t	Chrome 136.0.0	0	\N
+659	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 11:38:31.903983	t	Chrome 136.0.0	0	\N
+660	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 11:39:15.046757	t	Edge 136.0.0	0	\N
+661	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 11:41:22.452881	t	Edge 136.0.0	0	\N
+662	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 11:43:03.447146	t	Edge 136.0.0	0	\N
+663	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 11:43:51.27831	t	Chrome 136.0.0	0	\N
+664	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 11:45:50.925977	t	Edge 136.0.0	0	\N
+665	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 11:47:28.579786	t	Chrome 136.0.0	0	\N
+666	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 11:48:30.046106	t	Edge 136.0.0	0	\N
+667	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 11:49:29.466736	t	Edge 136.0.0	0	\N
+668	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 11:51:01.165474	t	Edge 136.0.0	0	\N
+669	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 12:11:19.808592	t	Edge 136.0.0	0	\N
+670	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 12:20:13.61503	t	Edge 136.0.0	0	\N
+671	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 12:20:39.270164	t	Edge 136.0.0	0	\N
+672	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 12:21:39.859166	t	Edge 136.0.0	0	\N
+673	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 12:22:48.820418	t	Chrome 136.0.0	0	\N
+674	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 12:26:24.700168	t	Edge 136.0.0	0	\N
+675	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 12:27:24.354843	t	Chrome 136.0.0	0	\N
+676	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 12:45:55.486389	t	Edge 136.0.0	0	\N
+677	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 12:50:54.201645	t	Edge 136.0.0	0	\N
+678	6	yustinayunita86@gmail.com	127.0.0.1	2025-05-23 12:51:54.12274	t	Opera 118.0.0	0	\N
+679	19	adelaideufrasia@gmail.com	127.0.0.1	2025-05-23 12:52:09.528779	t	Opera 118.0.0	0	\N
+680	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 12:53:18.788207	t	Edge 136.0.0	0	\N
+681	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 12:55:03.733932	t	Edge 136.0.0	0	\N
+682	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 12:55:52.358747	t	Chrome 136.0.0	0	\N
+683	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 12:55:53.922203	t	Chrome 136.0.0	0	\N
+684	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 12:58:12.926403	t	Edge 136.0.0	0	\N
+685	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 12:59:30.587071	t	Edge 136.0.0	0	\N
+686	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 13:02:04.03328	t	Edge 136.0.0	0	\N
+687	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 13:06:34.482546	t	Edge 136.0.0	0	\N
+688	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 13:17:01.362778	t	Edge 136.0.0	0	\N
+689	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 13:19:08.622385	t	Edge 136.0.0	5	2025-05-23 08:24:54.327272
+690	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 13:27:19.232396	t	Edge 136.0.0	5	2025-05-23 13:34:01.912401
 \.
 
 
@@ -1356,6 +1425,7 @@ COPY public.login_attempts ("logAtt_id", user_id, email, ip_address, attempt_tim
 --
 
 COPY public.notifications (notification_id, user_id, title, message, notification_type, is_read, created_at, read_at) FROM stdin;
+146	7	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	f	2025-05-23 07:26:24.594422	\N
 8	7	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	f	2025-05-14 02:58:47.217426	\N
 11	4	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 135.0.0	new_device	f	2025-05-14 17:43:05.797696	\N
 12	1	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 135.0.0	new_device	f	2025-05-14 18:01:19.93972	\N
@@ -1407,6 +1477,8 @@ COPY public.notifications (notification_id, user_id, title, message, notificatio
 46	19	Permintaan Izin Baru	Ada permintaan izin baru dari Nabila Libasutaqwa.	permission	t	2025-05-18 14:52:29.895812	2025-05-23 07:34:23.683471
 50	19	Permintaan Izin Baru	Ada permintaan izin baru dari Nabila Libasutaqwa.	permission	t	2025-05-18 16:24:04.756409	2025-05-23 07:34:27.156648
 52	19	Permintaan Izin Baru	Ada permintaan izin baru dari ROJAAH AMIN.	permission	t	2025-05-18 19:58:16.520535	2025-05-23 07:34:28.163724
+147	7	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 136.0.0	new_device	t	2025-05-23 07:27:24.135354	2025-05-23 07:55:07.590632
+149	7	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 136.0.0	new_device	f	2025-05-23 07:55:52.468436	\N
 57	3	Permintaan Izin Baru	Ada permintaan izin baru dari ROJAAH AMIN.	permission	f	2025-05-18 20:11:53.940808	\N
 64	7	Percobaan Login Gagal	Terdeteksi 5 kali percobaan login gagal. Akun Anda dikunci sementara.	failed_login	f	2025-05-18 21:09:25.449617	\N
 59	3	Permintaan Izin Baru	Ada permintaan izin baru dari ROJAAH AMIN.	permission	t	2025-05-18 20:13:05.507031	2025-05-20 12:55:11.423328
@@ -1416,14 +1488,13 @@ COPY public.notifications (notification_id, user_id, title, message, notificatio
 84	4	Permintaan Izin Baru	Ada permintaan izin baru dari Nabila Libasutaqwa.	permission	f	2025-05-20 00:33:08.671771	\N
 90	4	Permintaan Izin Baru	Ada permintaan izin baru dari ROJAAH AMIN.	permission	f	2025-05-20 05:27:26.774969	\N
 91	17	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome Mobile 133.0.0	new_device	t	2025-05-20 08:57:53.259483	2025-05-20 08:59:28.155274
-75	3	Permintaan Izin Baru	Ada permintaan izin baru dari Yustina Yunita.	permission	t	2025-05-19 09:10:02.964473	2025-05-20 09:18:09.538941
+82	3	Permintaan Izin Baru	Ada permintaan izin baru dari Nabila Libasutaqwa.	permission	t	2025-05-20 00:33:08.671771	2025-05-23 06:51:26.459513
 104	15	Permintaan Izin Baru	Ada permintaan izin baru dari Yustina Yunita.	permission	t	2025-05-23 07:29:54.688585	2025-05-23 07:31:26.933087
 55	3	Permintaan Izin Baru	Ada permintaan izin baru dari ROJAAH AMIN.	permission	t	2025-05-18 20:00:24.284593	2025-05-20 12:55:13.28395
 53	3	Permintaan Izin Baru	Ada permintaan izin baru dari ROJAAH AMIN.	permission	t	2025-05-18 19:58:16.520535	2025-05-20 12:55:18.091954
 88	3	Permintaan Izin Baru	Ada permintaan izin baru dari ROJAAH AMIN.	permission	t	2025-05-20 05:27:26.774969	2025-05-20 12:54:44.302642
 86	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	t	2025-05-20 05:26:33.126384	2025-05-20 12:54:45.811616
 85	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Opera 118.0.0	new_device	t	2025-05-20 05:17:15.199951	2025-05-20 12:54:47.271414
-82	3	Permintaan Izin Baru	Ada permintaan izin baru dari Nabila Libasutaqwa.	permission	t	2025-05-20 00:33:08.671771	2025-05-20 12:54:49.694744
 80	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	t	2025-05-20 00:30:51.152493	2025-05-20 12:54:52.000714
 78	3	Permintaan Izin Baru	Ada permintaan izin baru dari Nabila Libasutaqwa.	permission	t	2025-05-20 00:17:36.084042	2025-05-20 12:54:55.036671
 76	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Opera 118.0.0	new_device	t	2025-05-19 10:17:18.324367	2025-05-20 12:54:57.467793
@@ -1434,7 +1505,6 @@ COPY public.notifications (notification_id, user_id, title, message, notificatio
 61	3	Permintaan Izin Baru	Ada permintaan izin baru dari ROJAAH AMIN.	permission	t	2025-05-18 20:14:10.537946	2025-05-20 12:55:08.956709
 94	4	Permintaan Izin Baru	Ada permintaan izin baru dari ROJAAH AMIN.	permission	f	2025-05-20 12:56:24.616752	\N
 92	17	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Opera 118.0.0	new_device	t	2025-05-20 09:06:20.277327	2025-05-21 12:44:42.65418
-95	21	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	f	2025-05-21 18:21:06.273696	\N
 97	4	Permintaan Izin Baru	Ada permintaan izin baru dari Nabila Libasutaqwa.	permission	f	2025-05-22 20:55:14.800656	\N
 99	4	Permintaan Izin Baru	Ada permintaan izin baru dari Nabila Libasutaqwa.	permission	f	2025-05-22 21:20:09.117635	\N
 101	4	Permintaan Izin Baru	Ada permintaan izin baru dari Nabila Libasutaqwa.	permission	f	2025-05-22 22:10:34.953657	\N
@@ -1458,6 +1528,52 @@ COPY public.notifications (notification_id, user_id, title, message, notificatio
 66	19	Permintaan Izin Baru	Ada permintaan izin baru dari ROJAAH AMIN.	permission	t	2025-05-18 21:38:15.016478	2025-05-23 07:34:36.083015
 70	19	Permintaan Izin Baru	Ada permintaan izin baru dari Yustina Yunita.	permission	t	2025-05-19 09:08:33.417309	2025-05-23 07:34:37.388157
 72	19	Permintaan Izin Baru	Ada permintaan izin baru dari Yustina Yunita.	permission	t	2025-05-19 09:09:50.983611	2025-05-23 07:34:38.58494
+106	21	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Opera 118.0.0	new_device	t	2025-05-23 08:33:08.711615	2025-05-23 08:33:12.400074
+95	21	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	t	2025-05-21 18:21:06.273696	2025-05-23 08:33:14.241717
+107	3	Percobaan Login Gagal	Terdeteksi 5 kali percobaan login gagal. Akun Anda dikunci sementara.	failed_login	f	2025-05-23 10:30:53.4242	\N
+109	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 136.0.0	new_device	f	2025-05-23 10:35:59.312561	\N
+110	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	f	2025-05-23 10:39:46.767059	\N
+111	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 136.0.0	new_device	f	2025-05-23 10:52:05.004714	\N
+112	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	f	2025-05-23 10:55:18.362704	\N
+125	7	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	t	2025-05-23 06:30:39.603716	2025-05-23 07:46:16.504221
+148	7	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	t	2025-05-23 07:45:55.325716	2025-05-23 07:51:12.417578
+150	7	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	f	2025-05-23 07:58:13.049609	\N
+75	3	Permintaan Izin Baru	Ada permintaan izin baru dari Yustina Yunita.	permission	t	2025-05-19 09:10:02.964473	2025-05-23 11:16:37.527812
+118	14	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 11:17:27.776622	\N
+119	17	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 11:17:27.776622	\N
+120	15	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 11:17:27.776622	\N
+108	7	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 136.0.0	new_device	t	2025-05-23 10:31:26.56799	2025-05-23 08:06:41.304396
+122	14	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 11:19:13.30538	\N
+123	17	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 11:19:13.306465	\N
+124	15	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 11:19:13.306465	\N
+126	7	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 136.0.0	new_device	f	2025-05-23 06:31:02.329012	\N
+127	7	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	f	2025-05-23 06:31:57.586868	\N
+151	7	Percobaan Login Gagal	Terdeteksi 5 kali percobaan login gagal. Akun Anda dikunci sementara.	failed_login	f	2025-05-23 20:19:54.570098	\N
+129	14	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 11:32:17.491531	\N
+130	17	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 11:32:17.491531	\N
+131	15	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 11:32:17.491531	\N
+152	7	Percobaan Login Gagal	Terdeteksi 5 kali percobaan login gagal. Akun Anda dikunci sementara.	failed_login	f	2025-05-23 13:29:02.179497	\N
+133	7	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	f	2025-05-23 06:39:15.037517	\N
+134	3	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 06:43:18.663744	\N
+135	14	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 06:43:18.663744	\N
+136	17	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 06:43:18.663744	\N
+137	15	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 06:43:18.664796	\N
+138	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	f	2025-05-23 06:45:50.839621	\N
+140	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	f	2025-05-23 06:48:29.963412	\N
+128	3	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	t	2025-05-23 11:32:17.491531	2025-05-23 06:49:01.247303
+117	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 136.0.0	new_device	t	2025-05-23 11:16:14.030697	2025-05-23 06:51:07.009727
+116	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	t	2025-05-23 11:12:15.988688	2025-05-23 06:51:09.282288
+115	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 136.0.0	new_device	t	2025-05-23 11:06:54.201328	2025-05-23 06:51:12.481624
+114	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	t	2025-05-23 11:00:17.064208	2025-05-23 06:51:15.084477
+113	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 136.0.0	new_device	t	2025-05-23 10:55:47.235116	2025-05-23 06:51:17.715633
+139	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 136.0.0	new_device	t	2025-05-23 06:47:28.522624	2025-05-23 06:51:21.763979
+121	3	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	t	2025-05-23 11:19:13.30538	2025-05-23 06:51:35.027621
+132	7	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 136.0.0	new_device	t	2025-05-23 06:38:29.16872	2025-05-23 07:20:53.403952
+141	3	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 07:21:30.627906	\N
+142	14	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 07:21:30.628905	\N
+143	17	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 07:21:30.628905	\N
+144	15	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 07:21:30.628905	\N
+145	7	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 136.0.0	new_device	f	2025-05-23 07:22:48.610168	\N
 \.
 
 
@@ -1468,7 +1584,6 @@ COPY public.notifications (notification_id, user_id, title, message, notificatio
 COPY public.permissions (permissions_id, employee_id, permission_type, request_date, start_date, end_date, reason, permission_status, approved_date, user_id) FROM stdin;
 6	5	sick-leave	2025-05-20	2025-05-01	2025-05-03	rr	Pending	\N	7
 1	2	family-urgent	2025-05-19	2025-05-19	2025-05-21	asdf	Approved	2025-05-22	6
-2	2	personal-business	2025-05-19	2025-05-21	2025-05-24	aqwsdf	Approved	2025-05-22	6
 3	1	sick-leave	2025-05-20	2025-05-20	2025-05-21	tes	Approved	2025-05-22	1
 4	1	family-urgent	2025-05-20	2025-05-20	2025-05-20	tess	Declined	2025-05-22	1
 5	5	family-urgent	2025-05-20	2025-05-02	2025-05-10	eek dulu	Approved	2025-05-22	7
@@ -1476,6 +1591,13 @@ COPY public.permissions (permissions_id, employee_id, permission_type, request_d
 8	1	family-urgent	2025-05-22	2025-05-23	2025-05-24	hola	Declined	2025-05-22	1
 9	1	family-urgent	2025-05-22	2025-05-24	2025-05-25	tess	Approved	2025-05-22	1
 10	2	sick-leave	2025-05-23	2025-05-23	2025-05-23	i got fever	Approved	2025-05-23	6
+11	5	sick-leave	2025-05-23	2025-05-02	2025-05-10	kepo bgt jdi HR	Pending	\N	7
+12	5	family-urgent	2025-05-23	2025-05-08	2025-05-17	sok asik	Pending	\N	7
+13	5	personal-business	2025-05-23	2025-05-01	2025-05-02	backburner	Pending	\N	7
+14	5	family-urgent	2025-05-23	2025-05-10	2025-05-23	nikah	Pending	\N	7
+15	5	family-urgent	2025-05-23	2025-05-02	2025-05-10	nikah	Pending	\N	7
+16	5	personal-business	2025-05-23	2025-05-09	2025-05-17	kepo	Pending	\N	7
+17	5	family-urgent	2025-05-23	2025-05-22	2025-06-03	blaa	Pending	\N	7
 \.
 
 
@@ -1514,7 +1636,6 @@ COPY public."user" (user_id, employee_id, username, email, password) FROM stdin;
 
 COPY public.user_roles (user_id, roles_id) FROM stdin;
 7	3
-3	1
 4	1
 1	3
 14	2
@@ -1523,6 +1644,7 @@ COPY public.user_roles (user_id, roles_id) FROM stdin;
 21	3
 6	3
 19	1
+3	2
 \.
 
 
@@ -1530,14 +1652,14 @@ COPY public.user_roles (user_id, roles_id) FROM stdin;
 -- Name: activity_logs_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: Project_owner
 --
 
-SELECT pg_catalog.setval('public.activity_logs_log_id_seq', 204, true);
+SELECT pg_catalog.setval('public.activity_logs_log_id_seq', 205, true);
 
 
 --
 -- Name: attendance_attendance_id_seq; Type: SEQUENCE SET; Schema: public; Owner: Project_owner
 --
 
-SELECT pg_catalog.setval('public.attendance_attendance_id_seq', 6, true);
+SELECT pg_catalog.setval('public.attendance_attendance_id_seq', 13, true);
 
 
 --
@@ -1558,21 +1680,21 @@ SELECT pg_catalog.setval('public.lock_system_lock_id_seq', 20, true);
 -- Name: login_attempts_logAtt_id_seq; Type: SEQUENCE SET; Schema: public; Owner: Project_owner
 --
 
-SELECT pg_catalog.setval('public."login_attempts_logAtt_id_seq"', 625, true);
+SELECT pg_catalog.setval('public."login_attempts_logAtt_id_seq"', 690, true);
 
 
 --
 -- Name: notifications_notification_id_seq; Type: SEQUENCE SET; Schema: public; Owner: Project_owner
 --
 
-SELECT pg_catalog.setval('public.notifications_notification_id_seq', 105, true);
+SELECT pg_catalog.setval('public.notifications_notification_id_seq', 152, true);
 
 
 --
 -- Name: permissions_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: Project_owner
 --
 
-SELECT pg_catalog.setval('public.permissions_permissions_id_seq', 10, true);
+SELECT pg_catalog.setval('public.permissions_permissions_id_seq', 17, true);
 
 
 --

@@ -80,6 +80,25 @@
 .bg-light {
     animation: pulse 2s infinite;
 }
+/* Notifikasi belum dibaca */
+.bg-light {
+    background-color: rgba(248, 249, 250, 0.8); /* Warna latar belakang lebih gelap */
+    animation: pulse 2s infinite; /* Animasi untuk notifikasi baru */
+}
+/* Tambahkan efek bayangan untuk notifikasi baru */
+.bg-light:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+/* Tambahan CSS untuk menyorot notifikasi yang belum dibaca */
+.dropdown-item.bg-light {
+    background-color: #f0f8ff !important; /* warna biru muda lembut */
+    font-weight: 600;
+}
+
+.dropdown-item.bg-light:hover {
+    background-color: #e6f2ff !important; /* warna saat hover */
+}
+
    </style>
   </head>
 
