@@ -149,6 +149,7 @@ async function saveAccount(e) {
     const emailAvailable = await isEmailAvailable(email);
     const usernameAvailable = await isUsernameAvailable(username);
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
     if (!username || !email || !password || !role) {
         Swal.fire('Error!', 'Please fill in all required fields.', 'error');
@@ -164,6 +165,10 @@ async function saveAccount(e) {
     }
     if (!emailAvailable) {
         Swal.fire('Error!', 'Email already exists. Please choose another one.', 'error');
+        return;
+    }
+    if (password && !passRegex.test(password)) {
+        Swal.fire('Error!', 'Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and symbols', 'error');
         return;
     }
     
@@ -212,6 +217,99 @@ async function saveAccount(e) {
     }
 }
 fetchUsers();
+
+//edit account
+async function editAccount(userId) {
+    const [userResponse, roleResponse] = await Promise.all([
+        fetch("http://localhost:8000/user/view"),
+        fetch("http://localhost:8000/user/available_roles")
+    ]);
+    const users = await userResponse.json();
+    const roles = await roleResponse.json();
+    const user = users.find(u => u.user_id === userId);
+    if (!user) return;
+
+    const roleSelect = document.getElementById("editRole");
+    roleSelect.innerHTML = "";
+
+    roles.forEach(role => {
+        const option = document.createElement("option");
+        option.value = role.roles_name;
+        option.textContent = role.roles_name;
+        roleSelect.appendChild(option);
+    });
+
+    document.getElementById("editUsername").value = user.username;
+    document.getElementById("editEmail").value = user.email;
+    document.getElementById("editRole").value = user.roles[0]?.roles_name || '';
+    document.getElementById("editPassword").value = '';
+    document.getElementById("editUserId").value = user.user_id;
+
+    $('#editAccountModal').modal('show');
+}
+
+async function saveUserChanges() {
+    const userId = document.getElementById("editUserId").value;
+    const eusername = document.getElementById('editUsername').value.trim();
+    const eemail = document.getElementById('editEmail').value.trim();
+    const erole = document.getElementById('editRole').value.trim();
+    const epassword = document.getElementById("editPassword").value.trim();
+    const eusernameAvailable = await isUsernameAvailable(eusername, userId);
+    const eemailAvailable = await isEmailAvailable(eemail, userId);    
+    const eemailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const epassRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (!eusername || !eemail || !erole) {
+        Swal.fire('Error!', 'Please fill in all required fields.', 'error');
+        return;
+    }
+
+    if (!eusernameAvailable) {
+        Swal.fire('Error Editing!', 'Username already exists. Please choose another one.', 'error');
+        return;
+    }
+
+    if (!eemailRegex.test(eemail)) {
+        Swal.fire('Error!', 'Please enter a valid email address. Example: yourname@gmail.com', 'error');
+        return;
+    }
+
+    if (!eemailAvailable) {
+        Swal.fire('Error!', 'Email already exists. Please choose another one.', 'error');
+        return;
+    }
+
+    if (epassword && !epassRegex.test(epassword)) {
+        Swal.fire("Error", "Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and symbols.", "error");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("username", eusername);
+    formData.append("email", eemail);
+    formData.append("role_name", erole);
+    if (epassword) {
+        formData.append("password", epassword);
+    }
+
+    try {
+        const response = await fetch(`http://localhost:8000/user/update/${userId}`, {
+            method: "PUT",
+            body: formData,
+        });
+
+        if (response.ok) {
+            Swal.fire("Success", "Account updated successfully!", "success");
+            $('#editAccountModal').modal('hide');
+            fetchUsers();
+        } else {
+            const err = await response.json();
+            Swal.fire("Error", err.detail || "Failed to update account", "error");
+        }
+    } catch (error) {
+        Swal.fire("Error", error.message, "error");
+    }
+}
 
 //delete account
 async function deleteAccount(id) {
@@ -294,95 +392,6 @@ async function syncEmail(id) {
   }
 }
 
-//edit account
-async function editAccount(userId) {
-    const [userResponse, roleResponse] = await Promise.all([
-        fetch("http://localhost:8000/user/view"),
-        fetch("http://localhost:8000/user/available_roles")
-    ]);
-    const users = await userResponse.json();
-    const roles = await roleResponse.json();
-    const user = users.find(u => u.user_id === userId);
-    if (!user) return;
-
-    const roleSelect = document.getElementById("editRole");
-    roleSelect.innerHTML = "";
-
-    roles.forEach(role => {
-        const option = document.createElement("option");
-        option.value = role.roles_name;
-        option.textContent = role.roles_name;
-        roleSelect.appendChild(option);
-    });
-
-    document.getElementById("editUsername").value = user.username;
-    document.getElementById("editEmail").value = user.email;
-    document.getElementById("editRole").value = user.roles[0]?.roles_name || '';
-    document.getElementById("editPassword").value = '';
-    document.getElementById("editUserId").value = user.user_id;
-
-    $('#editAccountModal').modal('show');
-}
-
-async function saveUserChanges() {
-    const userId = document.getElementById("editUserId").value;
-    const eusername = document.getElementById('editUsername').value.trim();
-    const eemail = document.getElementById('editEmail').value.trim();
-    const erole = document.getElementById('editRole').value.trim();
-    const eusernameAvailable = await isUsernameAvailable(eusername, userId);
-    const eemailAvailable = await isEmailAvailable(eemail, userId);    
-    const eemailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!eusername || !eemail || !erole) {
-        Swal.fire('Error!', 'Please fill in all required fields.', 'error');
-        return;
-    }
-    
-    if (!eusernameAvailable) {
-        Swal.fire('Error Editing!', 'Username already exists. Please choose another one.', 'error');
-        return;
-    }
-    
-    if (!eemailRegex.test(eemail)) {
-        Swal.fire('Error!', 'Please enter a valid email address. Example: yourname@gmail.com', 'error');
-        return;
-    }
-    
-    if (!eemailAvailable) {
-        Swal.fire('Error!', 'Email already exists. Please choose another one.', 'error');
-        return;
-    }
-    
-
-    const formData = new FormData();
-
-    formData.append("username", document.getElementById("editUsername").value);
-    formData.append("email", document.getElementById("editEmail").value);
-    formData.append("role_name", document.getElementById("editRole").value);
-
-    const password = document.getElementById("editPassword").value;
-    if (password) {
-        formData.append("password", password);
-    }
-
-    try {
-        const response = await fetch(`http://localhost:8000/user/update/${userId}`, {
-            method: "PUT",
-            body: formData,
-        });
-
-        if (response.ok) {
-            Swal.fire("Success", "Account updated successfully!", "success");
-            $('#editAccountModal').modal('hide');
-            fetchUsers();
-        } else {
-            const err = await response.json();
-            Swal.fire("Error", err.detail || "Failed to update account", "error");
-        }
-    } catch (error) {
-        Swal.fire("Error", error.message, "error");
-    }
-}
 
 // Filter search
 const searchInput = document.getElementById('searchInput');

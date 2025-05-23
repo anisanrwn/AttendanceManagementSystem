@@ -267,7 +267,6 @@ async def login_user(
             attempt.lockout_until = now + timedelta(hours=1)
 
         db.commit()
-        mark_absent_for_missing_days(db, user.employee_id)
         raise HTTPException(status_code=401, detail="Email atau password salah.")
 
     # Generate tokens
@@ -308,7 +307,7 @@ async def login_user(
             db.add(notification)
 
     db.commit()
-    
+    mark_absent_for_missing_days(db, user.employee_id)
     user_dict = {
         "user_id": user.user_id,
         "email": user.email,

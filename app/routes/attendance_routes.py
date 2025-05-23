@@ -4,19 +4,18 @@ from app.database import get_db
 from app.models import model as m
 from app.schemas import schemas as s
 from app.utils.face_recog import verify_face
-from app.utils.attendance import ( format_time, calculate_total_hours,calculate_late, calculate_overtime,)
-
+from app.utils.attendance import format_time, calculate_total_hours,calculate_late, calculate_overtime
 import json
 from datetime import datetime, timedelta, timezone, date, time
 
 router = APIRouter(prefix="/attendance", tags=["Attendance"])
 
-OFFICE_START = time(8, 0, 0)  # jam 08:00:00
-OFFICE_END = time(17, 0, 0)   # jam 17:00:00
+OFFICE_START = time(8, 0, 0)
+OFFICE_END = time(17, 0, 0)
 
 @router.get("/server-time")
 def get_server_time():
-    wib = timezone(timedelta(hours=7))  # GMT+7
+    wib = timezone(timedelta(hours=7))
     now_wib = datetime.now(wib)
     return {"serverTime": now_wib.isoformat()}
 
@@ -96,7 +95,6 @@ def clock_out_attendance(payload: s.AttendanceClockOutSession, db: Session = Dep
             detail="Face not recognized",
         )
 
-    # Cek record attendance hari ini, harus ada clock in sebelumnya
     today = date.today()
     attendance = db.query(m.Attendance).filter(
         m.Attendance.employee_id == employee_id,
@@ -206,16 +204,17 @@ def view_all_attendance(db: Session = Depends(get_db)):
         result.append({
             "attendance_id": rec.attendance_id,
             "attendance_date": rec.attendance_date.isoformat(),
+            "attendance_status": rec.attendance_status,
             "employee_id": employee.employee_id,
             "employee_name": f"{employee.first_name} {employee.last_name}".strip(),
             "clock_in": rec.clock_in.strftime('%H:%M') if rec.clock_in else None,
             "clock_out": rec.clock_out.strftime('%H:%M') if rec.clock_out else None,
+            "clock_in_lat": rec.clock_in_latitude,
+            "clock_in_lng": rec.clock_in_longitude,
+            "clock_out_lat": rec.clock_out_latitude,
+            "clock_out_lng": rec.clock_out_longitude,
             "clock_in_reason": rec.clock_in_reason,
             "clock_out_reason": rec.clock_out_reason,
-            "clock_in_distance": rec.clock_in_distance,
-            "clock_out_distance": rec.clock_out_distance,
-            "clock_in_verified": rec.clock_in_verified,
-            "clock_out_verified": rec.clock_out_verified,
             "face_verified": rec.face_verified,
             "totalHours": calculate_total_hours(rec.clock_in, rec.clock_out),
             "late": calculate_late(rec.clock_in, OFFICE_START) if rec.clock_in else None,

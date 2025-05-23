@@ -4,7 +4,7 @@ from app.database import get_db
 from app.models import model as m
 from app.schemas import schemas as s
 from app.utils.logger import log_activity
-from app.utils.verifpass import hash_password
+from app.utils.verifpass import hash_password, validate_password_strength
 from typing import List, Optional
 
 router = APIRouter(prefix="/user", tags=["User"])
@@ -57,7 +57,8 @@ async def create_user(
         ).first()
         if existing_user:
             raise HTTPException(status_code=400, detail="Username or Email already exists")
-
+        
+        validate_password_strength(password)
         hashed_password = hash_password(password)
 
         new_user = m.User(
@@ -109,6 +110,7 @@ def update_user(
         user.email = email
 
         if password:
+            validate_password_strength(password)
             hashed_password = hash_password(password)
             user.password = hashed_password
 

@@ -56,21 +56,22 @@ async function fetchAllAttendance() {
 
     attendance.forEach(record => {
         const name = record.employee_name || '-';
-        const punchInArea = record.clock_in_reason ? 'Outside' : 'Inside';
-        const punchOutArea = record.clock_out_reason ? 'Outside' : 'Inside';
-
+        const punchInArea = record.clock_in_reason? 'Outside': (record.clock_in_lat !== null && record.clock_in_lng !== null) ? 'Inside' : 'None';
+        const punchOutArea = record.clock_out_reason? 'Outside' : (record.clock_out_lat !== null && record.clock_out_lng !== null) ? 'Inside': 'None';
+        
         const row = document.createElement("tr");
         row.innerHTML = `
             <td class="text-center">${record.attendance_date || '-'}</td>
             <td class="text-center">${name}</td>
+            <td class="text-center">${record.attendance_status || '-'}</td>
             <td class="text-center">${record.clock_in || '-'}</td>
             <td class="text-center">
-            <span class="badge ${punchInArea === 'Inside' ? 'bg-success' : 'bg-danger'}">${punchInArea}</span>
+              <span class="badge ${punchInArea === 'Inside' ? 'bg-success' : punchInArea === 'Outside' ? 'bg-danger' : 'bg-secondary' }">${punchInArea}</span>
             </td>
             <td class="text-center">${record.clock_in_reason || '-'}</td>
             <td class="text-center">${record.clock_out || '-'}</td>
             <td class="text-center">
-            <span class="badge ${punchOutArea === 'Inside' ? 'bg-success' : 'bg-danger'}">${punchOutArea}</span>
+              <span class="badge ${punchOutArea === 'Inside' ? 'bg-success' : punchOutArea === 'Outside' ? 'bg-danger' : 'bg-secondary' }">${punchOutArea}</span>
             </td>
             <td class="text-center">${record.clock_out_reason || '-'}</td>
             <td class="text-center">
@@ -91,7 +92,6 @@ async function fetchAllAttendance() {
 
 fetchAllAttendance();
 
-// export button juga di cek dulu ada gak di halaman
 const exportBtn = document.getElementById('exportButton');
 if (exportBtn) {
   exportBtn.addEventListener('click', function() {
