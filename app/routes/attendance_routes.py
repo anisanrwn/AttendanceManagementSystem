@@ -180,6 +180,7 @@ def view_attendance(employee_id: int, db: Session = Depends(get_db)):
     for rec in records:
         result.append({
             "date": rec.attendance_date.isoformat(),
+            "attendance_status": rec.attendance_status,
             "punch_in": rec.clock_in.strftime('%H:%M') if rec.clock_in else None,
             "punch_out": rec.clock_out.strftime('%H:%M') if rec.clock_out else None,
             "totalHours": calculate_total_hours(rec.clock_in, rec.clock_out),

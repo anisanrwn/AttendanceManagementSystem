@@ -34,6 +34,7 @@
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="../assets/js/config.js"></script>
 
+<<<<<<< Updated upstream
     <style>
 /* Notifikasi dropdown */
 .dropdown-menu[aria-labelledby="notification-area"] {
@@ -74,6 +75,10 @@
 }
    </style>
 
+=======
+    <!--Extra-->
+    <link rel="stylesheet" href="../assets/css/scriptyuyusta.css" />
+>>>>>>> Stashed changes
   </head>
 
   <body>
@@ -227,6 +232,10 @@
                   <h5 class="card-header d-flex justify-content-between align-items-center">
                     <span>Attendance Recap</span>
                     <div class="d-flex align-items-center">
+                      <select id="filterStatus" class="form-select me-2" style="width: 200px;">
+                        <option value="">Select Status</option>
+                      </select>
+
                       <select id="filterMonth" class="form-select me-2" style="width: 200px;">
                         <option value="">Select Month</option>
                       </select>
@@ -234,8 +243,7 @@
                       <select id="filterYear" class="form-select me-2" style="width: 200px;">
                         <option value="">Select Year</option>
                       </select>
-  
-                      <button class="btn me-2" id="filterButton" style="background-color: #29ccef; color: white;">Cari</button>
+                      <button class="btn" id="clearFiltersButton" style="background-color: #7f82ff; color: white; max-width: 150px;">Clear Filters</button>
                     </div>
                   </h5>
   
@@ -244,6 +252,7 @@
                       <thead>
                         <tr>
                           <th class="text-center">Date</th>
+                          <th class="text-center">Status</th>
                           <th class="text-center">Punch In</th>
                           <th class="text-center">Punch Out</th>
                           <th class="text-center">Working Hour</th>
@@ -257,7 +266,7 @@
                     </table>
                   </div>
                 </div>
-                <div class="layout-overlay layout-menu-toggle"></div>
+              <div class="layout-overlay layout-menu-toggle"></div>
             </div>
           </div>
         </div>
@@ -276,7 +285,7 @@
 
         <!-- Page JS -->
         <script src="../assets/js/dashboards-analytics.js"></script>
-        <script src="../assets/js/recap.js"></script>
+        <script src="../assets/js/recap_user.js"></script>
         <script async defer src="https://buttons.github.io/buttons.js"></script>
         <script src="/assets/js/notifications.js"></script>
         
