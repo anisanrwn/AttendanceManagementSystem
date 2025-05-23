@@ -161,7 +161,6 @@
             stroke-linejoin: round;
         }
         
-/* Notifikasi dropdown */
 .dropdown-menu[aria-labelledby="notification-area"] {
     padding: 0;
 }
