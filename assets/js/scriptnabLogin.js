@@ -11,13 +11,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: formData,
             });
 
-              if (!response.ok) {
+            if (!response.ok) {
                 const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
+                const errorMessage = getHttpErrorMessage(response.status, errorData.detail);
+
+                // Menampilkan SweetAlert untuk kesalahan login
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Login Failed',
+                    text: errorMessage,
+                });
+
                 if (errorData.detail === "Your role is currently locked. Please contact an administrator.") {
                     // Redirect to the account settings page
-                      window.location.href = "../html/pages-misc-under-maintenance.html";
-                } else {
-                    alert(errorData.detail || "Login failed, please try again");
+                    window.location.href = "../html/pages-misc-under-maintenance.html";
                 }
                 return;
             }
@@ -43,12 +50,48 @@ document.addEventListener("DOMContentLoaded", function () {
             } else if (roleNames.includes("Employee")) {
                 window.location.href = `/html/index.html`;
             } else {
-                alert("Role not recognized");
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Role Not Recognized',
+                    text: "Role not recognized",
+                });
                 window.location.href = "/login/login";
             }
         } catch (error) {
             console.error("Login error:", error);
-            alert("An error occurred during login. Please try again.");
+            Swal.fire({
+                icon: 'error',
+                title: 'An Error Occurred',
+                text: "An error occurred during login. Please try again.",
+            });
         }
     });
 });
+
+// Fungsi untuk mendapatkan pesan kesalahan berdasarkan status dan detail
+function getHttpErrorMessage(statusCode, detailMessage = "") {
+    const httpExceptions = {
+        401: {
+            default: "Unauthorized access. Please check your credentials.",
+            "Email atau password salah.": "Email atau password salah.",
+            "Invalid token type": "Token tidak valid.",
+            "Invalid refresh token": "Refresh token tidak valid.",
+            "Refresh token expired": "Sesi Anda telah habis. Silakan login ulang.",
+        },
+        403: {
+            default: "Your role is currently locked. Please contact an administrator.",
+            "Anda tidak memiliki akses.": "Peran Anda dikunci. Hubungi admin.",
+            "IP Anda telah diblokir karena terlalu banyak percobaan login yang gagal.": "IP Anda diblokir karena terlalu banyak gagal login.",
+            "Akun dikunci. Silakan coba lagi setelah": "Akun dikunci sementara.",
+        },
+        404: {
+            default: "Data tidak ditemukan.",
+            "User  not found": "Pengguna tidak ditemukan.",
+            "Notification not found or you don't have permission": "Notifikasi tidak ditemukan atau akses ditolak.",
+        },
+        default: "Terjadi kesalahan. Silakan coba lagi nanti."
+    };
+
+    const category = httpExceptions[statusCode] || {};
+    return category[detailMessage] || category.default || httpExceptions.default;
+}

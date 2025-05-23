@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import model as m
+from app.utils.messages import HTTPExceptionMessages as HM
 
 SECRET_KEY = "your-secret-key-here"  # Ganti dengan secret key yang kuat
 ALGORITHM = "HS256"
@@ -51,5 +52,5 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_
     payload = verify_token(token)
     user = db.query(m.User).filter(m.User.user_id == payload['user_id']).first()
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="User  not found")
     return user

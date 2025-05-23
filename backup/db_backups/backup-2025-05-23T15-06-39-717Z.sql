@@ -676,6 +676,7 @@ COPY public.activity_logs (log_id, user_id, action, detail, ip_address, "timesta
 203	\N	Updated user	User yuyusdaily updated successfully	\N	2025-05-23 07:24:26.3145+00
 204	\N	Updated user	User superadmin updated successfully	\N	2025-05-23 07:33:12.034039+00
 205	\N	Updated user	User HR updated successfully	\N	2025-05-23 11:18:51.428851+00
+206	\N	Updated user	User admin_nisa updated successfully	\N	2025-05-23 13:50:40.841831+00
 \.
 
 
@@ -1415,8 +1416,21 @@ COPY public.login_attempts ("logAtt_id", user_id, email, ip_address, attempt_tim
 686	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 13:02:04.03328	t	Edge 136.0.0	0	\N
 687	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 13:06:34.482546	t	Edge 136.0.0	0	\N
 688	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 13:17:01.362778	t	Edge 136.0.0	0	\N
+697	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 13:46:01.091363	t	Edge 136.0.0	0	\N
+698	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 13:55:53.985712	t	Edge 136.0.0	0	\N
+699	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 13:56:42.963222	t	Edge 136.0.0	0	\N
+700	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 13:58:40.281529	t	Edge 136.0.0	0	\N
 689	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 13:19:08.622385	t	Edge 136.0.0	5	2025-05-23 08:24:54.327272
+701	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 14:00:59.550416	t	Edge 136.0.0	0	\N
+702	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 14:01:30.149378	t	Edge 136.0.0	0	\N
+703	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 14:09:16.125282	t	Edge 136.0.0	0	\N
 690	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 13:27:19.232396	t	Edge 136.0.0	5	2025-05-23 13:34:01.912401
+691	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 13:36:21.559966	t	Edge 136.0.0	0	\N
+692	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 13:36:50.520263	f	Edge 136.0.0	6	2025-05-23 13:42:08.823226
+693	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 13:42:56.326054	t	Edge 136.0.0	0	\N
+694	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 13:44:18.790006	t	Chrome 136.0.0	0	\N
+695	7	maureengabriella1m@gmail.com	127.0.0.1	2025-05-23 13:44:55.667454	t	Edge 136.0.0	0	\N
+696	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-05-23 13:45:44.904513	t	Chrome 136.0.0	0	\N
 \.
 
 
@@ -1548,11 +1562,9 @@ COPY public.notifications (notification_id, user_id, title, message, notificatio
 124	15	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 11:19:13.306465	\N
 126	7	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 136.0.0	new_device	f	2025-05-23 06:31:02.329012	\N
 127	7	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	f	2025-05-23 06:31:57.586868	\N
-151	7	Percobaan Login Gagal	Terdeteksi 5 kali percobaan login gagal. Akun Anda dikunci sementara.	failed_login	f	2025-05-23 20:19:54.570098	\N
 129	14	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 11:32:17.491531	\N
 130	17	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 11:32:17.491531	\N
 131	15	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 11:32:17.491531	\N
-152	7	Percobaan Login Gagal	Terdeteksi 5 kali percobaan login gagal. Akun Anda dikunci sementara.	failed_login	f	2025-05-23 13:29:02.179497	\N
 133	7	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	f	2025-05-23 06:39:15.037517	\N
 134	3	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 06:43:18.663744	\N
 135	14	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 06:43:18.663744	\N
@@ -1560,7 +1572,7 @@ COPY public.notifications (notification_id, user_id, title, message, notificatio
 137	15	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 06:43:18.664796	\N
 138	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	f	2025-05-23 06:45:50.839621	\N
 140	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	f	2025-05-23 06:48:29.963412	\N
-128	3	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	t	2025-05-23 11:32:17.491531	2025-05-23 06:49:01.247303
+155	3	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 08:45:10.892826	\N
 117	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 136.0.0	new_device	t	2025-05-23 11:16:14.030697	2025-05-23 06:51:07.009727
 116	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	t	2025-05-23 11:12:15.988688	2025-05-23 06:51:09.282288
 115	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 136.0.0	new_device	t	2025-05-23 11:06:54.201328	2025-05-23 06:51:12.481624
@@ -1574,6 +1586,19 @@ COPY public.notifications (notification_id, user_id, title, message, notificatio
 143	17	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 07:21:30.628905	\N
 144	15	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 07:21:30.628905	\N
 145	7	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 136.0.0	new_device	f	2025-05-23 07:22:48.610168	\N
+156	14	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 08:45:10.892826	\N
+157	17	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 08:45:10.892826	\N
+158	15	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 08:45:10.892826	\N
+128	3	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	t	2025-05-23 11:32:17.491531	2025-05-23 13:49:49.397965
+161	17	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 20:56:33.944735	\N
+162	15	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 20:56:33.944735	\N
+163	14	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	f	2025-05-23 20:56:33.944735	\N
+151	7	Percobaan Login Gagal	Terdeteksi 5 kali percobaan login gagal. Akun Anda dikunci sementara.	failed_login	t	2025-05-23 20:19:54.570098	2025-05-23 14:01:09.787906
+152	7	Percobaan Login Gagal	Terdeteksi 5 kali percobaan login gagal. Akun Anda dikunci sementara.	failed_login	t	2025-05-23 13:29:02.179497	2025-05-23 14:01:12.183595
+160	3	Permintaan Izin Baru	Ada permintaan izin baru dari Maureen Gabriella.	permission	t	2025-05-23 20:56:33.944735	2025-05-23 14:01:41.025673
+159	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 136.0.0	new_device	t	2025-05-23 20:46:00.517792	2025-05-23 14:01:44.448951
+154	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 136.0.0	new_device	t	2025-05-23 20:44:18.1129	2025-05-23 14:01:45.026013
+153	3	Percobaan Login Gagal	Terdeteksi 5 kali percobaan login gagal. Akun Anda dikunci sementara.	failed_login	t	2025-05-23 20:37:09.035224	2025-05-23 14:09:21.349867
 \.
 
 
@@ -1598,6 +1623,8 @@ COPY public.permissions (permissions_id, employee_id, permission_type, request_d
 15	5	family-urgent	2025-05-23	2025-05-02	2025-05-10	nikah	Pending	\N	7
 16	5	personal-business	2025-05-23	2025-05-09	2025-05-17	kepo	Pending	\N	7
 17	5	family-urgent	2025-05-23	2025-05-22	2025-06-03	blaa	Pending	\N	7
+18	5	sick-leave	2025-05-23	2025-05-03	2025-05-10	hahaha	Pending	\N	7
+19	5	family-urgent	2025-05-23	2025-05-03	2025-05-10	hahaha	Pending	\N	7
 \.
 
 
@@ -1621,12 +1648,12 @@ COPY public."user" (user_id, employee_id, username, email, password) FROM stdin;
 3	3	HR	nirwanaanisa1508@gmail.com	$2b$12$V5XqrJ75alWOUkkxT.yi2us/fRoV70yL5jxLEzCkuFbIzEHLOVBNK
 4	4	Nabilaa	nabila.libasutaqwa@student.president.ac.id	$2b$12$PaKgoLTSs5BP/JEF40n11ukzIxa04Umi65gyplrPX7uHGkaOAQP/.
 1	1	nblalb	nabilalb2004@gmail.com	$2b$12$JnBtsYTTsnhcD5tkNlT1Geo.vttLhfjPMY.Cw5IKyRxHE3bsDFDRG
-14	\N	admin_nisa	anisa.nrwn15@gmail.com	$2b$12$jBWDyhGP/q73T6QXGUywbulAZmlyU22mfZ1yoNKZu4ZvXhHYn37ky
 17	11	admin_nabila	nabilalb0109@gmail.com	$2b$12$vY6bp2xsUbSj3WrsbfAPt.Z6NTgzbOa97zYSFhhekVDaC8XJgMzo.
 15	\N	admin_yuyus	gwenrosevyn@gmail.com	$2b$12$n6BJe5tRoj7WuGWc8i9D8OdFzZZyGLAuf7GhuQJP2YXcBOo0lohAe
 21	12	yuyus	yustinayunitayy@gmail.com	$2b$12$oUIIzyyVooIUhSbT06hLzuqSPrR8uTbVT3yuPOGQhdv96daaQp5MC
 6	2	yuyusdaily	yustinayunita86@gmail.com	$2b$12$JiauegZlw836RvjlRD0Gq.i3rhIvI.X7/cK.1Ya62C1rPs8XjZMRC
 19	\N	superadmin	adelaideufrasia@gmail.com	$2b$12$9jeN9OEYKCN2rUJol0cUyOR3SoaRHUD/KfMISbt7DH/.EDSOu5A1u
+14	\N	admin_nisa	anisa.nrwn15@gmail.com	$2b$12$PuXOSXGxV1zoXufrDHXtwufNFyUho1t/Ajo61pb/BCMk7vRJyYm9G
 \.
 
 
@@ -1638,13 +1665,13 @@ COPY public.user_roles (user_id, roles_id) FROM stdin;
 7	3
 4	1
 1	3
-14	2
 17	2
 15	2
 21	3
 6	3
 19	1
 3	2
+14	2
 \.
 
 
@@ -1652,7 +1679,7 @@ COPY public.user_roles (user_id, roles_id) FROM stdin;
 -- Name: activity_logs_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: Project_owner
 --
 
-SELECT pg_catalog.setval('public.activity_logs_log_id_seq', 205, true);
+SELECT pg_catalog.setval('public.activity_logs_log_id_seq', 206, true);
 
 
 --
@@ -1680,21 +1707,21 @@ SELECT pg_catalog.setval('public.lock_system_lock_id_seq', 20, true);
 -- Name: login_attempts_logAtt_id_seq; Type: SEQUENCE SET; Schema: public; Owner: Project_owner
 --
 
-SELECT pg_catalog.setval('public."login_attempts_logAtt_id_seq"', 690, true);
+SELECT pg_catalog.setval('public."login_attempts_logAtt_id_seq"', 703, true);
 
 
 --
 -- Name: notifications_notification_id_seq; Type: SEQUENCE SET; Schema: public; Owner: Project_owner
 --
 
-SELECT pg_catalog.setval('public.notifications_notification_id_seq', 152, true);
+SELECT pg_catalog.setval('public.notifications_notification_id_seq', 163, true);
 
 
 --
 -- Name: permissions_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: Project_owner
 --
 
-SELECT pg_catalog.setval('public.permissions_permissions_id_seq', 17, true);
+SELECT pg_catalog.setval('public.permissions_permissions_id_seq', 19, true);
 
 
 --
