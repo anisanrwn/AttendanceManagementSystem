@@ -815,8 +815,14 @@
   loadAttendanceTrendChart();
 
   async function loadWorkingHoursChart() {
+  const employeeId = sessionStorage.getItem('employee_id');
+  if (!employeeId) {
+    console.error('employee_id not found in sessionStorage');
+    return;
+  }
+
   try {
-    const response = await fetch('http://localhost:8000/dashboard/weekly-working-hours');
+    const response = await fetch(`http://localhost:8000/dashboard/weekly-working-hours/${employeeId}`);
     const data = await response.json();
 
     const options = {
@@ -871,11 +877,13 @@
 
     const chart = new ApexCharts(document.querySelector('#weeklyWorkingHoursChart'), options);
     chart.render();
-    } catch (error) {
-      console.error('Failed to load working hours data:', error);
-    }
+
+  } catch (error) {
+    console.error('Failed to load working hours data:', error);
   }
-  loadWorkingHoursChart();
+}
+
+loadWorkingHoursChart();
 
   async function loadMonthlyAttendanceChart() {
   const employeeId = sessionStorage.getItem('employee_id');

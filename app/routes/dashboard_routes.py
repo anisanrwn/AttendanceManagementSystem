@@ -71,17 +71,18 @@ def attendance_trend_monthly(db: Session = Depends(get_db)):
 
     return [{"month": r[0].date().isoformat()[:7], "status": r[1], "count": r[2]} for r in results]
 
-@router.get("/weekly-working-hours")
-def get_weekly_working_hours(db: Session = Depends(get_db)):
+@router.get("/weekly-working-hours/{employee_id}")
+def get_weekly_working_hours(employee_id: int, db: Session = Depends(get_db)):
     today = datetime.today()
     start_of_week = today - timedelta(days=today.weekday())
 
     records = db.query(m.Attendance).filter(
+        m.Attendance.employee_id == employee_id,  
         m.Attendance.attendance_date >= start_of_week.date()
     ).all()
 
     working_hours = defaultdict(float)
-    days_present = set() 
+    days_present = set()
 
     for r in records:
         weekday = r.attendance_date.strftime('%A')
