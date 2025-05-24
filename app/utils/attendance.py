@@ -33,7 +33,6 @@ def calculate_overtime(clock_out: time, office_end: time) -> int:
 def mark_absent_for_missing_days(db: Session, employee_id: int):
     today = datetime.now(wib).date()
     
-    # Ambil absensi terakhir dan tanggal terakhir absensi
     last_attendance = (
         db.query(m.Attendance)
         .filter(m.Attendance.employee_id == employee_id)
@@ -41,13 +40,15 @@ def mark_absent_for_missing_days(db: Session, employee_id: int):
         .first()
     )
     
-    # Jika belum pernah absen, bisa skip atau isi dari tanggal tertentu
     last_date = last_attendance.attendance_date if last_attendance else today - timedelta(days=1)
     
-    # Cek hari-hari dari last_date+1 sampai kemarin
     current_date = last_date + timedelta(days=1)
     while current_date < today:
-        # Cek apakah ada permission (izin) yang cover tanggal ini
+        # Skip weekend (Sabtu=5, Minggu=6)
+        if current_date.weekday() >= 5:
+            current_date += timedelta(days=1)
+            continue
+        
         permission_exist = (
             db.query(m.Permission)
             .filter(
@@ -59,7 +60,6 @@ def mark_absent_for_missing_days(db: Session, employee_id: int):
             .first()
         )
         
-        # Cek apakah sudah ada attendance di tanggal ini
         attendance_exist = (
             db.query(m.Attendance)
             .filter(
