@@ -237,25 +237,25 @@
           </ul>
         </li>
 
-        <!-- User Dropdown -->
-        <li class="nav-item navbar-dropdown dropdown-user dropdown">
-          <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+         <!-- User Dropdown -->
+       <li class="nav-item navbar-dropdown dropdown-user dropdown">
+         <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+       <div class="avatar avatar-online">
+       <img id="navbarProfileAvatar" src="../assets/img/avatars/default.png" alt class="w-px-40 h-auto rounded-circle" />
+       </div>
+         </a>
+       <ul class="dropdown-menu dropdown-menu-end">
+       <li>
+      <a class="dropdown-item" href="#">
+        <div class="d-flex">
+          <div class="flex-shrink-0 me-3">
             <div class="avatar avatar-online">
-              <img src="../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+              <img id="dropdownProfileAvatar" src="../assets/img/avatars/default.png" alt class="w-px-40 h-auto rounded-circle" />
             </div>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li>
-              <a class="dropdown-item" href="#">
-                <div class="d-flex">
-                  <div class="flex-shrink-0 me-3">
-                    <div class="avatar avatar-online">
-                      <img src="../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
-                    </div>
-                  </div>
-                  <div class="flex-grow-1">
-                    <span class="fw-semibold d-block">John Doe</span>
-                    <small class="text-muted">Admin</small>
+          </div>
+          <div class="flex-grow-1">
+            <span id="navbarProfileName" class="fw-semibold d-block"></span>
+            <small id="navbarProfileRole" class="text-muted"></small>
                   </div>
                 </div>
               </a>
@@ -299,17 +299,14 @@
                       <div class="d-flex align-items-start align-items-sm-center gap-4">
                         <div class="avatar-upload">
                           <div class="avatar-preview">
-                            <img
-                              src="../assets/img/avatars/1.png"
-                              id="profileAvatar"
-                              alt="profile-avatar"
-                              class="img-fluid"
-                            />
+                          <img
+  src=""
+  id="profileAvatar"
+  alt="profile-avatar"
+  class="img-fluid"
+/>
+
                           </div>
-                          <label class="btn-upload" for="avatarInput">
-                            <i class="bx bx-camera"></i>
-                          </label>
-                          <input type="file" id="avatarInput" accept="image/*" />
                         </div>
                         <div class="user-info">
                         </div>
@@ -382,6 +379,7 @@
     <!--Welcome User-->
     <script src="../assets/js/scriptnabpagesaccount.js"></script>
     <script src="/assets/js/notifications.js"></script>
+    <script src="/assets/js/navbar.js"></script>
 
   </body>
 </html>

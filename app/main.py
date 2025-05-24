@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
+
 from app.routes import employee_routes, permissionlist_routes, user_routes, login_routes, locksystem_routes, attendance_routes, maps_routes, permission_routes, profile_routes, dashboard_routes
 
 # Run backup.js in separate thread
@@ -40,6 +41,8 @@ main_app.add_middleware(
 )
 
 main_app.mount("/html", StaticFiles(directory="html"), name="html")
+
+main_app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Include route handlers (routers) for various functionalities
 main_app.include_router(employee_routes.router)

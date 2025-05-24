@@ -149,41 +149,45 @@
                   </ul>
                 </li>
 
-                <!-- User Dropdown -->
-                <li class="nav-item navbar-dropdown dropdown-user dropdown">
-                  <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                    <div class="avatar avatar-online">
-                      <img src="../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
-                    </div>
-                  </a>
-                  <ul class="dropdown-menu dropdown-menu-end">
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <div class="d-flex">
-                          <div class="flex-shrink-0 me-3">
-                            <div class="avatar avatar-online">
-                              <img src="../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
-                            </div>
-                          </div>
-                          <div class="flex-grow-1">
-                            <span class="fw-semibold d-block">Super Admin</span>
-                            <small class="text-muted">Administrator</small>
-                          </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li><div class="dropdown-divider"></div></li>
-                    <li>
-                      <a class="dropdown-item" href="Login.html">
-                        <i class="bx bx-power-off me-2"></i>
-                        <span class="align-middle">Log Out</span>
-                      </a>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
+        <!-- User Dropdown -->
+                 <li class="nav-item navbar-dropdown dropdown-user dropdown">
+         <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+       <div class="avatar avatar-online">
+       <img id="navbarProfileAvatar" src="../assets/img/avatars/default.png" alt class="w-px-40 h-auto rounded-circle" />
+       </div>
+         </a>
+       <ul class="dropdown-menu dropdown-menu-end">
+       <li>
+      <a class="dropdown-item" href="#">
+        <div class="d-flex">
+          <div class="flex-shrink-0 me-3">
+            <div class="avatar avatar-online">
+              <img id="dropdownProfileAvatar" src="../assets/img/avatars/default.png" alt class="w-px-40 h-auto rounded-circle" />
             </div>
-          </nav>
+          </div>
+          <div class="flex-grow-1">
+            <span id="navbarProfileName" class="fw-semibold d-block"></span>
+            <small id="navbarProfileRole" class="text-muted"></small>
+                  </div>
+                </div>
+              </a>
+            </li>
+            <li><div class="dropdown-divider"></div></li>
+            <li>
+              <a class="dropdown-item" href="Login.html">
+                <i class="bx bx-power-off me-2"></i>
+                <span class="align-middle">Log Out</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <!--/ User Dropdown -->
+      </ul>
+    </div>
+  </nav>
+
+
+          <!-- / Navbar -->
 
           <!-- Content wrapper -->
           <div class="content-wrapper">
@@ -291,6 +295,7 @@
     <!-- Main JS -->
     <script src="../assets/js/main.js"></script>
 
+    <script src="../assets/js/navbar.js"></script>
     <!-- Page JS -->
     <script src="../assets/js/dashboards-analytics.js"></script>
     <script src="../assets/js/notifications.js"></script>

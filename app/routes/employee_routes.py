@@ -52,6 +52,7 @@ async def add_employee(
             position=position,
             department=department,
             face_encoding=encoding_json,
+            image_filename=file.filename
         )
 
         db.add(employee)
