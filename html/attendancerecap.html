@@ -180,49 +180,48 @@
 
           <!-- Content wrapper -->
           <div class="content-wrapper">
-          
-            <!-- Content -->
+    
+            <!-- Main Content -->
             <div class="container-xxl flex-grow-1 container-p-y">
               <h4 class="fw-bold mt-6 mb-4"><span class="text-muted fw-light">Pages /</span> Attendance Recap </h4>
-              <h2 id="welcome-message"></h2>
-                <div class="card">
-                  <h5 class="card-header d-flex justify-content-between align-items-center">
-                    <span>Attendance Recap</span>
-                    <div class="d-flex align-items-center">
-                      <select id="filterStatus" class="form-select me-2" style="width: 200px;">
-                        <option value="">Select Status</option>
-                      </select>
+              <div class="card">
+                <h5 class="card-header d-flex justify-content-between align-items-center">
+                  <span>Attendance Recap</span>
+                  <div class="d-flex align-items-center">
+                    <select id="filterStatus" class="form-select me-2" style="width: 200px;">
+                      <option value="">Select Status</option>
+                    </select>
 
-                      <select id="filterMonth" class="form-select me-2" style="width: 200px;">
-                        <option value="">Select Month</option>
-                      </select>
-                  
-                      <select id="filterYear" class="form-select me-2" style="width: 200px;">
-                        <option value="">Select Year</option>
-                      </select>
-                      <button class="btn" id="clearFiltersButton" style="background-color: #7f82ff; color: white; max-width: 150px;">Clear Filters</button>
-                    </div>
-                  </h5>
-  
-                  <div class="table-responsive text-nowrap">
-                    <table class="table" id="attendanceTable">
-                      <thead>
-                        <tr>
-                          <th class="text-center">Date</th>
-                          <th class="text-center">Status</th>
-                          <th class="text-center">Punch In</th>
-                          <th class="text-center">Punch Out</th>
-                          <th class="text-center">Working Hour</th>
-                          <th class="text-center">Late</th>
-                          <th class="text-center">Overtime</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <!-- data absen-->
-                      </tbody>
-                    </table>
+                    <select id="filterMonth" class="form-select me-2" style="width: 200px;">
+                      <option value="">Select Month</option>
+                    </select>
+                
+                    <select id="filterYear" class="form-select me-2" style="width: 200px;">
+                      <option value="">Select Year</option>
+                    </select>
+                    <button class="btn" id="clearFiltersButton" style="background-color: #7f82ff; color: white; max-width: 150px;">Clear Filters</button>
                   </div>
+                </h5>
+
+                <div class="table-responsive text-nowrap">
+                  <table class="table" id="attendanceTable">
+                    <thead>
+                      <tr>
+                        <th class="text-center">Date</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Punch In</th>
+                        <th class="text-center">Punch Out</th>
+                        <th class="text-center">Working Hour</th>
+                        <th class="text-center">Late</th>
+                        <th class="text-center">Overtime</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- data absen-->
+                    </tbody>
+                  </table>
                 </div>
+              </div>
               <div class="layout-overlay layout-menu-toggle"></div>
             </div>
           </div>

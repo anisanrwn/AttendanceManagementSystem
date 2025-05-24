@@ -22,6 +22,9 @@ let config = {
     body: '#f4f5fb',
     headingColor: '#566a7f',
     axisColor: '#a1acb8',
-    borderColor: '#eceef1'
+    borderColor: '#eceef1',
+    bluecolor: '#4361ee',
+    purplecolor :'#3f37c9',
+    skycolor: '#4cc9f0'
   }
 };

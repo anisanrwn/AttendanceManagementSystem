@@ -1,0 +1,70 @@
+.chart-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: white;
+    height: 100%;
+}
+
+.chart-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.chart-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.25rem 1.5rem;
+    background: transparent;
+}
+
+.chart-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.chart-body {
+    padding: 1.5rem;
+}
+
+.stats-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.stats-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+.stats-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.stats-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+/* Modern color scheme */
+
+.chart-button-wrapper {
+    margin-top: 0px; /* atau sesuai kebutuhan, misalnya 8px */
+  }
+#workingHoursChart {
+  margin-bottom: 0; /* Hilangkan jarak bawah chart */
+}
