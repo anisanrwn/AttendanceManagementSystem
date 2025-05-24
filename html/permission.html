@@ -30,105 +30,84 @@
 
   <!-- Config -->
   <script src="../assets/js/config.js"></script>
-
-  <style>
-body {
-  background-color: #f0f2f5;
-}
-.center-card {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: calc(100vh - 100px);
-  padding: 2rem;
-}
-.card {
+<style>
+/* SELECT DROPDOWN STYLING */
+select#permission_type {
   width: 100%;
-  max-width: 1100px;
-  border-radius: 1rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-  background: #ffffff;
-  padding: 1.5rem 2rem; /* dikurangi untuk tinggi card */
-  font-family: 'Public Sans', sans-serif;
-}
-.card-header {
-  background: linear-gradient(135deg, #ffffff, #ffffff);
-  color: white;
-  font-size: 1.4rem; /* lebih kecil */
-  font-weight: bold;
-  text-align: center;
-  padding: 1rem; /* lebih kecil */
-  border-radius: 1rem 1rem 0 0;
-}
-.form-label {
-  font-weight: 600;
-  color: #13161d;
-  margin-bottom: 0.4rem;
-  display: block;
-  font-size: 0.85rem; /* sedikit lebih kecil */
-}
-input[type="text"],
-input[type="date"],
-input[type="time"],
-select,
-textarea {
-  width: 100%;
-  padding: 0.5rem 0.9rem; /* lebih kecil */
-  border: 1.5px solid #cbd5e0;
+  padding: 0.7rem 1rem;
+  border: 1.5px solid #e0e0e0;
   border-radius: 8px;
-  font-size: 0.9rem; /* kecilin tulisan */
-  color: #2d3748;
-  background-color: #f9fafb;
-  transition: border-color 0.3s ease;
-  box-sizing: border-box;
-}
-input[type="text"]:focus,
-input[type="date"]:focus,
-input[type="time"]:focus,
-select:focus,
-textarea:focus {
-  border-color: #101318;
-  outline: none;
-  background-color: #fff;
-  box-shadow: 0 0 5px rgba(64, 78, 92, 0.4);
-}
-textarea {
-  min-height: 60px;
-  resize: vertical;
-}
-textarea:focus {
-  border-color: #333 !important; /* Override biru */
-  box-shadow: none !important;   /* Hilangkan efek glow biru */
-  outline: none !important;      /* Pastikan tidak ada outline biru */
-  background-color: #fff;        /* Warna latar saat fokus */
-}
-select.form-select:focus {
-  outline: none;
-  box-shadow: none;
-  border-color: #333; /* atau warna border yang kamu mau */
-}
-
-.mb-3 {
-  margin-bottom: 1.2rem; /* sedikit dikurangi */
-}
-button[type="submit"] {
-  background-color: #767676;
-  color: #fff;
-  padding: 0.6rem 1.4rem;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
+  background-color: #f8f9fa;
+  color: #333;
   font-size: 0.95rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%237f82ff' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 12px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+select#permission_type:hover {
+  border-color: #7f82ff;
+  background-color: #fff;
+}
+
+select#permission_type:focus {
+  outline: none;
+  border-color: #7f82ff;
+  box-shadow: 0 0 0 3px rgba(127, 130, 255, 0.2);
+}
+
+/* OPTION STYLING */
+select#permission_type option {
+  padding: 12px;
+  background: white;
+  color: #333;
+}
+
+select#permission_type option:hover {
+  background-color: #7f82ff !important;
+  color: white !important;
+}
+
+select#permission_type option:checked {
+  background-color: #f0ebff;
+  color: #7f82ff;
+}
+
+/* SUBMIT BUTTON STYLING */
+button[type="submit"] {
+  background-color: #7f82ff;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+  display: block; /* Ensures button appears */
 }
 
 button[type="submit"]:hover {
-  background-color: #5c5c5c; /* sedikit lebih gelap dari #767676 */
-  color: #fff;              /* pastikan teks tetap putih */
+  background-color: #6b6eff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(127, 130, 255, 0.3);
 }
 
+button[type="submit"]:active {
+  transform: translateY(0);
+}
 
+/* CONTAINER FOR BETTER SPACING */
+.form-group {
+  margin-bottom: 1.5rem;
+}
 /* Notifikasi dropdown */
 .dropdown-menu[aria-labelledby="notification-area"] {
   padding: 0;
@@ -161,7 +140,8 @@ button[type="submit"]:hover {
 .dropdown-item.bg-light:hover {
     background-color: #e6f2ff !important; /* warna saat hover */
 }
-  </style>
+</style>
+</style>
 </head>
 
 <body>
@@ -327,9 +307,11 @@ button[type="submit"]:hover {
              <!-- Main Content - Bagian yang diubah -->
             <div class="center-card">
               <div class="card">
-                <div class="card-header" style="color: #5a6e82;">
-                  Permission Attendance Form
-                </div>
+        <div class="card-header text-center fw-bold" style="color: #5a6e82; font-size: 24px;">
+  Permission Attendance Form
+</div>
+
+
                 
                 <div class="card-body">
                   <!-- Form yang diperbaiki -->
@@ -353,17 +335,18 @@ button[type="submit"]:hover {
                       <input type="date" id="end_date" name="end_date" class="form-control" required>
                     </div>
                     
-                    <!-- Permission Reason -->
-                    <div class="mb-3">
-                      <label for="permission_type" class="form-label">Permission Reason</label>
-                      <select id="permission_type" name="permission_type" class="form-select" required>
-                        <option value="" selected disabled>-- Select Reason --</option>
-                        <option value="family-urgent">Family Urgent</option>
-                        <option value="sick-leave">Sick</option>
-                        <option value="personal-business">Personal Business</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </div>
+                 <div class="form-group">
+  <label for="permission_type" class="form-label">PERMISSION REASON</label>
+  <select id="permission_type" name="permission_type" class="form-control" required>
+    <option value="" selected disabled>-- Select Reason --</option>
+    <option value="family-urgent">Family Urgent</option>
+    <option value="sick-leave">Sick</option>
+    <option value="personal-business">Personal Business</option>
+    <option value="other">Other</option>
+  </select>
+</div>
+
+
                     
                     <!-- Additional Notes -->
                     <div class="mb-3">
@@ -371,10 +354,9 @@ button[type="submit"]:hover {
                       <textarea id="reason" name="reason" class="form-control" rows="4" placeholder="Write additional notes...." required></textarea>
                     </div>
                     
-                    <!-- Submit Button -->
-                    <div class="d-grid">
-                      <button type="submit" class="btn btn-elegant">Submit Permission</button>
-                    </div>
+                  <div class="form-group">
+  <button type="submit" class="btn btn-primary">Submit Permission</button>
+</div>
                   </form>
                   
                   <!-- Pesan status -->

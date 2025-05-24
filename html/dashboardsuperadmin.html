@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html
   lang="en"
   class="light-style layout-menu-fixed"
@@ -15,7 +14,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Dashboard - Analytics | Sneat - Bootstrap 5 HTML Admin Template - Pro</title>
+    <title>Super Admin Dashboard</title>
 
     <meta name="description" content="" />
 
@@ -30,7 +29,7 @@
       rel="stylesheet"
     />
 
-    <!-- Icons. Uncomment required icon fonts -->
+    <!-- Icons -->
     <link rel="stylesheet" href="../assets/vendor/fonts/boxicons.css" />
 
     <!-- Core CSS -->
@@ -40,58 +39,143 @@
 
     <!-- Vendors CSS -->
     <link rel="stylesheet" href="../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
-
     <link rel="stylesheet" href="../assets/vendor/libs/apex-charts/apex-charts.css" />
 
     <!-- Page CSS -->
+    <style>
+      /* Modern Chart Styles */
+      .chart-card {
+          border: none;
+          border-radius: 12px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          background: white;
+          height: 100%;
+      }
+      
+      .chart-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+      }
+      
+      .chart-header {
+          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+          padding: 1.25rem 1.5rem;
+          background: transparent;
+      }
+      
+      .chart-title {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #2c3e50;
+          margin: 0;
+      }
+      
+      .chart-body {
+          padding: 1.5rem;
+      }
+      
+      /* Modern color scheme */
+      :root {
+          --primary-color: #4361ee;
+          --secondary-color: #3f37c9;
+          --accent-color: #4cc9f0;
+      }
+      
+      /* Notifikasi dropdown */
+      .dropdown-menu[aria-labelledby="notification-area"] {
+          padding: 0;
+      }
 
-    <!-- Helpers -->
-    <script src="../assets/vendor/js/helpers.js"></script>
+      .dropdown-menu[aria-labelledby="notification-area"] .dropdown-item {
+          white-space: normal;
+      }
 
-    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
-    <script src="../assets/js/config.js"></script>
-   <style>
-/* Notifikasi dropdown */
-.dropdown-menu[aria-labelledby="notification-area"] {
-    padding: 0;
-}
+      /* Badge notifikasi */
+      .badge-notification {
+          position: absolute;
+          top: 5px;
+          right: 5px;
+          font-size: 10px;
+          padding: 3px 6px;
+      }
 
-.dropdown-menu[aria-labelledby="notification-area"] .dropdown-item {
-    white-space: normal;
-}
+      /* Animasi untuk notifikasi baru */
+      @keyframes pulse {
+          0% { background-color: rgba(248, 249, 250, 1); }
+          50% { background-color: rgba(248, 249, 250, 0.5); }
+          100% { background-color: rgba(248, 249, 250, 1); }
+      }
 
-/* Badge notifikasi */
-.badge-notification {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    font-size: 10px;
-    padding: 3px 6px;
-}
+      .bg-light {
+          animation: pulse 2s infinite;
+      }
 
-/* Animasi untuk notifikasi baru */
-@keyframes pulse {
-    0% { background-color: rgba(248, 249, 250, 1); }
-    50% { background-color: rgba(248, 249, 250, 0.5); }
-    100% { background-color: rgba(248, 249, 250, 1); }
-}
+      /* Tambahan CSS untuk menyorot notifikasi yang belum dibaca */
+      .dropdown-item.bg-light {
+          background-color: #f0f8ff !important; /* warna biru muda lembut */
+          font-weight: 600;
+      }
 
-.bg-light {
-    animation: pulse 2s infinite;
-}
-
-/* Tambahan CSS untuk menyorot notifikasi yang belum dibaca */
-.dropdown-item.bg-light {
-    background-color: #f0f8ff !important; /* warna biru muda lembut */
-    font-weight: 600;
-}
-
-.dropdown-item.bg-light:hover {
-    background-color: #e6f2ff !important; /* warna saat hover */
-}
-   </style>
-  
+      .dropdown-item.bg-light:hover {
+          background-color: #e6f2ff !important; /* warna saat hover */
+      }
+      
+      /* Stats Cards */
+      .stats-card {
+          border-radius: 12px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+          transition: all 0.3s ease;
+          height: 100%;
+      }
+      
+      .stats-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+      }
+      
+      .stats-icon {
+          width: 48px;
+          height: 48px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+      }
+      
+      .stats-value {
+          font-size: 1.75rem;
+          font-weight: 700;
+      }
+      
+      .stats-label {
+          font-size: 0.875rem;
+          color: #6b7280;
+      }
+      
+      
+      
+      /* Attendance Overview Chart */
+      .attendance-legend {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+          margin-top: 1rem;
+      }
+      
+      .legend-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+      }
+      
+      .legend-color {
+          width: 16px;
+          height: 16px;
+          border-radius: 4px;
+      }
+    </style>
   </head>
 
   <body>
@@ -99,17 +183,16 @@
     <div class="layout-wrapper layout-content-navbar">
       <div class="layout-container">
         <!-- Menu -->
-
         <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-  <div class="app-brand demo">
-    <a href="index.html" class="app-brand-link">
-      <span class="app-brand-logo demo">
-        <img src="../assets/img/logo.png" alt="Logo" width="35" />
-      </span>
-      <span class="app-brand-text demo menu-text fw-bolder ms-2" style="font-size: 1rem; text-transform: uppercase;">
-        UNITED TRACTORS
-      </span>
-    </a>
+          <div class="app-brand demo">
+            <a href="index.html" class="app-brand-link">
+              <span class="app-brand-logo demo">
+                <img src="../assets/img/logo.png" alt="Logo" width="35" />
+              </span>
+              <span class="app-brand-text demo menu-text fw-bolder ms-2" style="font-size: 1rem; text-transform: uppercase;">
+                UNITED TRACTORS
+              </span>
+            </a>
 
             <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
               <i class="bx bx-chevron-left bx-sm align-middle"></i>
@@ -127,215 +210,235 @@
               </a>
             </li>
             <li class="menu-item">
-                <a href="ProfileEmployee.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-user"></i>
-                  <div data-i18n="Basic">Profile Employee</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="PermissionList.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-id-card"></i> <!-- ganti jadi id card -->
-                  <div data-i18n="Basic">Permission List</div>
-                </a>
-              </li>
-              <li class="menu-item">
-                <a href="RecapAttendance.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-calendar-check"></i> <!-- ganti jadi kalender cek -->
-                  <div data-i18n="Basic">Recap Attendance</div>
-                </a>
-              </li>
-              
-            
-            
+              <a href="ProfileEmployee.html" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-user"></i>
+                <div data-i18n="Basic">Profile Employee</div>
+              </a>
+            </li>
+            <li class="menu-item">
+              <a href="PermissionList.html" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-id-card"></i>
+                <div data-i18n="Basic">Permission List</div>
+              </a>
+            </li>
+            <li class="menu-item">
+              <a href="RecapAttendance.html" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-calendar-check"></i>
+                <div data-i18n="Basic">Recap Attendance</div>
+              </a>
+            </li>
             
             <li class="menu-header small text-uppercase">
               <span class="menu-header-text">Settings</span>
             </li>
             <li class="menu-item">
-                <a href="UserList.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-group"></i>
-                  <div data-i18n="Basic">User List</div>
-                </a>
-              </li>
-              
-              <li class="menu-item">
-                <a href="LockSystem.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-lock"></i>
-                  <div data-i18n="Basic">Lock System</div>
-                </a>
-              </li>
-              
-              <li class="menu-item">
-                <a href="LogActivity.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-clipboard"></i>
-                  <div data-i18n="Basic">Log Activity</div>
-                </a>
-              </li>
-              
+              <a href="UserList.html" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-group"></i>
+                <div data-i18n="Basic">User List</div>
+              </a>
+            </li>
+            
+            <li class="menu-item">
+              <a href="LockSystem.html" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-lock"></i>
+                <div data-i18n="Basic">Lock System</div>
+              </a>
+            </li>
+            
+            <li class="menu-item">
+              <a href="LogActivity.html" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-clipboard"></i>
+                <div data-i18n="Basic">Log Activity</div>
+              </a>
+            </li>
+            
             <li class="menu-item">
               <a href="Login.html" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-log-out"></i>
                 <div data-i18n="Basic">Logout</div>
               </a>
             </li>
-            
-
-           
-            
+          </ul>
         </aside>
         <!-- / Menu -->
 
-       <!-- Layout container -->
-<div class="layout-page">
-  <!-- Navbar -->
-  <nav class="layout-navbar container-xxl navbar navbar-expand-xl align-items-center"
-       id="layout-navbar"
-       style="background: transparent; box-shadow: none; border: none;">
-       
-    <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
-      <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
-        <i class="bx bx-menu bx-sm"></i>
-      </a>
-    </div>
-
-    <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-      
-      <!-- Notification Area -->
-      <ul class="navbar-nav flex-row align-items-center ms-auto">
-        <li class="nav-item lh-1 me-3 position-relative">
-          <a href="#" class="nav-link px-2" id="notification-area" data-bs-toggle="dropdown" aria-expanded="false" role="button">
-            <i class="bx bx-bell" style="font-size: 1.5rem;"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                  id="notification-badge"
-                  style="display: none;"></span>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end py-0"
-              aria-labelledby="notification-area"
-              style="width: 350px; max-height: 400px; overflow-y: auto;">
-            <li>
-              <div class="dropdown-item text-center py-3 text-muted">Loading notifications...</div>
-            </li>
-          </ul>
-        </li>
-
-        <!-- User Dropdown -->
-        <li class="nav-item navbar-dropdown dropdown-user dropdown">
-          <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-            <div class="avatar avatar-online">
-              <img src="../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+        <!-- Layout container -->
+        <div class="layout-page">
+          <!-- Navbar -->
+          <nav class="layout-navbar container-xxl navbar navbar-expand-xl align-items-center"
+               id="layout-navbar"
+               style="background: transparent; box-shadow: none; border: none;">
+               
+            <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+              <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+                <i class="bx bx-menu bx-sm"></i>
+              </a>
             </div>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li>
-              <a class="dropdown-item" href="#">
-                <div class="d-flex">
-                  <div class="flex-shrink-0 me-3">
+
+            <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+              
+              <!-- Notification Area -->
+              <ul class="navbar-nav flex-row align-items-center ms-auto">
+                <li class="nav-item lh-1 me-3 position-relative">
+                  <a href="#" class="nav-link px-2" id="notification-area" data-bs-toggle="dropdown" aria-expanded="false" role="button">
+                    <i class="bx bx-bell" style="font-size: 1.5rem;"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                          id="notification-badge"
+                          style="display: none;"></span>
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end py-0"
+                      aria-labelledby="notification-area"
+                      style="width: 350px; max-height: 400px; overflow-y: auto;">
+                    <li>
+                      <div class="dropdown-item text-center py-3 text-muted">Loading notifications...</div>
+                    </li>
+                  </ul>
+                </li>
+
+                <!-- User Dropdown -->
+                <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                  <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                     <div class="avatar avatar-online">
                       <img src="../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
                     </div>
-                  </div>
-                  <div class="flex-grow-1">
-                    <span class="fw-semibold d-block">John Doe</span>
-                    <small class="text-muted">Admin</small>
-                  </div>
-                </div>
-              </a>
-            </li>
-            <li><div class="dropdown-divider"></div></li>
-            <li>
-              <a class="dropdown-item" href="Login.html">
-                <i class="bx bx-power-off me-2"></i>
-                <span class="align-middle">Log Out</span>
-              </a>
-            </li>
-          </ul>
-        </li>
-        <!--/ User Dropdown -->
-      </ul>
-    </div>
-  </nav>
-
-
-          <!-- / Navbar -->
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                      <a class="dropdown-item" href="#">
+                        <div class="d-flex">
+                          <div class="flex-shrink-0 me-3">
+                            <div class="avatar avatar-online">
+                              <img src="../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+                            </div>
+                          </div>
+                          <div class="flex-grow-1">
+                            <span class="fw-semibold d-block">Super Admin</span>
+                            <small class="text-muted">Administrator</small>
+                          </div>
+                        </div>
+                      </a>
+                    </li>
+                    <li><div class="dropdown-divider"></div></li>
+                    <li>
+                      <a class="dropdown-item" href="Login.html">
+                        <i class="bx bx-power-off me-2"></i>
+                        <span class="align-middle">Log Out</span>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                <!--/ User Dropdown -->
+              </ul>
+            </div>
+          </nav>
 
           <!-- Content wrapper -->
           <div class="content-wrapper">
-              
-
             <!-- Content -->
             <div class="container-xxl flex-grow-1 container-p-y">
               <h4 class="fw-bold mt-6 mb-4"><span class="text-muted fw-light">Pages /</span> Dashboard</h4>
 
-              <div class="row">
-                <!-- Statistik Jumlah Employee -->
-                <div class="col-lg-3 col-md-6 col-12 mb-4">
-                  <div class="card text-center p-4">
-                    <h5 class="card-title mb-2">Total Employees</h5>
-                    <h2 class="fw-bold">128</h2> <!-- Ganti dinamis kalau mau -->
-                    <small class="text-muted">As of Today</small>
+              <!-- Stats Cards -->
+              <div class="row mb-4">
+                <div class="col-md-4 mb-4">
+                  <div class="card stats-card">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <h5 class="card-title mb-2">Total Employees</h5>
+                          <h2 class="stats-value mb-0" id="total-employees">0</h2>
+                          <small class="stats-label">Active employees</small>
+                        </div>
+                        <div class="stats-icon bg-label-primary">
+                          <i class="bx bx-user"></i>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              
-                <!-- Monthly Attendance Rate -->
-                <div class="col-lg-3 col-md-6 col-12 mb-4">
-                  <div class="card text-center p-4">
-                    <h5 class="card-title mb-2">Monthly Attendance Rate</h5>
-                    <h2 class="fw-bold">92%</h2> <!-- Ganti dinamis kalau mau -->
-                    <small class="text-muted">This Month</small>
+                
+                <div class="col-md-4 mb-4">
+                  <div class="card stats-card">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <h5 class="card-title mb-2">Today's Attendance</h5>
+                          <h2 class="stats-value mb-0" id="today-attendance">0%</h2>
+                          <small class="stats-label">Present employees</small>
+                        </div>
+                        <div class="stats-icon bg-label-success">
+                          <i class="bx bx-calendar-check"></i>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              
-                <!-- Active User Today -->
-                <div class="col-lg-3 col-md-6 col-12 mb-4">
-                  <div class="card text-center p-4">
-                    <h5 class="card-title mb-2">Active Users Today</h5>
-                    <h2 class="fw-bold">87</h2> <!-- Ganti dinamis kalau mau -->
-                    <small class="text-muted">Today</small>
-                  </div>
-                </div>
-              
-                <!-- Average Working Hours -->
-                <div class="col-lg-3 col-md-6 col-12 mb-4">
-                  <div class="card text-center p-4">
-                    <h5 class="card-title mb-2">Avg Working Hours</h5>
-                    <h2 class="fw-bold">7.5h</h2> <!-- Ganti dinamis kalau mau -->
-                    <small class="text-muted">Per Employee</small>
+                
+                <div class="col-md-4 mb-4">
+                  <div class="card stats-card">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <h5 class="card-title mb-2">Pending Permissions</h5>
+                          <h2 class="stats-value mb-0" id="pending-permissions">0</h2>
+                          <small class="stats-label">Requests to review</small>
+                        </div>
+                        <div class="stats-icon bg-label-warning">
+                          <i class="bx bx-time"></i>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-  <!-- Attendance Overview Section -->
-<div class="col-12 order-2 order-md-3 order-lg-2 mb-4">
-    <div class="card p-4">
-        <div class="row g-0">
-        
-            <!-- LEFT: Attendance Chart -->
-            <div class="col-md-12 col-lg-12 pe-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="card-title mb-0">Attendance Overview</h5>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="badge" style="background-color: #7f82ff;">Present</span>
-                        <span class="badge" style="background-color: #29ccef;">Absent</span> 
+              <!-- End Stats Cards -->
+
+              <!-- Chart Row -->
+              <div class="row g-4 mb-4">
+                <div class="col-lg-6">
+                  <div class="chart-card">
+                    <div class="chart-header">
+                      <h5 class="chart-title">Attendance Rate This Month</h5>
                     </div>
+                    <div class="chart-body">
+                      <div id="attendanceRateChart" style="height: 300px;"></div>
+                    </div>
+                  </div>
                 </div>
-                <div class="chart-container" style="margin-bottom: 20px;">
-                    <canvas id="attendanceOverviewChart" width="400" height="280"></canvas> <!-- Adjusted height -->
+                <div class="col-lg-6">
+                  <div class="chart-card">
+                    <div class="chart-header">
+                      <h5 class="chart-title">Department Attendance</h5>
+                    </div>
+                    <div class="chart-body">
+                      <div id="departmentAttendanceChart" style="height: 300px;"></div>
+                    </div>
+                  </div>
                 </div>
+              </div>
+              <!-- End Chart Row -->
+
+              
             </div>
-    
+            <!-- / Content -->
+
+            <div class="content-backdrop fade"></div>
+          </div>
+          <!-- Content wrapper -->
         </div>
+        <!-- / Layout page -->
+      </div>
+      <!-- Overlay -->
+      <div class="layout-overlay layout-menu-toggle"></div>
     </div>
-</div>
-  
+    <!-- / Layout wrapper -->
 
     <!-- Core JS -->
-    <!-- build:js assets/vendor/js/core.js -->
     <script src="../assets/vendor/libs/jquery/jquery.js"></script>
     <script src="../assets/vendor/libs/popper/popper.js"></script>
     <script src="../assets/vendor/js/bootstrap.js"></script>
     <script src="../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-
     <script src="../assets/vendor/js/menu.js"></script>
-    <!-- endbuild -->
 
     <!-- Vendors JS -->
     <script src="../assets/vendor/libs/apex-charts/apexcharts.js"></script>
@@ -343,64 +446,277 @@
     <!-- Main JS -->
     <script src="../assets/js/main.js"></script>
 
-    <script src="../assets/js/notifications.js"></script>
     <!-- Page JS -->
     <script src="../assets/js/dashboards-analytics.js"></script>
+    <script src="../assets/js/notifications.js"></script>
 
-    <!-- Place this tag in your head or just before your close body tag. -->
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
- <!-- Chart.js Script -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Include the notification script -->
-<script src="../assets/js/notifications.js"></script>
-<script>
-  // Chart.js Initialization
-  const ctx = document.getElementById('attendanceOverviewChart').getContext('2d');
-  const attendanceOverviewChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], // Days of the week
-      datasets: [{
-        label: 'Present',
-        data: [50, 70, 65, 80, 55], // Data for Present
-        backgroundColor: '#7f82ff',
-        borderColor: '#7f82ff',
-        borderWidth: 1
-      },
-      {
-        label: 'Absent',
-        data: [10, 5, 15, 5, 10], // Data for Absent
-        backgroundColor: '#29ccef',
-        borderColor: '#29ccef',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: {
-          beginAtZero: true,
-          max: 100
-        }
-      },
-      plugins: {
-        legend: {
-          display: true,
-          position: 'top',
-          labels: {
-            color: '#4e4f54'
-          }
-        }
-      },
-      elements: {
-        bar: {
-          borderRadius: 8
+    <!-- Dashboard Data Fetching and Rendering -->
+    <script>
+      // Global variables to store chart instances
+      let attendanceRateChart, departmentAttendanceChart;
+      
+      // Fetch all dashboard data
+      async function fetchDashboardData() {
+        try {
+          // Fetch all data in parallel
+          const [employeesRes, attendanceRes, permissionsRes, activityRes, topEmployeesRes] = await Promise.all([
+            fetch('http://localhost:8000/employees'),
+            fetch('http://localhost:8000/attendance/today'),
+            fetch('http://localhost:8000/permissions/pending'),
+            fetch('http://localhost:8000/activity/latest'),
+            fetch('http://localhost:8000/employees/top')
+          ]);
+          
+          // Check all responses
+          if (!employeesRes.ok) throw new Error("Failed to fetch employees");
+          if (!attendanceRes.ok) throw new Error("Failed to fetch attendance");
+          if (!permissionsRes.ok) throw new Error("Failed to fetch permissions");
+          
+          
+          // Parse JSON
+          const employees = await employeesRes.json();
+          const attendance = await attendanceRes.json();
+          const permissions = await permissionsRes.json();
+          const activities = await activityRes.json();
+          const topEmployees = await topEmployeesRes.json();
+          
+          // Update stats cards
+          updateStatsCards(employees, attendance, permissions);
+          
+          // Render charts
+          renderCharts(attendance);
+          
+       
+          
+          
+          
+        } catch (error) {
+          console.error("Error fetching dashboard data:", error);
+          // Show error to user
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to load dashboard data. Please try again later.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
         }
       }
-    }
-  });
- 
-</script>
+      
+      // Update stats cards
+      function updateStatsCards(employees, attendance, permissions) {
+        // Total employees
+        document.getElementById('total-employees').textContent = employees.length || 0;
+        
+        // Today's attendance rate
+        const presentCount = attendance.filter(a => a.attendance_status === 'Present').length;
+        const attendanceRate = employees.length > 0 ? Math.round((presentCount / employees.length) * 100) : 0;
+        document.getElementById('today-attendance').textContent = `${attendanceRate}%`;
+        
+        // Pending permissions
+        document.getElementById('pending-permissions').textContent = permissions.length || 0;
+      }
+      
+      // Render charts
+      function renderCharts(attendanceData) {
+        // Destroy existing charts if they exist
+        if (attendanceRateChart) attendanceRateChart.destroy();
+        if (departmentAttendanceChart) departmentAttendanceChart.destroy();
+        
+        // Process data for attendance rate chart
+        const monthlyData = processMonthlyAttendance(attendanceData);
+        renderAttendanceRateChart(monthlyData);
+        
+        // Process data for department attendance chart
+        const departmentData = processDepartmentAttendance(attendanceData);
+        renderDepartmentAttendanceChart(departmentData);
+      }
+      
+      // Process monthly attendance data
+      function processMonthlyAttendance(attendanceData) {
+        // Group by month and calculate attendance rate
+        // This is a simplified version - you might need to adjust based on your actual data structure
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const currentMonth = new Date().getMonth();
+        
+        // For demo purposes, we'll create some sample data
+        // In a real app, you would process the actual attendanceData
+        return months.map((month, index) => {
+          // Random data for demo - replace with actual calculation
+          const rate = index <= currentMonth ? Math.floor(Math.random() * 20) + 80 : 0;
+          return {
+            month,
+            rate
+          };
+        });
+      }
+      
+      // Process department attendance data
+      function processDepartmentAttendance(attendanceData) {
+        // Group by department and calculate attendance stats
+        // This is a simplified version - adjust based on your actual data
+        return [
+          { department: 'IT', present: 25, absent: 2 },
+          { department: 'HR', present: 18, absent: 1 },
+          { department: 'Finance', present: 22, absent: 3 },
+          { department: 'Operations', present: 30, absent: 5 },
+          { department: 'Marketing', present: 15, absent: 2 }
+        ];
+      }
+      
+      // Render attendance rate chart
+      function renderAttendanceRateChart(data) {
+        const options = {
+          series: [{
+            name: 'Attendance Rate',
+            data: data.map(item => item.rate)
+          }],
+          chart: {
+            height: 350,
+            type: 'line',
+            zoom: {
+              enabled: false
+            },
+            toolbar: {
+              show: false
+            }
+          },
+          colors: ['#4361ee'],
+          dataLabels: {
+            enabled: false
+          },
+          stroke: {
+            curve: 'smooth',
+            width: 3
+          },
+          grid: {
+            borderColor: '#f1f1f1',
+            strokeDashArray: 3
+          },
+          markers: {
+            size: 5,
+            hover: {
+              size: 7
+            }
+          },
+          xaxis: {
+            categories: data.map(item => item.month),
+            labels: {
+              style: {
+                colors: '#6b7280',
+                fontSize: '12px'
+              }
+            }
+          },
+          yaxis: {
+            min: 0,
+            max: 100,
+            labels: {
+              style: {
+                colors: '#6b7280',
+                fontSize: '12px'
+              },
+              formatter: function(val) {
+                return val + '%';
+              }
+            }
+          },
+          tooltip: {
+            y: {
+              formatter: function(val) {
+                return val + '% attendance';
+              }
+            }
+          }
+        };
+        
+        const chartEl = document.querySelector('#attendanceRateChart');
+        attendanceRateChart = new ApexCharts(chartEl, options);
+        attendanceRateChart.render();
+      }
+      
+      // Render department attendance chart
+      function renderDepartmentAttendanceChart(data) {
+        const options = {
+          series: [{
+            name: 'Present',
+            data: data.map(item => item.present)
+          }, {
+            name: 'Absent',
+            data: data.map(item => item.absent)
+          }],
+          chart: {
+            type: 'bar',
+            height: 350,
+            stacked: true,
+            stackType: '100%',
+            toolbar: {
+              show: false
+            }
+          },
+          colors: ['#4361ee', '#29ccef'],
+          plotOptions: {
+            bar: {
+              horizontal: true,
+              borderRadius: 4
+            },
+          },
+          dataLabels: {
+            enabled: false
+          },
+          stroke: {
+            width: 1,
+            colors: ['#fff']
+          },
+          xaxis: {
+            categories: data.map(item => item.department),
+            labels: {
+              style: {
+                colors: '#6b7280',
+                fontSize: '12px'
+              }
+            }
+          },
+          yaxis: {
+            labels: {
+              style: {
+                colors: '#6b7280',
+                fontSize: '12px'
+              }
+            }
+          },
+          tooltip: {
+            y: {
+              formatter: function(val) {
+                return val + ' employees';
+              }
+            }
+          },
+          legend: {
+            position: 'top',
+            horizontalAlign: 'center',
+            labels: {
+              colors: '#4e4f54'
+            }
+          },
+          fill: {
+            opacity: 1
+          }
+        };
+        
+        const chartEl = document.querySelector('#departmentAttendanceChart');
+        departmentAttendanceChart = new ApexCharts(chartEl, options);
+        departmentAttendanceChart.render();
+      }
+      
+      
+      
+      // Initialize dashboard when page loads
+      document.addEventListener('DOMContentLoaded', function() {
+        fetchDashboardData();
+        
+        // Refresh data every 5 minutes
+        setInterval(fetchDashboardData, 5 * 60 * 1000);
+      });
+    </script>
   </body>
 </html>

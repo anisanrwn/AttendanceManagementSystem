@@ -473,9 +473,12 @@ function renderWorkingHoursChart(totalHours) {
                             show: true,
                             label: 'Total Hours',
                             color: '#6b7280',
-                            formatter: function(w) {
-                                return w.globals.seriesTotals.reduce((a, b) => a + b, 0) + 'h'
-                            }
+                           formatter: function(w) {
+                            const raw = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                            const cleaned = raw.replace(/^0+(?!$)/, ''); // Hapus 0 di depan, kecuali kalau hasilnya cuma 0
+                            return cleaned + 'h';
+                        }
+
                         }
                     }
                 }
