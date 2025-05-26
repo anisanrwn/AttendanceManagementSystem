@@ -142,7 +142,8 @@ class ActivityLog(Base):
     user_id = Column(Integer, ForeignKey('user.user_id'), nullable=True)
     action = Column(String(500), nullable=False)
     detail = Column(Text, nullable=True)
-    ip_address = Column(String(45), nullable=True)
+    ip_address = Column(String(100), nullable=True)
+    device = Column(String(500), nullable=True) 
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User", back_populates="activity_logs")

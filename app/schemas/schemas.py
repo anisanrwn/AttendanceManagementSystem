@@ -164,12 +164,12 @@ class AttendanceStatusResponse(BaseModel):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
-
 class ActivityLogCreate(BaseModel):
     action: str
     detail: Optional[str] = None
     user_id: Optional[int] = None
     ip_address: Optional[str] = None
+    device: Optional[str] = None 
 
     class Config:
         from_attributes = True
@@ -236,3 +236,15 @@ class PermissionUpdate(BaseModel):
 
 class PermissionListResponse(BaseModel):
     permissions: list[PermissionResponse]
+    
+class ActivityLogResponse(BaseModel):
+    timestamp: str
+    user_name: str
+    user_role_class: str  
+    action: str
+    ip_address: Optional[str]
+    device: Optional[str]
+
+    class Config:
+        from_attributes = True
+

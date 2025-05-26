@@ -259,60 +259,22 @@
                 <h4 class="fw-bold mt-6 mb-4"><span class="text-muted fw-light">Pages /</span> Log Activity</h4>
 <!-- Activity Log -->
 <div class="card">
-    <h5 class="card-header">Activity Log</h5>
-    
-    <!-- Activity Log Table -->
-    <div class="table-responsive text-nowrap">
-      <table class="table table-sm" id="activityLogTable">
-        <thead>
-          <tr>
-            <th class="text-center">Timestamp</th>
-            <th class="text-center">User</th>
-            <th class="text-center">Action</th>
-            <th class="text-center">IP Address</th>
-            <th class="text-center">Device</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Dummy Activity Logs -->
-          <tr>
-            <td class="text-center">2025-04-27 08:00:00</td>
-            <td class="text-center"><span class="badge bg-label-primary">Superadmin</span></td>
-            <td class="text-center">Login</td>
-            <td class="text-center">192.168.0.1</td>
-            <td class="text-center">Chrome (Windows)</td>
-          </tr>
-          <tr>
-            <td class="text-center">2025-04-27 08:05:00</td>
-            <td class="text-center"><span class="badge bg-label-info">Admin (HR)</span></td>
-            <td class="text-center">Logout</td>
-            <td class="text-center">192.168.0.2</td>
-            <td class="text-center">Firefox (Mac)</td>
-          </tr>
-          <tr>
-            <td class="text-center">2025-04-27 08:10:00</td>
-            <td class="text-center"><span class="badge bg-label-warning">Employee</span></td>
-            <td class="text-center">Login</td>
-            <td class="text-center">192.168.0.3</td>
-            <td class="text-center">Safari (iOS)</td>
-          </tr>
-          <tr>
-            <td class="text-center">2025-04-27 08:20:00</td>
-            <td class="text-center"><span class="badge bg-label-primary">Superadmin</span></td>
-            <td class="text-center">Action (Change Settings)</td>
-            <td class="text-center">192.168.0.1</td>
-            <td class="text-center">Chrome (Windows)</td>
-          </tr>
-          <tr>
-            <td class="text-center">2025-04-27 08:30:00</td>
-            <td class="text-center"><span class="badge bg-label-warning">Employee</span></td>
-            <td class="text-center">Logout</td>
-            <td class="text-center">192.168.0.3</td>
-            <td class="text-center">Safari (iOS)</td>
-          </tr>
-          <!-- Add more rows for additional dummy logs -->
-        </tbody>
-      </table>
+  <h5 class="card-header">Activity Log</h5>
+  <div class="table-responsive text-nowrap">
+    <table class="table table-sm" id="activityLogTable">
+      <thead>
+        <tr>
+          <th class="text-center">Timestamp</th>
+          <th class="text-center">User</th>
+          <th class="text-center">Action</th>
+          <th class="text-center">IP Address</th>
+          <th class="text-center">Device</th>
+        </tr>
+      </thead>
+      <tbody id="logTableBody">
+        <!-- Data will be inserted here by JS -->
+      </tbody>
+    </table>
     </div>
 </div>
 
@@ -342,25 +304,51 @@
     <script src="/assets/js/notifications.js"></script>
     <script src="/assets/js/navbar.js"></script>
     <script>
-        // JavaScript to toggle status between 'active' and 'nonactive'
-        document.querySelectorAll('.toggle-status').forEach(function(statusElement) {
-          statusElement.addEventListener('click', function() {
-            const currentStatus = statusElement.getAttribute('data-status');
-            if (currentStatus === 'active') {
-              // Change to 'nonactive'
-              statusElement.setAttribute('data-status', 'nonactive');
-              statusElement.textContent = 'Non Active';
-              statusElement.classList.remove('bg-label-success');
-              statusElement.classList.add('bg-label-danger');
-            } else {
-              // Change to 'active'
-              statusElement.setAttribute('data-status', 'active');
-              statusElement.textContent = 'Active';
-              statusElement.classList.remove('bg-label-danger');
-              statusElement.classList.add('bg-label-success');
-            }
-          });
-        });
+  document.addEventListener("DOMContentLoaded", async () => {
+    const tbody = document.getElementById("logTableBody");
+    if (!tbody) {
+      console.error("Element logTableBody tidak ditemukan");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/activitylogs/activity/logs", {
+        headers: {
+          'Content-Type': 'application/json',
+          // Tambahkan token jika dibutuhkan:
+          // 'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) throw new Error("Gagal fetch logs");
+      const logs = await response.json();
+
+      tbody.innerHTML = ''; // kosongkan tbody
+
+      if (logs.length === 0) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="5" class="text-center">Tidak ada aktivitas ditemukan</td>`;
+        tbody.appendChild(tr);
+        return;
+      }
+
+      logs.forEach(log => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="text-center">${log.timestamp || '-'}</td>
+          <td class="text-center"><span class="badge bg-label-${log.user_roles_name || 'secondary'}">${log.user_name || '-'}</span></td>
+          <td class="text-center">${log.action || '-'}</td>
+          <td class="text-center">${log.ip_address || '-'}</td>
+          <td class="text-center">${log.device || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+    } catch (error) {
+      console.error("Error fetching logs:", error);
+      alert("Gagal memuat activity log.");
+    }
+  });
       </script>
     
     

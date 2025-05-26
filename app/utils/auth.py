@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
+from app.services.activity_log import create_activity_log
 from app.database import get_db
 from app.models import model as m
 from app.utils.messages import HTTPExceptionMessages as HM

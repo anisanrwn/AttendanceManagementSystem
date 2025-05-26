@@ -14,6 +14,7 @@ from fastapi.templating import Jinja2Templates
 from jose import jwt
 import pytz
 from app.utils.attendance import mark_absent_for_missing_days
+from app.services.activity_log import create_activity_log  
 from app.utils.messages import HTTPExceptionMessages as HM
 
 # JWT Configuration
@@ -312,6 +313,15 @@ async def login_user(
 
     db.commit()
     mark_absent_for_missing_days(db, user.employee_id)
+    
+    create_activity_log(
+        db=db,
+        request=request,
+        user_id=user.user_id,
+        action="Login",
+        detail=f"User {user.email} logged in successfully"
+    )
+    
     user_dict = {
         "user_id": user.user_id,
         "email": user.email,
