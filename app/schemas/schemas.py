@@ -247,4 +247,17 @@ class ActivityLogResponse(BaseModel):
 
     class Config:
         from_attributes = True
+        
+class UserResponse(BaseModel):
+    status: str
+    message: Optional[str] = None
+    email: Optional[str] = None
+    user_id: Optional[int] = None
+    employee_id: Optional[int] = None
+    username: Optional[str] = None
+    roles: list[RoleRead] = None
+    employee: Optional[dict] = None
+
+    class Config:
+        from_attributes = True
 

@@ -42,8 +42,6 @@ main_app.add_middleware(
 
 main_app.mount("/html", StaticFiles(directory="html"), name="html")
 
-main_app.mount("/static", StaticFiles(directory="static"), name="static")
-
 # Include route handlers (routers) for various functionalities
 main_app.include_router(employee_routes.router)
 main_app.include_router(user_routes.router)

@@ -1,21 +1,28 @@
 from fastapi import APIRouter, Depends, HTTPException, Form, Request, Body
-from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import func
-from app.database import get_db
-from app.models import model as m
-from datetime import datetime, timedelta, timezone
-from app.utils.verifpass import verify_password
-from user_agents import parse
-import json
-import asyncio
-from app.utils.auth import verify_token, create_access_token, create_refresh_token
 from fastapi.responses import StreamingResponse
 from fastapi.templating import Jinja2Templates
-from jose import jwt
-import pytz
+from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import func
+from user_agents import parse
+from app.database import get_db
+from app.models import model as m
+from app.schemas import schemas as s
+from datetime import datetime, timedelta, timezone
+from app.utils.verifpass import verify_password
 from app.utils.attendance import mark_absent_for_missing_days
 from app.services.activity_log import create_activity_log  
 from app.utils.messages import HTTPExceptionMessages as HM
+from app.utils.auth import verify_token, create_access_token, create_refresh_token
+import json
+import asyncio
+from jose import jwt
+import pytz
+import random
+import string
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from typing import Optional
 
 # JWT Configuration
 SECRET_KEY = "your-secret-key-here"  # Ganti dengan key yang aman
@@ -26,6 +33,50 @@ router = APIRouter(
     prefix="/login",
     tags=["Login"]
 )
+
+EMAIL_ADDRESS = "hrsystem812@gmail.com"  
+EMAIL_PASSWORD = "dfxhwuyiwqszauxh"   
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
+
+otp_storage = {}
+
+def generate_otp():
+    """Menghasilkan OTP 6 digit"""
+    return ''.join(random.choices(string.digits, k=6))
+
+def send_otp_email(email, otp):
+    """Mengirim OTP ke email pengguna"""
+    try:
+        message = MIMEMultipart()
+        message["From"] = EMAIL_ADDRESS
+        message["To"] = email
+        message["Subject"] = "Verification Code for Attendance System Login"
+        
+        body = f"""
+        <html>
+        <body>
+            <h2>Verification Code Login</h2>
+            <p>Here is your OTP code to login:</p>
+            <h1 style="background-color: #f2f2f2; padding: 10px; font-family: monospace; letter-spacing: 5px;">{otp}</h1>
+            <p>The code is valid for 5 minutes.</p>
+            <p>If you did not request this code, ignore this email.</p>
+        </body>
+        </html>
+        """
+        
+        message.attach(MIMEText(body, "html"))
+        
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
+        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+        server.send_message(message)
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"Error mengirim email: {e}")
+        return False
+    
 templates = Jinja2Templates(directory="templates")
 
 @router.get("/login")
@@ -272,6 +323,69 @@ async def login_user(
 
         db.commit()
         raise HTTPException(status_code=401, detail=HM.UNAUTHORIZED)
+    
+    otp = generate_otp()
+    expiry_time = datetime.utcnow() + timedelta(minutes=5)
+    otp_storage[email] = {
+        'otp': otp,
+        'expiry': expiry_time,
+        'user_id': user.user_id,
+        'ip_address': ip_address,
+        'user_agent': browser_name
+    }
+
+    if not send_otp_email(email, otp):
+        raise HTTPException(status_code=500, detail="Failed to send OTP code. Please try again.")
+
+    # Catat login attempt belum berhasil (menunggu OTP)
+    new_attempt = m.LoginAttempt(
+        user_id=user.user_id,
+        email=email,
+        ip_address=ip_address,
+        user_agent=browser_name,
+        failed_attempts=0,
+        is_successful=False,
+    )
+    db.add(new_attempt)
+    db.commit()
+
+    return {
+        "status": "otp_required",
+        "message": "The OTP code has been sent to your email",
+        "email": email
+    }
+
+
+@router.post("/verify-otp")
+async def verify_otp(
+    request: Request,
+    email: str = Form(...),
+    otp: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    ip_address = request.headers.get("x-forwarded-for", request.client.host)
+    raw_user_agent = request.headers.get("user-agent", "unknown")
+    user_agent_parsed = parse(raw_user_agent)
+    browser_name = f"{user_agent_parsed.browser.family} {user_agent_parsed.browser.version_string}".strip()
+
+    if email not in otp_storage:
+        raise HTTPException(status_code=400, detail="OTP session not found. Please login again.")
+
+    stored_data = otp_storage[email]
+    stored_otp = stored_data['otp']
+    expiry_time = stored_data['expiry']
+    user_id = stored_data['user_id']
+
+    if datetime.utcnow() > expiry_time:
+        del otp_storage[email]
+        raise HTTPException(status_code=400, detail="OTP code has expired. Please login again.")
+
+    if otp != stored_otp:
+        raise HTTPException(status_code=400, detail="Incorrect OTP code.")
+
+    del otp_storage[email]
+
+    user = db.query(m.User).options(joinedload(m.User.roles)).filter_by(user_id=user_id).first()
 
     # Generate tokens
     access_token = create_access_token(data={"sub": user.email, "user_id": user.user_id})
@@ -332,3 +446,30 @@ async def login_user(
     }
     
     return user_dict
+
+@router.post("/resend-otp")
+async def resend_otp(
+    email: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    if email not in otp_storage:
+        raise HTTPException(status_code=400, detail="OTP session not found. Please login again.")
+
+    otp = generate_otp()
+    expiry_time = datetime.utcnow() + timedelta(minutes=5)
+    user_id = otp_storage[email]['user_id']
+    ip_address = otp_storage[email]['ip_address']
+    user_agent = otp_storage[email]['user_agent']
+
+    otp_storage[email] = {
+        'otp': otp,
+        'expiry': expiry_time,
+        'user_id': user_id,
+        'ip_address': ip_address,
+        'user_agent': user_agent
+    }
+
+    if not send_otp_email(email, otp):
+        raise HTTPException(status_code=500, detail="Failed to send OTP code. Please try again.")
+
+    return {"status": "success", "message": "The new OTP code has been sent to your email"}
