@@ -136,41 +136,36 @@
                   <div data-i18n="Basic">Profile Employee</div>
                 </a>
               </li>
-              <li class="menu-item active">
-                <a href="PermissionList.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-id-card"></i> <!-- ganti jadi id card -->
+              <li class="menu-item">
+                <a href="javascript:void(0)" class="menu-link" onclick="checkAccess('PermissionList.html', ['Super Admin'])">
+                  <i class="menu-icon tf-icons bx bx-id-card"></i>
                   <div data-i18n="Basic">Permission List</div>
                 </a>
               </li>
+              
               <li class="menu-item">
-                <a href="RecapAttendance.html" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-calendar-check"></i> <!-- ganti jadi kalender cek -->
+                <a href="javascript:void(0)" class="menu-link" onclick="checkAccess('RecapAttendance.html', ['Super Admin'])">
+                  <i class="menu-icon tf-icons bx bx-calendar-check"></i>
                   <div data-i18n="Basic">Recap Attendance</div>
                 </a>
               </li>
-              
-            
-            
-            
             <li class="menu-header small text-uppercase">
               <span class="menu-header-text">Settings</span>
             </li>
             <li class="menu-item">
-                <a href="UserList.html" class="menu-link">
+                <a href="javascript:void(0)" class="menu-link" onclick="checkAccess('UserList.html', ['Admin'])">
                   <i class="menu-icon tf-icons bx bx-group"></i>
                   <div data-i18n="Basic">User List</div>
                 </a>
               </li>
-              
               <li class="menu-item">
-                <a href="LockSystem.html" class="menu-link">
+                <a href="javascript:void(0)" class="menu-link" onclick="checkAccess('LockSystem.html', ['Admin'])">
                   <i class="menu-icon tf-icons bx bx-lock"></i>
                   <div data-i18n="Basic">Lock System</div>
                 </a>
-              </li>
-              
+              </li>               
               <li class="menu-item">
-                <a href="LogActivity.html" class="menu-link">
+                <a href="javascript:void(0)" class="menu-link" onclick="checkAccess('LogActivity.html', ['Admin'])">
                   <i class="menu-icon tf-icons bx bx-clipboard"></i>
                   <div data-i18n="Basic">Log Activity</div>
                 </a>
@@ -181,10 +176,7 @@
                 <i class="menu-icon tf-icons bx bx-log-out"></i>
                 <div data-i18n="Basic">Logout</div>
               </a>
-            </li>
-            
-              
-            
+            </li>     
         </aside>
         <!-- / Menu -->
 
@@ -272,6 +264,13 @@
     <h5 class="card-header d-flex justify-content-between align-items-center">
       <span>Permission List</span>
       <div class="d-flex align-items-center">
+        <select id="filterStatus" class="form-select me-2" style="width: 120px;">
+        <option value="All">All</option>
+        <option value="Pending">Pending</option>
+        <option value="Approved">Approved</option>
+        <option value="Declined">Declined</option>
+        </select>
+
         <select id="filterMonth" class="form-select me-2" style="width: 120px;">
           <option value="">Bulan</option>
           <option value="01">Januari</option>
@@ -352,12 +351,11 @@
     <script src="/assets/js/notifications.js"></script>
     <script src="../assets/js/permission_list.js"></script>
     <script src="../assets/js/navbar.js"></script>
+    <script src="../assets/js/role-access.js"></script>
     
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <!-- Script Filter + Export -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
-<script>
-</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
   </body>
 </html>

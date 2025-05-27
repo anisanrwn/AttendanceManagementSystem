@@ -77,39 +77,46 @@
                 <div data-i18n="Basic">Profile Employee</div>
               </a>
             </li>
+            
+             <li class="menu-item">
+                <a href="javascript:void(0)" class="menu-link" onclick="checkAccess('PermissionList.html', ['Super Admin'])">
+                  <i class="menu-icon tf-icons bx bx-id-card"></i>
+                  <div data-i18n="Basic">Permission List</div>
+                </a>
+              </li>
+           
             <li class="menu-item">
-              <a href="PermissionList.html" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-id-card"></i>
-                <div data-i18n="Basic">Permission List</div>
-              </a>
-            </li>
-            <li class="menu-item">
-              <a href="RecapAttendance.html" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-calendar-check"></i>
-                <div data-i18n="Basic">Recap Attendance</div>
-              </a>
-            </li>
+                <a href="javascript:void(0)" class="menu-link" onclick="checkAccess('RecapAttendance.html', ['Super Admin'])">
+                  <i class="menu-icon tf-icons bx bx-calendar-check"></i>
+                  <div data-i18n="Basic">Recap Attendance</div>
+                </a>
+              </li>
+
             <li class="menu-header small text-uppercase">
               <span class="menu-header-text">Settings</span>
             </li>
+            
             <li class="menu-item">
-              <a href="UserList.html" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-group"></i>
-                <div data-i18n="Basic">User List</div>
-              </a>
-            </li>
+                <a href="javascript:void(0)" class="menu-link" onclick="checkAccess('UserList.html', ['Admin'])">
+                  <i class="menu-icon tf-icons bx bx-group"></i>
+                  <div data-i18n="Basic">User List</div>
+                </a>
+              </li>
+
             <li class="menu-item">
-              <a href="LockSystem.html" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-lock"></i>
-                <div data-i18n="Basic">Lock System</div>
-              </a>
-            </li>
-            <li class="menu-item">
-              <a href="LogActivity.html" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-clipboard"></i>
-                <div data-i18n="Basic">Log Activity</div>
-              </a>
-            </li>
+                <a href="javascript:void(0)" class="menu-link" onclick="checkAccess('LockSystem.html', ['Admin'])">
+                  <i class="menu-icon tf-icons bx bx-lock"></i>
+                  <div data-i18n="Basic">Lock System</div>
+                </a>
+              </li>
+                           
+              <li class="menu-item">
+                <a href="javascript:void(0)" class="menu-link" onclick="checkAccess('LogActivity.html', ['Admin'])">
+                  <i class="menu-icon tf-icons bx bx-clipboard"></i>
+                  <div data-i18n="Basic">Log Activity</div>
+                </a>
+              </li>
+              
             <li class="menu-item">
               <a href="Login.html" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-log-out"></i>
@@ -296,6 +303,7 @@
     <script src="../assets/js/main.js"></script>
 
     <script src="../assets/js/navbar.js"></script>
+    <script src="../assets/js/role-access.js"></script>
     <!-- Page JS -->
     <script src="../assets/js/dashboards-analytics.js"></script>
     <script src="../assets/js/notifications.js"></script>
