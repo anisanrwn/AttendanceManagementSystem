@@ -23,8 +23,6 @@ def get_server_time():
 @router.post("/clockin", response_model=s.AttendanceOut)
 def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depends(get_db)):
     employee_id = int(payload.dict().get("employee_id"))
-
-    # Ambil data employee
     employee = db.query(m.Employee).filter(m.Employee.employee_id == employee_id).first()
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
@@ -32,18 +30,15 @@ def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depen
     if not employee.face_encoding:
         raise HTTPException(status_code=400, detail="Employee has no face encoding")
 
-    # Verifikasi wajah
+
     known_encoding = json.loads(employee.face_encoding)
     is_verified, distance = verify_face(payload.image_base64, known_encoding)
-
-    # Kalau wajah tidak dikenali, hentikan proses
     if not is_verified:
         raise HTTPException(
             status_code=400,
             detail="Face not recognized",
         )
 
-    # Cek sudah absen hari ini atau belum
     today = date.today()
     existing_attendance = db.query(m.Attendance).filter(
         m.Attendance.employee_id == employee_id,
@@ -53,7 +48,6 @@ def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depen
     if existing_attendance:
         raise HTTPException(status_code=400, detail="Already clocked in today")
 
-    # Buat record attendance
     attendance = m.Attendance(
         employee_id=employee_id,
         clock_in=datetime.now().time(),
@@ -77,7 +71,6 @@ def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depen
 def clock_out_attendance(payload: s.AttendanceClockOutSession, db: Session = Depends(get_db)):
     employee_id = int(payload.employee_id)
 
-    # Ambil data employee
     employee = db.query(m.Employee).filter(m.Employee.employee_id == employee_id).first()
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
@@ -85,10 +78,8 @@ def clock_out_attendance(payload: s.AttendanceClockOutSession, db: Session = Dep
     if not employee.face_encoding:
         raise HTTPException(status_code=400, detail="Employee has no face encoding")
 
-    # Verifikasi wajah
     known_encoding = json.loads(employee.face_encoding)
     is_verified, distance = verify_face(payload.image_base64, known_encoding)
-
     if not is_verified:
         raise HTTPException(
             status_code=400,
@@ -107,7 +98,6 @@ def clock_out_attendance(payload: s.AttendanceClockOutSession, db: Session = Dep
     if attendance.clock_out is not None:
         raise HTTPException(status_code=400, detail="Already clocked out today")
 
-    # Update record clock out
     attendance.clock_out = datetime.now().time()
     attendance.clock_out_latitude = payload.clock_out_latitude
     attendance.clock_out_longitude = payload.clock_out_longitude
@@ -181,8 +171,8 @@ def view_attendance(employee_id: int, db: Session = Depends(get_db)):
         result.append({
             "date": rec.attendance_date.isoformat(),
             "attendance_status": rec.attendance_status,
-            "punch_in": rec.clock_in.strftime('%H:%M') if rec.clock_in else None,
-            "punch_out": rec.clock_out.strftime('%H:%M') if rec.clock_out else None,
+            "punch_in": rec.clock_in.strftime('%H:%M:%S') if rec.clock_in else None,
+            "punch_out": rec.clock_out.strftime('%H:%M:%S') if rec.clock_out else None,
             "totalHours": calculate_total_hours(rec.clock_in, rec.clock_out),
             "late" : calculate_late(rec.clock_in, OFFICE_START) if rec.clock_in else None,
             "overtime" : calculate_overtime(rec.clock_out, OFFICE_END) if rec.clock_out else None,

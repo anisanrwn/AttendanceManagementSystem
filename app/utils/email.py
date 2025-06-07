@@ -4,7 +4,7 @@ from email.mime.multipart import MIMEMultipart
 
 def send_email(receiver_email, subject, body):
     sender_email = "hrsystem812@gmail.com"
-    password = "dfxhwuyiwqszauxh"  # Gunakan App Password, bukan password asli
+    password = "dfxhwuyiwqszauxh"
 
     msg = MIMEMultipart()
     msg["From"] = sender_email

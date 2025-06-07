@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from app.database import get_db
 from app.models import model as m
 from app.schemas import schemas as s
-from app.utils.auth import verify_token, get_current_user
+from app.utils.auth import get_current_user
 
 router = APIRouter()
 
@@ -14,12 +14,10 @@ async def request_permission(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)
 ):
-    # Dapatkan employee_id dari user yang login
     user = db.query(m.User).filter(m.User.user_id == current_user.user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Buat permission baru
     new_permission = m.Permission(
         user_id=current_user.user_id,
         employee_id=user.employee_id,
@@ -35,7 +33,6 @@ async def request_permission(
     db.commit()
     db.refresh(new_permission)
 
-    # Kirim notifikasi ke admin
     await send_notification_to_admins(db, user.employee_id)
     
     return {"message": "Permission request submitted successfully"}

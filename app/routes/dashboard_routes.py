@@ -4,7 +4,7 @@ from collections import defaultdict
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import model as m
-from datetime import datetime, timedelta, timezone, date, time
+from datetime import datetime, timedelta, date
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
@@ -111,7 +111,6 @@ def get_weekly_working_hours(employee_id: int, db: Session = Depends(get_db)):
 def get_monthly_attendance(employee_id: int, db: Session = Depends(get_db)):
     from collections import defaultdict
 
-    # Ambil semua data attendance per employee
     records = db.query(
         m.Attendance.attendance_date,
         m.Attendance.attendance_status,
@@ -128,13 +127,10 @@ def get_monthly_attendance(employee_id: int, db: Session = Depends(get_db)):
         5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug',
         9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'
     }
-
-    # Prepare result dictionary, 12 bulan per status
     result = defaultdict(lambda: [0]*12)
 
     for row in records:
-        # row.attendance_date harusnya datetime.date
-        month = row.attendance_date.month  # dapatkan bulan
+        month = row.attendance_date.month
         month_index = month - 1
         result[row.attendance_status][month_index] += row.count
 

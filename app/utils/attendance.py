@@ -8,7 +8,7 @@ wib = pytz.timezone("Asia/Jakarta")
 def format_time(dt: datetime | None):
     if not dt:
         return None
-    return dt.strftime('%H:%M')
+    return dt.strftime('%H:%M:%S')
 
 def calculate_total_hours(clock_in, clock_out):
     if not clock_in or not clock_out:
@@ -22,13 +22,13 @@ def calculate_late(clock_in: time, office_start: time) -> int:
     in_dt = datetime.combine(date.today(), clock_in)
     office_start_dt = datetime.combine(date.today(), office_start)
     late_seconds = max(0, (in_dt - office_start_dt).total_seconds())
-    return round(late_seconds / 60)  # menit
+    return round(late_seconds / 60)  
 
 def calculate_overtime(clock_out: time, office_end: time) -> int:
     out_dt = datetime.combine(date.today(), clock_out)
     office_end_dt = datetime.combine(date.today(), office_end)
     overtime_seconds = max(0, (out_dt - office_end_dt).total_seconds())
-    return round(overtime_seconds / 60)  # menit
+    return round(overtime_seconds / 60) 
 
 def mark_absent_for_missing_days(db: Session, employee_id: int):
     today = datetime.now(wib).date()
@@ -44,7 +44,6 @@ def mark_absent_for_missing_days(db: Session, employee_id: int):
     
     current_date = last_date + timedelta(days=1)
     while current_date < today:
-        # Skip weekend (Sabtu=5, Minggu=6)
         if current_date.weekday() >= 5:
             current_date += timedelta(days=1)
             continue

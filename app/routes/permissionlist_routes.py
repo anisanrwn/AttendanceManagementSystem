@@ -1,5 +1,3 @@
-# app/routes/permissionlist_routes.py
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
@@ -7,10 +5,7 @@ from app.database import get_db
 from app.models import model as m
 from app.utils.email import send_email 
 
-router = APIRouter(
-    prefix="/permissionlist",
-    tags=["Permission List"]
-)
+router = APIRouter(prefix="/permissionlist", tags=["Permission List"])
 
 @router.get("/permissions/list")
 def get_all_permissions(db: Session = Depends(get_db)):

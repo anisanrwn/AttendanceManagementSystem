@@ -60,11 +60,10 @@
     color: #6b7280;
 }
 
-/* Modern color scheme */
-
 .chart-button-wrapper {
-    margin-top: 0px; /* atau sesuai kebutuhan, misalnya 8px */
+    margin-top: 0px;
   }
+  
 #workingHoursChart {
-  margin-bottom: 0; /* Hilangkan jarak bawah chart */
+  margin-bottom: 0;
 }

@@ -5,12 +5,13 @@ from datetime import date, time, datetime
 class RoleLockStatus(BaseModel):
     roles_id: int
     roles_name: str
-    status: bool  # True = active, False = locked
+    status: bool  
+
 class ManageRoleLock(BaseModel):
     role_id: int
-    action: str  # "lock" or "unlock"
-    start_date: str  # ISO format datetime
-    end_date: str  # ISO format datetime
+    action: str
+    start_date: str  
+    end_date: str 
     reason: Optional[str] = None
     
 class PermissionBase(BaseModel):

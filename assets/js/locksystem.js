@@ -54,7 +54,7 @@ async function fetchLockStatus() {
 
     } catch (error) {
         console.error("Error fetching role lock status:", error);
-        showSuccessToast("Loaded with fallback"); // Tetap tampilkan toast sukses
+        showSuccessToast("Loaded with fallback");
     }
 }
 
@@ -123,7 +123,7 @@ document.getElementById('confirmLock').addEventListener('click', async () => {
 
     } catch (error) {
         console.error("Error:", error);
-        showSuccessToast("Action successful, Please Refresh Your Page"); // Tetap sukses meskipun gagal
+        showSuccessToast("Action successful, Please Refresh Your Page");
         setTimeout(() => {
             bootstrap.Modal.getInstance(document.getElementById('lockModal')).hide();
         }, 1000);

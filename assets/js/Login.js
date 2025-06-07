@@ -50,9 +50,9 @@ document.addEventListener("DOMContentLoaded", function () {
         sessionStorage.setItem("isSuperAdmin", roleNames.includes("Super Admin") ? "true" : "false");
 
         if (roleNames.includes("Super Admin") || roleNames.includes("Admin")) {
-            window.location.href = `/html/dashboardsuperadmin.html`;
+            window.location.href = `/html/admin_dashboard.html`;
         } else if (roleNames.includes("Employee")) {
-            window.location.href = `/html/index.html`;
+            window.location.href = `/html/employee_dashboard.html`;
         } else {
             showAlert("Role not recognized");
             window.location.href = "/login/login";

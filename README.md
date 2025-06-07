@@ -6,7 +6,7 @@ karena setup envnya org" ini beda", jdinya gue gitginore myvenv sama .env. ini s
 - cd dlib-install
 - python -m pip install dlib-19.24.1-cp311-cp311-win_amd64.whl (py ver 11) / python -m pip install dlib-19.24.99-cp312-cp312-win_amd64.whl (py ver 12)
 - cd ..
-- pip install -r yuyusrequirement.txt (py 12) / pip install -r yuyusrequirement.txt (+ pip install numpy == 1.25.1)
+- pip install -r yuyusrequirement.txt (py 12) / pip install -r yuyusrequirement.txt (+ pip install numpy==1.25.1)
 - buat file .env & paste yg di desc wa
 - uvicorn app.main:main_app --reload
 ---------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,5 +1,3 @@
-
-
 class HTTPExceptionMessages:
     UNAUTHORIZED = "Email atau password salah."
     INVALID_TOKEN_TYPE = "Invalid token type"

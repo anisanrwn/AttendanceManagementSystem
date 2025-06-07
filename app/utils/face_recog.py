@@ -26,7 +26,7 @@ def verify_face(image_base64, known_encoding, threshold=0.6):
     faces_encodings = face_recognition.face_encodings(rgb_img)
 
     if not faces_encodings:
-        return False, None  # Tidak ada wajah terdeteksi
+        return False, None 
 
     unknown_encoding = faces_encodings[0]
     distance = np.linalg.norm(np.array(known_encoding) - np.array(unknown_encoding))

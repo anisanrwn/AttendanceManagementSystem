@@ -42,11 +42,10 @@ SMTP_PORT = 587
 otp_storage = {}
 
 def generate_otp():
-    """Menghasilkan OTP 6 digit"""
     return ''.join(random.choices(string.digits, k=6))
 
 def send_otp_email(email, otp):
-    """Mengirim OTP ke email pengguna"""
+
     try:
         message = MIMEMultipart()
         message["From"] = EMAIL_ADDRESS
