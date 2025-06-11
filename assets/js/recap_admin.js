@@ -15,11 +15,17 @@ async function fetchAllAttendance() {
       const name = record.employee_name || '-';
       const punchInArea = record.clock_in_reason ? 'Outside' : (record.clock_in_lat !== null && record.clock_in_lng !== null) ? 'Inside' : 'None';
       const punchOutArea = record.clock_out_reason ? 'Outside' : (record.clock_out_lat !== null && record.clock_out_lng !== null) ? 'Inside' : 'None';
-
+      const statusText = record.late === 0 ? "on time" : record.late ? "late" : "none";
       const row = document.createElement("tr");
+      row.setAttribute("data-status", statusText);
       row.innerHTML = `
-          <td class="text-center">${record.attendance_date || '-'}</td>
-          <td class="text-center">${name}</td>
+        <td class="text-center">${record.attendance_date || '-'}</td>
+        <td class="text-center">${name}</td>
+        <td class="text-center">
+          ${record.late === 0 ? '<span class="badge bg-success">On Time</span>' 
+            : record.late ? `<span class="badge bg-warning" onclick="Swal.fire('Late Duration', '${formatDuration(record.late)}', 'info')">Late</span>`
+            : '-'}
+        </td>
           <td class="text-center">${record.attendance_status || '-'}</td>
           <td class="text-center">${record.clock_in || '-'}</td>
           <td class="text-center">
@@ -36,9 +42,12 @@ async function fetchAllAttendance() {
                 ${record.face_verified ? 'Yes' : 'No'}
             </span>
           </td>
-          <td class="text-center">${record.totalHours || '-'}</td>
-          <td class="text-center">${record.late !== null && record.late !== undefined ? record.late + ' mins' : '-'}</td>
-          <td class="text-center">${record.overtime !== null && record.overtime !== undefined ? record.overtime + ' mins' : '-'}</td>
+          <td class="text-center">
+            ${record.totalHours !== null && record.totalHours !== undefined ? formatDuration(record.totalHours): '-'}
+          </td>
+          <td class="text-center">
+            ${record.overtime !== null && record.overtime !== undefined ? formatDuration(record.overtime) : '-'}
+          </td>
       `;
       tableBody.appendChild(row);
     });
@@ -48,6 +57,13 @@ async function fetchAllAttendance() {
   } catch (error) {
     console.error("Error fetching attendance:", error);
   }
+}
+function formatDuration(minutes) {
+  const hrs = Math.floor(minutes / 60);
+  const mins = Math.floor(minutes % 60);
+  const secs = Math.round((minutes * 60) % 60);
+
+  return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
 
@@ -96,7 +112,7 @@ function populateFilters() {
 
   rows.forEach(row => {
     const dateText = row.cells[0].textContent.trim().split(' ')[0];
-    const status = row.cells[2].textContent.trim().toLowerCase();
+    const status = row.getAttribute("data-status");
 
     const date = new Date(dateText);
     if (!isNaN(date)) {
@@ -137,7 +153,7 @@ function filterAttendance() {
   rows.forEach(row => {
     const dateText = row.cells[0].textContent.trim().split(' ')[0];
     const name = row.cells[1].textContent.toLowerCase();
-    const status = row.cells[2].textContent.toLowerCase();
+    const status = row.getAttribute("data-status");
 
     const date = new Date(dateText);
     const rowMonth = (date.getMonth() + 1).toString().padStart(2, '0');

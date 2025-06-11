@@ -15,12 +15,20 @@ async function fetchAttendance() {
       const row = document.createElement("tr");
       row.innerHTML = `
         <td class="text-center">${record.date || '-'}</td>
+        <td class="text-center">
+          ${record.late === 0 ? '<span class="badge bg-success">On Time</span>' 
+            : record.late ? `<span class="badge bg-warning" onclick="Swal.fire('Late Duration', '${formatDuration(record.late)}', 'info')">Late</span>`
+            : '-'}
+        </td>
         <td class="text-center">${record.attendance_status || '-'}</td>
         <td class="text-center">${record.punch_in || '-'}</td>
         <td class="text-center">${record.punch_out || '-'}</td>
-        <td class="text-center">${record.totalHours || '-'}</td>
-        <td class="text-center">${record.late !== null && record.late !== undefined ? record.late + ' mins' : '-'}</td>
-        <td class="text-center">${record.overtime !== null && record.overtime !== undefined ? record.overtime + ' mins' : '-'}</td>
+        <td class="text-center">
+          ${record.totalHours !== null && record.totalHours !== undefined ? formatDuration(record.totalHours): '-'}
+        </td>
+        <td class="text-center">
+          ${record.overtime !== null && record.overtime !== undefined ? formatDuration(record.overtime) : '-'}
+        </td>
       `;
       tableBody.appendChild(row);
     });
@@ -31,6 +39,15 @@ async function fetchAttendance() {
 }
 
 fetchAttendance();
+
+function formatDuration(minutes) {
+  const hrs = Math.floor(minutes / 60);
+  const mins = Math.floor(minutes % 60);
+  const secs = Math.round((minutes * 60) % 60);
+
+  return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
 
 const filterStatus = document.getElementById('filterStatus');
 const filterMonth = document.getElementById('filterMonth');

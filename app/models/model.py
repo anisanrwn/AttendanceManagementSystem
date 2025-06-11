@@ -1,9 +1,9 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Float, Text, LargeBinary, DateTime, Boolean, Index, Time
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Float, Text, DateTime, Boolean, Index, Time
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
-from datetime import datetime
-
+from datetime import datetime, timedelta
+from sqlalchemy.dialects.postgresql import INTERVAL
 
 class Employee(Base):
     __tablename__ = 'employees'
@@ -94,28 +94,26 @@ class Attendance(Base):
 
     attendance_id = Column(Integer, primary_key=True, index=True)
     employee_id = Column(Integer, ForeignKey('employees.employee_id'))
-    
-    # Clock in data
+    attendance_date = Column(Date)
+    late = Column(Integer, default=0, nullable=False)
+    attendance_status = Column(String(20))
     clock_in = Column(Time)  
     clock_in_latitude = Column(Float)
     clock_in_longitude = Column(Float)
     clock_in_verified = Column(Boolean, default=False)
     clock_in_reason = Column(Text, nullable=True)
     clock_in_distance = Column(Float, nullable=True)
-
-    # Clock out data
     clock_out = Column(Time, nullable=True) 
     clock_out_latitude = Column(Float, nullable=True)
     clock_out_longitude = Column(Float, nullable=True)
     clock_out_verified = Column(Boolean, default=False)
     clock_out_reason = Column(Text, nullable=True)
     clock_out_distance = Column(Float, nullable=True)
-    
     attendance_date = Column(Date)
     attendance_status = Column(String(20))
-    
     face_verified = Column(Boolean, default=False)
-    
+    working_hour = Column(Integer, nullable=True)
+    overtime = Column(Integer, nullable=True)
     employee = relationship("Employee", back_populates="attendances")
 
 class Permission(Base):

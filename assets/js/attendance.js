@@ -16,11 +16,19 @@ function formatTime(ms) {
   return [h, m, s].map(n => String(n).padStart(2, '0')).join(':');
 }
 
+function formatHMS(minutes) {
+  const totalSeconds = Math.floor(minutes * 60);
+  const hours = Math.floor(totalSeconds / 3600);
+  const mins = Math.floor((totalSeconds % 3600) / 60);
+  const secs = totalSeconds % 60;
+  return [hours, mins, secs].map(n => String(n).padStart(2, '0')).join(':');
+}
+
 function getGreeting(hour) {
-  if (hour < 12) return "Good Morning";
-  if (hour < 17) return "Good Afternoon";
-  if (hour < 20) return "Good Evening";
-  return "Good Night";
+  if (hour < 12) return "Good Morning!";
+  if (hour < 17) return "Good Afternoon!";
+  if (hour < 20) return "Good Evening!";
+  return "Good Night!";
 }
 
 async function getServerTime() {
@@ -270,7 +278,7 @@ async function resetToAttendancePage() {
 
     document.getElementById("inTime").textContent = data.clock_in ?? "--:--";
     document.getElementById("outTime").textContent = data.clock_out ?? "--:--";
-    document.getElementById("totalHours").textContent = data.totalHours ?? "--";
+    document.getElementById("totalHours").textContent =  data.totalHours != null ? formatHMS(data.totalHours) : "--";
 
     const statusText = data.attendance_status ?? "Absent";
     console.log('Status text:', statusText);

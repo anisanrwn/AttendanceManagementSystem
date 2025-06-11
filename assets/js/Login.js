@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 showAlert(errorMessage, 'error');
 
                 if (data.detail === "Your role is currently locked. Please contact an administrator.") {
-                    window.location.href = "../html/pages-misc-under-maintenance.html";
+                    window.location.href = "../html/undermaintenance.html";
                 }
                 return;
             }

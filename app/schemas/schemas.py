@@ -152,7 +152,7 @@ class AttendanceStatusResponse(BaseModel):
     employee_id: int
     clock_in: Optional[str]
     clock_out: Optional[str]
-    totalHours: Optional[str]
+    totalHours: Optional[int]
     attendance_status: str
     clock_in_latitude: Optional[float]
     clock_in_longitude: Optional[float]

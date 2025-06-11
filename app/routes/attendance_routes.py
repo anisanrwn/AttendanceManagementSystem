@@ -11,7 +11,7 @@ from datetime import datetime, timedelta, timezone, date, time
 router = APIRouter(prefix="/attendance", tags=["Attendance"])
 
 OFFICE_START = time(8, 0, 0)
-OFFICE_END = time(17, 0, 0)
+OFFICE_END = time(16, 45, 0)
 
 @router.get("/server-time")
 def get_server_time():
@@ -58,7 +58,8 @@ def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depen
         clock_in_distance=distance,
         face_verified=is_verified,
         attendance_date=today,
-        attendance_status="Punch In" if is_verified else "Absent"
+        attendance_status="Punch In" if is_verified else "Absent",
+        late = calculate_late(datetime.now().time(), OFFICE_START)
     )
 
     db.add(attendance)
@@ -105,7 +106,9 @@ def clock_out_attendance(payload: s.AttendanceClockOutSession, db: Session = Dep
     attendance.clock_out_verified = True
     attendance.face_verified = attendance.face_verified and is_verified 
     attendance.attendance_status = "Punch Out" if is_verified else "Absent"
-    attendance.clock_out_distance = distance  
+    attendance.clock_out_distance = distance
+    attendance.working_hour = calculate_total_hours(attendance.clock_in, attendance.clock_out)
+    attendance.overtime = calculate_overtime(attendance.clock_out, OFFICE_END)
 
     db.commit()
     db.refresh(attendance)
@@ -135,7 +138,7 @@ def get_attendance_status(employee_id: int, db: Session = Depends(get_db)):
             "employee_id": employee_id,
             "clock_in": None,
             "clock_out": None,
-            "totalHours": "--",
+            "working_hour": "--",
             "attendance_status": "Absent",
             "clock_in_latitude": None,
             "clock_in_longitude": None,
@@ -173,9 +176,10 @@ def view_attendance(employee_id: int, db: Session = Depends(get_db)):
             "attendance_status": rec.attendance_status,
             "punch_in": rec.clock_in.strftime('%H:%M:%S') if rec.clock_in else None,
             "punch_out": rec.clock_out.strftime('%H:%M:%S') if rec.clock_out else None,
-            "totalHours": calculate_total_hours(rec.clock_in, rec.clock_out),
-            "late" : calculate_late(rec.clock_in, OFFICE_START) if rec.clock_in else None,
-            "overtime" : calculate_overtime(rec.clock_out, OFFICE_END) if rec.clock_out else None,
+            "totalHours": calculate_total_hours(rec.clock_in, rec.clock_out, rec.attendance_date),
+            "late": calculate_late(rec.clock_in, OFFICE_START, rec.attendance_date) if rec.clock_in else None,
+            "overtime": calculate_overtime(rec.clock_out, OFFICE_END, rec.attendance_date) if rec.clock_out else None,
+
         })
 
     return {"attendance": result}
@@ -207,9 +211,9 @@ def view_all_attendance(db: Session = Depends(get_db)):
             "clock_in_reason": rec.clock_in_reason,
             "clock_out_reason": rec.clock_out_reason,
             "face_verified": rec.face_verified,
-            "totalHours": calculate_total_hours(rec.clock_in, rec.clock_out),
-            "late": calculate_late(rec.clock_in, OFFICE_START) if rec.clock_in else None,
-            "overtime": calculate_overtime(rec.clock_out, OFFICE_END) if rec.clock_out else None,
+            "totalHours": calculate_total_hours(rec.clock_in, rec.clock_out, rec.attendance_date),
+            "late": calculate_late(rec.clock_in, OFFICE_START, rec.attendance_date) if rec.clock_in else None,
+            "overtime": calculate_overtime(rec.clock_out, OFFICE_END, rec.attendance_date) if rec.clock_out else None,
         })
 
     return {"attendance": result}

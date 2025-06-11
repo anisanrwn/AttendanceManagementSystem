@@ -10,25 +10,27 @@ def format_time(dt: datetime | None):
         return None
     return dt.strftime('%H:%M:%S')
 
-def calculate_total_hours(clock_in, clock_out):
+def calculate_total_hours(clock_in: time, clock_out: time, attendance_date: date):
     if not clock_in or not clock_out:
         return None
-    in_dt = datetime.combine(date.today(), clock_in)
-    out_dt = datetime.combine(date.today(), clock_out)
+    in_dt = datetime.combine(attendance_date, clock_in)
+    out_dt = datetime.combine(attendance_date, clock_out)
     duration = out_dt - in_dt
-    return str(duration).split('.')[0]  
+    return int(duration.total_seconds() // 60)
 
-def calculate_late(clock_in: time, office_start: time) -> int:
-    in_dt = datetime.combine(date.today(), clock_in)
-    office_start_dt = datetime.combine(date.today(), office_start)
+
+def calculate_late(clock_in: time, office_start: time, attendance_date: date) -> int:
+    in_dt = datetime.combine(attendance_date, clock_in)
+    office_start_dt = datetime.combine(attendance_date, office_start)
     late_seconds = max(0, (in_dt - office_start_dt).total_seconds())
-    return round(late_seconds / 60)  
+    return round(late_seconds / 60)
+ 
 
-def calculate_overtime(clock_out: time, office_end: time) -> int:
-    out_dt = datetime.combine(date.today(), clock_out)
-    office_end_dt = datetime.combine(date.today(), office_end)
+def calculate_overtime(clock_out: time, office_end: time, attendance_date: date) -> int:
+    out_dt = datetime.combine(attendance_date, clock_out)
+    office_end_dt = datetime.combine(attendance_date, office_end)
     overtime_seconds = max(0, (out_dt - office_end_dt).total_seconds())
-    return round(overtime_seconds / 60) 
+    return round(overtime_seconds / 60)
 
 def mark_absent_for_missing_days(db: Session, employee_id: int):
     today = datetime.now(wib).date()
