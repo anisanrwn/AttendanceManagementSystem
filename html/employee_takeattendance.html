@@ -26,13 +26,15 @@
     <!-- Vendors CSS -->
     <link rel="stylesheet" href="../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
     <link rel="stylesheet" href="../assets/vendor/libs/apex-charts/apex-charts.css" />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Helpers -->
     <script src="../assets/vendor/js/helpers.js"></script>
 
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="../assets/js/config.js"></script>
+
+    <!--Sweetalert-->
+    <script src=" https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!--Extra-->
     <link rel="stylesheet" href="../assets/css/extra.css" />
@@ -45,25 +47,23 @@
       <div class="layout-container">
 
         <!-- NAVBAR MENU VERTICAL -->
-            <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-              <div class="app-brand demo">
-                <a href="employee_dashboard.html" class="app-brand-link">
-                  <span class="app-brand-logo demo">
-                    <img src="/assets/img/logo.png" alt="Logo" width="35" />
-                  </span>
-                  <span class="app-brand-text demo menu-text fw-bolder ms-2" style="font-size: 1rem; text-transform: uppercase;">
-                    UNITED TRACTORS
-                  </span>
-                </a>
-
-                <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
-                  <i class="bx bx-chevron-left bx-sm align-middle"></i>
-                </a>
-              </div>
+        <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+          <div class="app-brand demo">
+            <a href="employee_dashboard.html" class="app-brand-link">
+              <span class="app-brand-logo demo">
+                <img src="/assets/img/logo.png" alt="Logo" width="35" />
+              </span>
+              <span class="app-brand-text demo menu-text fw-bolder ms-2" style="font-size: 1rem; text-transform: uppercase;">
+                UNITED TRACTORS
+              </span>
+            </a>
+            <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+              <i class="bx bx-chevron-left bx-sm align-middle"></i>
+            </a>
+          </div>
 
           <!-- Navbar List-->
           <div class="menu-inner-shadow"></div>
-
           <ul class="menu-inner py-1">
             <li class="menu-item ">
               <a href="employee_dashboard.html" class="menu-link">
@@ -118,73 +118,63 @@
                 <i class="bx bx-menu bx-sm"></i>
               </a>
             </div>
-
             <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
               <ul class="navbar-nav flex-row align-items-center ms-auto">
-
-                <!-- Notification Area -->
                 <ul class="navbar-nav flex-row align-items-center ms-auto">
                   <li class="nav-item lh-1 me-3 position-relative">
                     <a href="#" class="nav-link px-2" id="notification-area" data-bs-toggle="dropdown" aria-expanded="false" role="button">
                       <i class="bx bx-bell" style="font-size: 1.5rem;"></i>
-                      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                            id="notification-badge"
-                            style="display: none;"></span>
+                      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-badge"style="display: none;"></span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end py-0"
-                        aria-labelledby="notification-area"
-                        style="width: 350px; max-height: 400px; overflow-y: auto;">
+                    <ul class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="notification-area" style="width: 350px; max-height: 400px; overflow-y: auto;">
                       <li>
                         <div class="dropdown-item text-center py-3 text-muted">Loading notifications...</div>
                       </li>
                     </ul>
                   </li>
-
-                <!-- User -->
-                 <!-- User Dropdown -->
-       <li class="nav-item navbar-dropdown dropdown-user dropdown">
-         <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-       <div class="avatar avatar-online">
-       <img id="navbarProfileAvatar" src="../assets/img/avatars/default.png" alt class="w-px-40 h-auto rounded-circle" />
-       </div>
-         </a>
-       <ul class="dropdown-menu dropdown-menu-end">
-       <li>
-      <a class="dropdown-item" href="#">
-        <div class="d-flex">
-          <div class="flex-shrink-0 me-3">
-            <div class="avatar avatar-online">
-              <img id="dropdownProfileAvatar" src="../assets/img/avatars/default.png" alt class="w-px-40 h-auto rounded-circle" />
-            </div>
-          </div>
-          <div class="flex-grow-1">
-            <span id="navbarProfileName" class="fw-semibold d-block"></span>
-            <small id="navbarProfileRole" class="text-muted"></small>
-
+                  <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                    <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+                      <div class="avatar avatar-online">
+                        <img id="navbarProfileAvatar" src="../assets/img/avatars/default.png" alt class="w-px-40 h-auto rounded-circle" />
+                      </div>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                      <li>
+                        <a class="dropdown-item" href="#">
+                          <div class="d-flex">
+                            <div class="flex-shrink-0 me-3">
+                              <div class="avatar avatar-online">
+                                <img id="dropdownProfileAvatar" src="../assets/img/avatars/default.png" alt class="w-px-40 h-auto rounded-circle" />
+                              </div>
+                            </div>
+                            <div class="flex-grow-1">
+                              <span id="navbarProfileName" class="fw-semibold d-block"></span>
+                              <small id="navbarProfileRole" class="text-muted"></small>
+                            </div>
                           </div>
-                        </div>
-                      </a>
-                    </li>
-                    <li>
-                      <div class="dropdown-divider"></div>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="employee_profile.html">
-                        <i class="bx bx-user me-2"></i>
-                        <span class="align-middle">My Profile</span>
-                      </a>
-                    </li>
-                    <li>
-                      <div class="dropdown-divider"></div>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="Login.html">
-                        <i class="bx bx-power-off me-2"></i>
-                        <span class="align-middle">Log Out</span>
-                      </a>
-                    </li>
-                  </ul>
-                </li>
+                        </a>
+                      </li>
+                      <li>
+                        <div class="dropdown-divider"></div>
+                      </li>
+                      <li>
+                        <a class="dropdown-item" href="employee_profile.html">
+                          <i class="bx bx-user me-2"></i>
+                          <span class="align-middle">My Profile</span>
+                        </a>
+                      </li>
+                      <li>
+                        <div class="dropdown-divider"></div>
+                      </li>
+                      <li>
+                        <a class="dropdown-item" href="Login.html">
+                          <i class="bx bx-power-off me-2"></i>
+                          <span class="align-middle">Log Out</span>
+                        </a>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
               </ul>
             </div>
           </nav>
@@ -198,6 +188,7 @@
                 <div class="container-xxxl py-1">
                   <div class="card">
                     <div class="card-body">
+                      
                       <!-- opening page-->
                       <div id="attendance-page">
                         <div class="card shadow-sm mb-4 p-4 d-flex flex-md-row flex-column justify-content-between align-items-center" style="background-color: #f0f2ff; border-left: 5px solid #696cff;">
@@ -210,9 +201,11 @@
                             <span id="countdown-text" class="fw-bold text-primary" style="font-size: 1.2rem;"></span>
                           </div>
                         </div>
+                        
                         <!-- Punch Section -->
                         <div class="row">
-                          <!-- KIRI: Attendance Box -->
+                          
+                          <!-- Kiri : Attendance Box -->
                           <div class="col-lg-6 col-md-12">
                             <div class="card h-100 p-4">
                               <h5 class="mb-3 text-center">Attendance</h5>
@@ -233,7 +226,8 @@
                               </ul>
                             </div>
                           </div>
-                          <!-- kanan: Live Clock -->
+                          
+                          <!-- Kanan: Live Clock -->
                           <div class="col-lg-6 col-md-12">
                             <div class="card h-100 text-center p-4 d-flex align-items-center justify-content-center">
                               <div>
@@ -254,58 +248,57 @@
                           <div class="progress-step">3</div>
                         </div>
 
-
+                        <!-- Step 1: Loc Access -->
                         <div class="step-container active-step" id="step1Container">
                           <h4 class="mb-4">Step 1: Location Access</h4>
                           <div class="d-grid gap-2">
                             <p>We need access to your location to verify your attendance.</p>
                             <div class="d-flex justify-content-center align-items-center gap-2">
-                                <button id="backToAttendanceBtn" class="btn btn-secondary">Back to Attendance</button>
-                                <button class="btn btn-primary" id="allowLocationBtn">Allow Location Access</button>
+                              <button id="backToAttendanceBtn" class="btn btn-secondary">Back to Attendance</button>
+                              <button class="btn btn-primary" id="allowLocationBtn">Allow Location Access</button>
                             </div>
                           </div>
                         </div>
 
-                        <!-- Step 2: Show Map & Verify Location -->
+                        <!-- Step 2: Loc Track -->
                         <div class="step-container" id="step2Container">
-                            <h4 class="mb-4">Step 2: Location Verification</h4>
-                            
-                            <!-- Location Details Card -->
-                            <div class="card mb-3">
-                                <div class="card-body location-info">
-                                    <h5 class="card-title">Your Current Location</h5>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <p><strong>Latitude:</strong> <span id="currentLat">-</span></p>
-                                            <p><strong>Longitude:</strong> <span id="currentLng">-</span></p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p><strong>Accuracy:</strong> <span id="locationAccuracy">-</span> meters</p>
-                                            <p><strong>Distance from Office:</strong> <span id="distanceToOffice">-</span> meters</p
-                                        </div>
-                                    </div>
-                                    <div id="locationStatus" class="status-indicator mt-2">Checking your location...</div>
+                          <h4 class="mb-4">Step 2: Location Verification</h4>
+                          <div class="card mb-3">
+                            <div class="card-body location-info">
+                              <h5 class="card-title">Your Current Location</h5>
+                              <div class="row">
+                                <div class="col-md-6">
+                                  <p><strong>Latitude:</strong> <span id="currentLat">-</span></p>
+                                  <p><strong>Longitude:</strong> <span id="currentLng">-</span></p>
                                 </div>
-                            </div>
-                            
-                            <div id="map"></div>
-                            
-                            <!-- Form for users outside of geofence -->
-                            <div id="reasonForm">
-                                <div class="card-body">
-                                    <h5 class="card-title">Please explain why you're not in the designated area</h5>
-                                    <div class="mb-3">
-                                        <label for="reasonText" class="form-label">Reason:</label>
-                                        <textarea class="form-control" id="reasonText" rows="3" required></textarea>
-                                    </div>
+                                <div class="col-md-6">
+                                  <p><strong>Accuracy:</strong> <span id="locationAccuracy">-</span> meters</p>
+                                  <p><strong>Distance from Office:</strong> <span id="distanceToOffice">-</span> meters</p
                                 </div>
+                              </div>
+                              <div id="locationStatus" class="status-indicator mt-2">Checking your location...</div>
                             </div>
                           </div>
-                          <div class="d-flex justify-content-center align-items-center gap-2">
-                              <button class="btn btn-secondary" id="btn-back-step">Back</button>
-                              <button class="btn btn-primary" id="verifyLocationBtn" disabled>Next: Face Verification</button>
+                          
+                          <div id="map"></div>
+                          
+                          <!-- Form for users outside of geofence -->
+                          <div id="reasonForm">
+                            <div class="card-body">
+                              <h5 class="card-title">Please explain why you're not in the designated area</h5>
+                              <div class="mb-3">
+                                <label for="reasonText" class="form-label">Reason:</label>
+                                <textarea class="form-control" id="reasonText" rows="3" required></textarea>
+                              </div>
+                            </div>
                           </div>
+                        </div>
+                        <div class="d-flex justify-content-center align-items-center gap-2">
+                          <button class="btn btn-secondary" id="btn-back-step">Back</button>
+                          <button class="btn btn-primary" id="verifyLocationBtn" disabled>Next: Face Verification</button>
+                        </div>
                       </div>
+                      
                       <!-- Step 3: Face Recognition -->
                       <div id="step3Container" class="step-container" style="display:none;">
                         <h3>Step 3: Face Recognition</h3>
@@ -314,11 +307,11 @@
                           <button class="btn btn-primary" id="captureFaceBtn" disabled>Capture & Verify Face</button>
                         </div>
                       </div>
-                      </div>
                     </div>
-                    <div class="layout-overlay layout-menu-toggle"></div>
                   </div>
+                  <div class="layout-overlay layout-menu-toggle"></div>
                 </div>
+              </div>
             </div>
           </div>
         </div>
@@ -344,7 +337,6 @@
         <script type="module" src="../assets/js/facerecog.js"></script>
         <script type="module" src="../assets/js/notifications.js"></script>
         <script type="module" src="../assets/js/navbar.js"></script>
-      </div>
     </div>
   </body>
 </html>

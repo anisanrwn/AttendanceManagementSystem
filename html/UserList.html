@@ -129,8 +129,6 @@
             </div>
 
             <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-              
-              <!-- Notification Area -->
               <ul class="navbar-nav flex-row align-items-center ms-auto">
                 <li class="nav-item lh-1 me-3 position-relative">
                   <a href="#" class="nav-link px-2" id="notification-area" data-bs-toggle="dropdown" aria-expanded="false" role="button">
@@ -147,26 +145,24 @@
                     </li>
                   </ul>
                 </li>
-
-                <!-- User Dropdown -->
                 <li class="nav-item navbar-dropdown dropdown-user dropdown">
-                    <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                      <div class="avatar avatar-online">
-                        <img id="navbarProfileAvatar" src="../assets/img/avatars/default.png" alt class="w-px-40 h-auto rounded-circle" />
-                      </div>
-                    </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                    <a class="dropdown-item" href="#">
-                      <div class="d-flex">
-                      <div class="flex-shrink-0 me-3">
-                        <div class="avatar avatar-online">
-                           <img id="dropdownProfileAvatar" src="../assets/img/avatars/default.png" alt class="w-px-40 h-auto rounded-circle" />
-                        </div>
-                      </div>
-                  <div class="flex-grow-1">
-                      <span id="navbarProfileName" class="fw-semibold d-block"></span>
-                          <small id="navbarProfileRole" class="text-muted"></small>
+                  <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+                    <div class="avatar avatar-online">
+                      <img id="navbarProfileAvatar" src="../assets/img/avatars/default.png" alt class="w-px-40 h-auto rounded-circle" />
+                    </div>
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                      <a class="dropdown-item" href="#">
+                        <div class="d-flex">
+                          <div class="flex-shrink-0 me-3">
+                            <div class="avatar avatar-online">
+                              <img id="dropdownProfileAvatar" src="../assets/img/avatars/default.png" alt class="w-px-40 h-auto rounded-circle" />
+                            </div>
+                          </div>
+                          <div class="flex-grow-1">
+                            <span id="navbarProfileName" class="fw-semibold d-block"></span>
+                            <small id="navbarProfileRole" class="text-muted"></small>
                           </div>
                         </div>
                       </a>
@@ -194,19 +190,19 @@
               <div class="card">
                 <h5 class="card-header">User Management</h5>
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                      <!-- Filters Section -->
-                      <input type="text" id="searchInput" class="form-control me-2" style="flex: 1; max-width: 500px;" placeholder="Search by Name or Username">
-                        <select id="filterRole" class="form-select me-2" style="flex: 1; max-width: 400px;">
-                          <option value="">Select Roles</option>
-                        </select>
-                        <button class="btn" id="clearFiltersButton" style="background-color: #7f82ff; color: white; max-width: 150px;">Clear Filters</button>
-                        <!-- Add User Button -->
-                        <button class="btn ms-2 d-flex align-items-center justify-content-center gap-2" id="addAccountButton" style="max-width: 200px; background-color: #7f82ff; color: white;" data-bs-toggle="modal" data-bs-target="#addAccountModal">
-                          <i class="bx bx-plus"></i>
-                          <span>Add Account</span>
-                        </button>
-                    </div>
+                  <div class="d-flex justify-content-between align-items-center mb-4">
+                    <!-- Filters Section -->
+                    <input type="text" id="searchInput" class="form-control me-2" style="flex: 1; max-width: 500px;" placeholder="Search by Name or Username">
+                    <select id="filterRole" class="form-select me-2" style="flex: 1; max-width: 400px;">
+                      <option value="">Select Roles</option>
+                    </select>
+                    <button class="btn" id="clearFiltersButton" style="background-color: #7f82ff; color: white; max-width: 150px;">Clear Filters</button>
+                    <!-- Add User Button -->
+                    <button class="btn ms-2 d-flex align-items-center justify-content-center gap-2" id="addAccountButton" style="max-width: 200px; background-color: #7f82ff; color: white;" data-bs-toggle="modal" data-bs-target="#addAccountModal">
+                      <i class="bx bx-plus"></i>
+                      <span>Add Account</span>
+                    </button>
+                  </div>
                 </div>
     
                 <!-- Modal for Adding Account -->
@@ -218,37 +214,37 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
-                          <form id="addAccountForm">
-                            <div class="mb-3">
-                              <label for="employeeSelect" class="form-label">Select Employee</label>
-                              <select id="employeeSelect" class="form-control" name="employee_id"required >
-                                <option value="">Select Employee</option>
-                              </select>
-                            </div>
-                            <div class="mb-3">
-                              <label for="username" class="form-label">Username</label>
-                              <input type="text" class="form-control" id="username" name="username" required>
-                            </div>
-                            <div class="mb-3">
-                              <label for="email" class="form-label">Email</label>
-                              <input type="email" class="form-control" id="email" name="email" required>
-                            </div>
-                            <div class="mb-3">
-                              <label for="password" class="form-label">Password</label>
-                              <input type="password" class="form-control" id="password" name="password" required>
-                            </div>
-                            <div class="mb-3">
-                              <label for="roleSelect" class="form-label">Select Roles</label>
-                              <select id="roleSelect" class="form-control" name="role_name"required >
-                                <option value="">Select Roles</option>
-                              </select>
-                            </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                              <button type="button" id="submitAccount" class="btn" style="background-color: #7f82ff; color: white;">Save Account</button>
-                            </div>
-                          </form>
-                        </div>  
+                        <form id="addAccountForm">
+                          <div class="mb-3">
+                            <label for="employeeSelect" class="form-label">Select Employee</label>
+                            <select id="employeeSelect" class="form-control" name="employee_id"required >
+                              <option value="">Select Employee</option>
+                            </select>
+                          </div>
+                          <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                          </div>
+                          <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                          </div>
+                          <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                          </div>
+                          <div class="mb-3">
+                            <label for="roleSelect" class="form-label">Select Roles</label>
+                            <select id="roleSelect" class="form-control" name="role_name"required >
+                              <option value="">Select Roles</option>
+                            </select>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" id="submitAccount" class="btn" style="background-color: #7f82ff; color: white;">Save Account</button>
+                          </div>
+                        </form>
+                      </div>  
                     </div>
                   </div>
                 </div>

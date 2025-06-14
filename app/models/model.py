@@ -2,8 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Date, Float, Text, D
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
-from datetime import datetime, timedelta
-from sqlalchemy.dialects.postgresql import INTERVAL
+from datetime import datetime
 
 class Employee(Base):
     __tablename__ = 'employees'

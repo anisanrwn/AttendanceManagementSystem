@@ -92,7 +92,6 @@ async function saveEmployee(e) {
     const department = document.getElementById('department').value.trim();
     const image = document.getElementById('photo').value.trim();
     const emailAvailable = await isEmailAvail(email);
-    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^08[0-9]{8,11}$/;
 
@@ -113,6 +112,11 @@ async function saveEmployee(e) {
 
     if (!phoneRegex.test(phone)) {
         Swal.fire('Error!', 'Phone number must be 10–13 digits (numbers only) and starts with 08.', 'error');
+        return;
+    }
+
+    if (nrp.length !== 11) {
+        Swal.fire('Error!', 'NRP must be exactly 11 digits.', 'error');
         return;
     }
 

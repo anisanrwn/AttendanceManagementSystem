@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function redirectToLogin() {
-        window.location.href = '/login.html'; // Sesuaikan dengan halaman login kamu
+        window.location.href = '/Login.html'; // Sesuaikan dengan halaman login kamu
     }
 
     // Event listener untuk form submission

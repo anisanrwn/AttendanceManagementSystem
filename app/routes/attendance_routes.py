@@ -30,7 +30,6 @@ def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depen
     if not employee.face_encoding:
         raise HTTPException(status_code=400, detail="Employee has no face encoding")
 
-
     known_encoding = json.loads(employee.face_encoding)
     is_verified, distance = verify_face(payload.image_base64, known_encoding)
     if not is_verified:
@@ -59,7 +58,7 @@ def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depen
         face_verified=is_verified,
         attendance_date=today,
         attendance_status="Punch In" if is_verified else "Absent",
-        late = calculate_late(datetime.now().time(), OFFICE_START)
+        late = calculate_late(datetime.now().time(), OFFICE_START, today)
     )
 
     db.add(attendance)
@@ -107,8 +106,8 @@ def clock_out_attendance(payload: s.AttendanceClockOutSession, db: Session = Dep
     attendance.face_verified = attendance.face_verified and is_verified 
     attendance.attendance_status = "Punch Out" if is_verified else "Absent"
     attendance.clock_out_distance = distance
-    attendance.working_hour = calculate_total_hours(attendance.clock_in, attendance.clock_out)
-    attendance.overtime = calculate_overtime(attendance.clock_out, OFFICE_END)
+    attendance.working_hour = calculate_total_hours(attendance.clock_in, attendance.clock_out, today)
+    attendance.overtime = calculate_overtime(attendance.clock_out, OFFICE_END, today)
 
     db.commit()
     db.refresh(attendance)
@@ -152,7 +151,7 @@ def get_attendance_status(employee_id: int, db: Session = Depends(get_db)):
         "employee_id": employee_id,
         "clock_in": format_time(attendance.clock_in),
         "clock_out": format_time(attendance.clock_out),
-        "totalHours": calculate_total_hours(attendance.clock_in, attendance.clock_out),
+        "totalHours": calculate_total_hours(attendance.clock_in, attendance.clock_out, today),
         "attendance_status": attendance.attendance_status,
         "clock_in_latitude": attendance.clock_in_latitude,
         "clock_in_longitude": attendance.clock_in_longitude,
