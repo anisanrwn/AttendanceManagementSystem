@@ -4,8 +4,10 @@ from app.database import get_db
 from app.models import model as m
 from app.schemas import schemas as s
 from app.utils.face_recog import verify_face
-from app.utils.attendance import format_time, calculate_total_hours,calculate_late, calculate_overtime
+from app.utils.attendance import format_time, calculate_total_working,calculate_late, calculate_overtime
+from app.utils.time import get_ntp_time
 import json
+import ntplib
 from datetime import datetime, timedelta, timezone, date, time
 
 router = APIRouter(prefix="/attendance", tags=["Attendance"])
@@ -15,10 +17,11 @@ OFFICE_END = time(16, 45, 0)
 
 @router.get("/server-time")
 def get_server_time():
-    wib = timezone(timedelta(hours=7))
-    now_wib = datetime.now(wib)
+    client = ntplib.NTPClient()
+    response = client.request('pool.ntp.org')  # Get time from real internet server
+    now_utc = datetime.fromtimestamp(response.tx_time, tz=timezone.utc)
+    now_wib = now_utc.astimezone(timezone(timedelta(hours=7)))
     return {"serverTime": now_wib.isoformat()}
-
 
 @router.post("/clockin", response_model=s.AttendanceOut)
 def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depends(get_db)):
@@ -46,10 +49,11 @@ def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depen
 
     if existing_attendance:
         raise HTTPException(status_code=400, detail="Already clocked in today")
-
+    
+    now = get_ntp_time()
     attendance = m.Attendance(
         employee_id=employee_id,
-        clock_in=datetime.now().time(),
+        clock_in=now.time(),
         clock_in_latitude=payload.clock_in_latitude,
         clock_in_longitude=payload.clock_in_longitude,
         clock_in_reason=payload.clock_in_reason,
@@ -58,7 +62,7 @@ def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depen
         face_verified=is_verified,
         attendance_date=today,
         attendance_status="Punch In" if is_verified else "Absent",
-        late = calculate_late(datetime.now().time(), OFFICE_START, today)
+        late = calculate_late(now.time(), OFFICE_START, now.date()),
     )
 
     db.add(attendance)
@@ -97,8 +101,9 @@ def clock_out_attendance(payload: s.AttendanceClockOutSession, db: Session = Dep
 
     if attendance.clock_out is not None:
         raise HTTPException(status_code=400, detail="Already clocked out today")
-
-    attendance.clock_out = datetime.now().time()
+    
+    now = get_ntp_time()
+    attendance.clock_out = now.time()
     attendance.clock_out_latitude = payload.clock_out_latitude
     attendance.clock_out_longitude = payload.clock_out_longitude
     attendance.clock_out_reason = payload.clock_out_reason
@@ -106,8 +111,8 @@ def clock_out_attendance(payload: s.AttendanceClockOutSession, db: Session = Dep
     attendance.face_verified = attendance.face_verified and is_verified 
     attendance.attendance_status = "Punch Out" if is_verified else "Absent"
     attendance.clock_out_distance = distance
-    attendance.working_hour = calculate_total_hours(attendance.clock_in, attendance.clock_out, today)
-    attendance.overtime = calculate_overtime(attendance.clock_out, OFFICE_END, today)
+    attendance.working_hour = calculate_total_working(attendance.clock_in, attendance.clock_out, today)
+    attendance.overtime = calculate_overtime(now.time(), OFFICE_END, now.date())
 
     db.commit()
     db.refresh(attendance)
@@ -151,7 +156,7 @@ def get_attendance_status(employee_id: int, db: Session = Depends(get_db)):
         "employee_id": employee_id,
         "clock_in": format_time(attendance.clock_in),
         "clock_out": format_time(attendance.clock_out),
-        "totalHours": calculate_total_hours(attendance.clock_in, attendance.clock_out, today),
+        "totalHours": calculate_total_working(attendance.clock_in, attendance.clock_out, today),
         "attendance_status": attendance.attendance_status,
         "clock_in_latitude": attendance.clock_in_latitude,
         "clock_in_longitude": attendance.clock_in_longitude,
@@ -175,7 +180,7 @@ def view_attendance(employee_id: int, db: Session = Depends(get_db)):
             "attendance_status": rec.attendance_status,
             "punch_in": rec.clock_in.strftime('%H:%M:%S') if rec.clock_in else None,
             "punch_out": rec.clock_out.strftime('%H:%M:%S') if rec.clock_out else None,
-            "totalHours": calculate_total_hours(rec.clock_in, rec.clock_out, rec.attendance_date),
+            "totalHours": calculate_total_working(rec.clock_in, rec.clock_out, rec.attendance_date),
             "late": calculate_late(rec.clock_in, OFFICE_START, rec.attendance_date) if rec.clock_in else None,
             "overtime": calculate_overtime(rec.clock_out, OFFICE_END, rec.attendance_date) if rec.clock_out else None,
 
@@ -201,8 +206,8 @@ def view_all_attendance(db: Session = Depends(get_db)):
             "attendance_status": rec.attendance_status,
             "employee_id": employee.employee_id,
             "employee_name": f"{employee.first_name} {employee.last_name}".strip(),
-            "clock_in": rec.clock_in.strftime('%H:%M') if rec.clock_in else None,
-            "clock_out": rec.clock_out.strftime('%H:%M') if rec.clock_out else None,
+            "clock_in": rec.clock_in.strftime('%H:%M:%S') if rec.clock_in else None,
+            "clock_out": rec.clock_out.strftime('%H:%M:%S') if rec.clock_out else None,
             "clock_in_lat": rec.clock_in_latitude,
             "clock_in_lng": rec.clock_in_longitude,
             "clock_out_lat": rec.clock_out_latitude,
@@ -210,7 +215,7 @@ def view_all_attendance(db: Session = Depends(get_db)):
             "clock_in_reason": rec.clock_in_reason,
             "clock_out_reason": rec.clock_out_reason,
             "face_verified": rec.face_verified,
-            "totalHours": calculate_total_hours(rec.clock_in, rec.clock_out, rec.attendance_date),
+            "totalHours": calculate_total_working(rec.clock_in, rec.clock_out, rec.attendance_date),
             "late": calculate_late(rec.clock_in, OFFICE_START, rec.attendance_date) if rec.clock_in else None,
             "overtime": calculate_overtime(rec.clock_out, OFFICE_END, rec.attendance_date) if rec.clock_out else None,
         })

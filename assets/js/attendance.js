@@ -16,12 +16,11 @@ function formatTime(ms) {
   return [h, m, s].map(n => String(n).padStart(2, '0')).join(':');
 }
 
-function formatHMS(minutes) {
-  const totalSeconds = Math.floor(minutes * 60);
-  const hours = Math.floor(totalSeconds / 3600);
-  const mins = Math.floor((totalSeconds % 3600) / 60);
-  const secs = totalSeconds % 60;
-  return [hours, mins, secs].map(n => String(n).padStart(2, '0')).join(':');
+function formatDuration(seconds) {
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
 function getGreeting(hour) {
@@ -31,18 +30,25 @@ function getGreeting(hour) {
   return "Good Night!";
 }
 
-async function getServerTime() {
-  const res = await fetch('http://localhost:8000/attendance/server-time');
-  const { serverTime } = await res.json();
-  return new Date(serverTime);
-}
-
 let serverOffset = 0;
+
+async function getServerTime() {
+  try {
+    const res = await fetch('http://localhost:8000/attendance/server-time');
+    if (!res.ok) throw new Error("Failed to fetch server time");
+
+    const { serverTime } = await res.json();
+    return new Date(serverTime);
+  } catch (err) {
+    console.error("Error fetching server time:", err);
+    return new Date();
+  }
+}
 
 async function initTimeSync() {
   const serverDate = await getServerTime();
   const localDate = new Date();
-  serverOffset = serverDate - localDate;
+  serverOffset = serverDate.getTime() - localDate.getTime();
 }
 
 function getTrustedNow() {
@@ -278,7 +284,7 @@ async function resetToAttendancePage() {
 
     document.getElementById("inTime").textContent = data.clock_in ?? "--:--";
     document.getElementById("outTime").textContent = data.clock_out ?? "--:--";
-    document.getElementById("totalHours").textContent =  data.totalHours != null ? formatHMS(data.totalHours) : "--";
+    document.getElementById("totalHours").textContent = data.totalHours != null ? formatDuration(data.totalHours) : "--";
 
     const statusText = data.attendance_status ?? "Absent";
     console.log('Status text:', statusText);
