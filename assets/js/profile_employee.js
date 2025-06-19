@@ -39,7 +39,6 @@ async function fetchEmployees() {
 async function viewProfile(id) {
     try {
         const response = await fetch(`http://localhost:8000/employee/profile/${id}`);
-        
         if (!response.ok) {
             throw new Error('Employee not found');
         }
@@ -67,7 +66,6 @@ async function isEmailAvail(email, id = null) {
         if (id) {
             url += `?exclude_id=${id}`;
         }
-        
         const response = await fetch(url);
         const result = await response.json();
         return result.available;
@@ -81,8 +79,6 @@ async function isEmailAvail(email, id = null) {
 document.getElementById('submit').addEventListener('click', saveEmployee);
 async function saveEmployee(e) {
     e.preventDefault(); 
-
-    // manual validation
     const firstName = document.getElementById('first_name').value.trim();
     const lastName = document.getElementById('last_name').value.trim();
     const nrp = document.getElementById('nrp_id').value.trim();
@@ -94,37 +90,29 @@ async function saveEmployee(e) {
     const emailAvailable = await isEmailAvail(email);
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^08[0-9]{8,11}$/;
-
     if (!firstName || !lastName || !email || !phone || !nrp || !position || !department|| !image) {
         Swal.fire('Error!', 'Please fill in all required fields.', 'error');
         return;
     }
-
     if (!emailRegex.test(email)) {
         Swal.fire('Error!', 'Please enter a valid email address. Example : yourname@gmail.com', 'error');
         return;
     }
-
     if (!emailAvailable) {
         Swal.fire('Error!', 'Email already exists. Please choose another one.', 'error');
         return;
     }
-
     if (!phoneRegex.test(phone)) {
         Swal.fire('Error!', 'Phone number must be 10–13 digits (numbers only) and starts with 08.', 'error');
         return;
     }
-
     if (nrp.length !== 11) {
         Swal.fire('Error!', 'NRP must be exactly 11 digits.', 'error');
         return;
     }
-
-    //saving data
     const formData = new FormData(employeeForm);
     try {
         $('#addEmployeeModal').modal('hide');
-
         Swal.fire({
             title: 'Registering...',
             text: 'Please wait while we save the employee data.',
@@ -133,14 +121,11 @@ async function saveEmployee(e) {
                 Swal.showLoading();
             }
         });
-
         const response = await fetch("http://localhost:8000/employee/add", {
             method: "POST",
             body: formData
         });
-
         Swal.close();
-
         if (response.ok) {
             Swal.fire({
                 title: 'Success!',
@@ -149,15 +134,12 @@ async function saveEmployee(e) {
                 timer: 1500,
                 showConfirmButton: false
             });
-
             employeeForm.reset();
             fetchEmployees();
-        
         } else {
             const errorData = await response.json();
             Swal.fire('Error!', errorData.detail || 'Failed to register employee.', 'error');
         }
-
     } catch (error) {
         Swal.fire('Error!', `An error occurred: ${error.message}`, 'error');
     }
