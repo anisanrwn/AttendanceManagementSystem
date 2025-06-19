@@ -6,12 +6,11 @@ from sqlalchemy.orm import Session
 from app.services.activity_log import create_activity_log
 from app.database import get_db
 from app.models import model as m
+from app.core.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_DAYS
+
 from app.utils.messages import HTTPExceptionMessages as HM
 
-SECRET_KEY = "your-secret-key-here"  # Ganti dengan secret key yang kuat
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-REFRESH_TOKEN_EXPIRE_DAYS = 30
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login/login")
 

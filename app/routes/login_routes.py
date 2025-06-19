@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Form, Request, Body
 from fastapi.responses import StreamingResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 from user_agents import parse
@@ -13,6 +12,7 @@ from app.utils.attendance import mark_absent_for_missing_days
 from app.services.activity_log import create_activity_log  
 from app.utils.messages import HTTPExceptionMessages as HM
 from app.utils.auth import verify_token, create_access_token, create_refresh_token
+from app.core.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 import json
 import asyncio
 from jose import jwt
@@ -24,10 +24,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import Optional
 
-# JWT Configuration
-SECRET_KEY = "your-secret-key-here"  # Ganti dengan key yang aman
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+
 
 router = APIRouter(
     prefix="/login",
@@ -76,11 +74,7 @@ def send_otp_email(email, otp):
         print(f"Error mengirim email: {e}")
         return False
     
-templates = Jinja2Templates(directory="templates")
 
-@router.get("/login")
-async def login_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
 
 @router.get("/notifications/stream")
 async def notification_stream(
@@ -262,11 +256,10 @@ async def login_user(
     if attempt:
         if attempt.lockout_until and now < attempt.lockout_until:
             lockout_utc = attempt.lockout_until
-            # pastikan lockout_until aware (punya info timezone)
+            
             if lockout_utc.tzinfo is None:
                 lockout_utc = lockout_utc.replace(tzinfo=timezone.utc)
 
-            # convert ke Asia/Jakarta dengan pytz
             jakarta_tz = pytz.timezone("Asia/Jakarta")
             lockout_local = lockout_utc.astimezone(jakarta_tz)
 
@@ -280,7 +273,6 @@ async def login_user(
                 detail=HM.ACCOUNT_LOCKED.format(time=lockout_local.strftime('%H:%M:%S'))
             )
 
-    # Check if the user's role is locked
     if user:
         current_time = datetime.utcnow()
         locks = db.query(m.RoleLock).filter(
@@ -291,6 +283,8 @@ async def login_user(
 
         if locks:
             raise HTTPException(status_code=403, detail=HM.ROLE_LOCKED)
+        
+    
 
     if not user or not verify_password(password, user.password):
         if attempt and (now - attempt.attempt_time) < timedelta(minutes=30):
@@ -308,17 +302,82 @@ async def login_user(
         if attempt.failed_attempts == 5:
             attempt.lockout_until = now + timedelta(minutes=5)
             if user:
+                locked_until_str = (attempt.lockout_until + timedelta(hours=7)).strftime('%H:%M:%S')
+                message = f"Detected 5 failed login attempts. Your account has been locked until {locked_until_str}."
                 notification = m.Notification(
                     user_id=user.user_id,
-                    title="Percobaan Login Gagal",
-                    message="Terdeteksi 5 kali percobaan login gagal. Akun Anda dikunci sementara.",
+                    title="Failed Login Attempt",
+                    message = message,
                     notification_type="failed_login",
                     created_at=datetime.utcnow() + timedelta(hours=7)
                 )
                 db.add(notification)
+                try:
+                    email_message = MIMEMultipart()
+                    email_message["From"] = EMAIL_ADDRESS
+                    email_message["To"] = user.email
+                    email_message["Subject"] = "Account Locked - Attendance System"
+
+                    email_body = f"""
+                    <html>
+                    <body>
+                        <h2>Account Locked Notification</h2>
+                        <p>We detected <strong>5 failed login attempts</strong> on your account.</p>
+                        <p>Your account has been temporarily locked until <strong>{locked_until_str}</strong>.</p>
+                        <p>If this was not you, please contact support immediately.</p>
+                    </body>
+                    </html>
+                    """
+
+                    email_message.attach(MIMEText(email_body, "html"))
+
+                    server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+                    server.starttls()
+                    server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+                    server.send_message(email_message)
+                    server.quit()
+                except Exception as e:
+                    print(f"Failed to Send Email lockout: {e}")
 
         if attempt.failed_attempts >= 10:
             attempt.lockout_until = now + timedelta(hours=1)
+            if user:
+                locked_until_str = (attempt.lockout_until + timedelta(hours=7)).strftime('%H:%M:%S')
+                message = f"Detected 10 failed login attempts. Your account has been locked until {locked_until_str}."
+                notification = m.Notification(
+                    user_id=user.user_id,
+                    title="Failed Login Attempt",
+                    message = message,
+                    notification_type="failed_login",
+                    created_at=datetime.utcnow() + timedelta(hours=7)
+                )
+                db.add(notification)
+                try:
+                    email_message = MIMEMultipart()
+                    email_message["From"] = EMAIL_ADDRESS
+                    email_message["To"] = user.email
+                    email_message["Subject"] = "Account Locked - Attendance System"
+
+                    email_body = f"""
+                    <html>
+                    <body>
+                        <h2>Account Locked Notification</h2>
+                        <p>We detected <strong>10 failed login attempts</strong> on your account.</p>
+                        <p>Your account has been temporarily locked until <strong>{locked_until_str}</strong>.</p>
+                        <p>If this was not you, please contact support immediately.</p>
+                    </body>
+                    </html>
+                    """
+
+                    email_message.attach(MIMEText(email_body, "html"))
+
+                    server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+                    server.starttls()
+                    server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+                    server.send_message(email_message)
+                    server.quit()
+                except Exception as e:
+                    print(f"Failed to Send Email lockout: {e}")
 
         db.commit()
         raise HTTPException(status_code=401, detail=HM.UNAUTHORIZED)
@@ -386,7 +445,7 @@ async def verify_otp(
 
     user = db.query(m.User).options(joinedload(m.User.roles)).filter_by(user_id=user_id).first()
 
-    # Generate tokens
+   
     access_token = create_access_token(data={"sub": user.email, "user_id": user.user_id})
     refresh_token = create_refresh_token(data={"sub": user.email, "type": "refresh"})
 
@@ -417,12 +476,43 @@ async def verify_otp(
         ):
             notification = m.Notification(
                 user_id=user.user_id,
-                title="Login dari Perangkat Baru",
-                message=f"Login terdeteksi dari IP: {ip_address}, Perangkat: {browser_name}",
+                title="Login from New Device",
+                message=f"Login detected from IP: {ip_address}, Device: {browser_name}",
                 notification_type="new_device",
                 created_at=datetime.utcnow() + timedelta(hours=7)
             )
             db.add(notification)
+            try:
+                email_message = MIMEMultipart()
+                email_message["From"] = EMAIL_ADDRESS
+                email_message["To"] = user.email
+                email_message["Subject"] = "Login Detected from New Device - Attendance System"
+
+                email_body = f"""
+                <html>
+                <body>
+                    <h2>New Device Login Notification</h2>
+                    <p>We've detected a login from a new device:</p>
+                    <ul>
+                        <li><strong>IP Address:</strong> {ip_address}</li>
+                        <li><strong>Device:</strong> {browser_name}</li>
+                    </ul>
+                    <p>If this was you, you can safely ignore this message.</p>
+                    <p>If this wasn't you, we recommend changing your password immediately.</p>
+                </body>
+                </html>
+                """
+
+                email_message.attach(MIMEText(email_body, "html"))
+
+                server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+                server.starttls()
+                server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+                server.send_message(email_message)
+                server.quit()
+            except Exception as e:
+                print(f"Failed to send Email new device login: {e}")
+
 
     db.commit()
     mark_absent_for_missing_days(db, user.employee_id)

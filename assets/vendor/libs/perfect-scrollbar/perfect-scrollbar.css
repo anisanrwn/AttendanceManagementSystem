@@ -108,7 +108,7 @@
     overflow: auto !important;
   }
 }
-@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+@media (forced-colors: active) {
   .ps {
     overflow: auto !important;
   }

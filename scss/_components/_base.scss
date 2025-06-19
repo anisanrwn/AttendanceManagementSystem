@@ -127,7 +127,7 @@ body {
 // * IE Fixes
 // *******************************************************************************
 
-@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+@media (forced-colors: active) {
   // Fix IE parent container height bug when containing image with fluid width
   .card,
   .card-body,

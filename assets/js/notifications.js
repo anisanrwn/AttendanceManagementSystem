@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const config = {
         apiBaseUrl: 'http://127.0.0.1:8000',
         maxNotifications: 20,
-        reconnectDelay: 5000,
+        reconnectDelay: 31536000000,
         
     };
 
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const notificationDropdown = document.querySelector('.dropdown-menu[aria-labelledby="notification-area"]');
     const notificationBadge = document.getElementById('notification-badge');
 
-    // 1. Fungsi Utama Autentikasi
+    
     async function getUserId() {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -85,6 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (newToken) {
                     headers['Authorization'] = `Bearer ${newToken}`;
                     response = await fetch(url, { ...options, headers });
+                   
                 } else {
                     return null;
                 }
@@ -97,10 +98,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 2. Fungsi Notifikasi
     async function loadNotifications() {
         try {
-            // Tampilkan loading state
+            
             notificationDropdown.innerHTML = '<li><a class="dropdown-item text-center py-3">Loading notifications...</a></li>';
 
             const userId = await getUserId();
@@ -348,7 +348,7 @@ function formatTimeAgo(dateString) {
     const now = new Date();
     const date = new Date(dateString);
     
-    // Mengonversi waktu ke zona waktu Jakarta
+    
     const jakartaTime = new Date(date.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
     const diffInSeconds = Math.floor((now - jakartaTime) / 1000);
     if (isNaN(diffInSeconds)) return '';

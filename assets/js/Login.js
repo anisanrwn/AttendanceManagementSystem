@@ -166,28 +166,29 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Fungsi pesan error HTTP
+  
     function getHttpErrorMessage(statusCode, detailMessage = "") {
         const httpExceptions = {
             401: {
                 default: "Unauthorized access. Please check your credentials.",
-                "Email atau password salah.": "Email atau password salah.",
-                "Invalid token type": "Token tidak valid.",
-                "Invalid refresh token": "Refresh token tidak valid.",
-                "Refresh token expired": "Sesi Anda telah habis. Silakan login ulang.",
+                "Unauthorized access. Please check your credentials.": "Unauthorized access. Please check your credentials.",
+                "Invalid token type": "Invalid token type.",
+                "Invalid refresh token": "Invalid refresh token.",
+                "Refresh token expired": "Your session has expired. Please log in again.",
             },
             403: {
                 default: "Your role is currently locked. Please contact an administrator.",
-                "Anda tidak memiliki akses.": "Peran Anda dikunci. Hubungi admin.",
-                "IP Anda telah diblokir karena terlalu banyak percobaan login yang gagal.": "IP Anda diblokir karena terlalu banyak gagal login.",
-                "Akun dikunci. Silakan coba lagi setelah": "Akun dikunci sementara.",
+                "You do not have access.": "You do not have access.",
+                "Your IP has been blocked due to too many failed login attempts.": "Your IP has been blocked due to too many failed login attempts.",
+                "Your account is temporarily locked. Please try again later.": "Your account is temporarily locked. Please try again later.",
             },
             404: {
-                default: "Data tidak ditemukan.",
-                "User  not found": "Pengguna tidak ditemukan.",
-                "Notification not found or you don't have permission": "Notifikasi tidak ditemukan atau akses ditolak.",
+                default: "Data not found.",
+                "User  not found": "User not found.",
+                "Notification not found or you don't have permission": "Notification not found or access denied.",
             },
-            default: "Terjadi kesalahan. Silakan coba lagi nanti."
+            default: "An error occurred. Please try again later."
+
         };
 
         const category = httpExceptions[statusCode] || {};

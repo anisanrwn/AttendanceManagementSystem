@@ -511,7 +511,7 @@ html:not(.layout-footer-fixed) .content-wrapper {
 }
 
 // Disable transitions/animations in IE 10-11
-@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+@media (forced-colors: active) {
   .menu,
   .layout-menu,
   .layout-page,

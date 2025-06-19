@@ -1,11 +1,19 @@
 import subprocess
 import threading
 import os
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
+from dotenv import load_dotenv
+
 from app.routes import employee_routes, permissionlist_routes, user_routes, login_routes, locksystem_routes, attendance_routes, maps_routes, permission_routes, profile_routes, dashboard_routes, activity_routes
+
+load_dotenv()
+
+logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
 
 def run_backup():
     script_path = os.path.join("backup", "backup.js")
@@ -35,7 +43,7 @@ main_app.add_middleware(
 # Add session middleware with secret key for secure sessions
 main_app.add_middleware(
     SessionMiddleware,
-    secret_key="9320f42d3712059ded88a848d7d44dced91d3667e5183efd",  # Your secret key here
+    secret_key=os.getenv("SESSION_SECRET_KEY")
 )
 
 main_app.mount("/html", StaticFiles(directory="html"), name="html")

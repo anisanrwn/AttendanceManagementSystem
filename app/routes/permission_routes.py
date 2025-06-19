@@ -5,8 +5,16 @@ from app.database import get_db
 from app.models import model as m
 from app.schemas import schemas as s
 from app.utils.auth import get_current_user
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import smtplib
 
 router = APIRouter()
+
+EMAIL_ADDRESS = "hrsystem812@gmail.com"  
+EMAIL_PASSWORD = "dfxhwuyiwqszauxh"   
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
 
 @router.post("/permissions/request")
 async def request_permission(
@@ -46,12 +54,42 @@ async def send_notification_to_admins(db: Session, employee_id: int):
     for admin in admin_users:
         notification = m.Notification(
             user_id=admin.user_id,
-            title="Permintaan Izin Baru",
-            message=f"Ada permintaan izin baru dari {employee_name}.",
+            title="New Permission Request",
+            message=f"There is a new permission request from {employee_name}.",
             notification_type="permission",
             created_at=datetime.utcnow() + timedelta(hours=7)
         )
         db.add(notification)
+        try:
+            email_message = MIMEMultipart()
+            email_message["From"] = EMAIL_ADDRESS
+            email_message["To"] = admin.email
+            email_message["Subject"] = "New Permission Request - Attendance System"
+
+            email_body = f"""
+            <html>
+            <body>
+                <h2>New Permission Request</h2>
+                <p>Dear Admin,</p>
+                <p>A new permission request has been submitted by <strong>{employee_name}</strong>.</p>
+                <p>Please review the request in the Attendance Management System.</p>
+                <br>
+                <p>Thank you,</p>
+                <p><i>Attendance System - United Tractors</i></p>
+            </body>
+            </html>
+            """
+
+            email_message.attach(MIMEText(email_body, "html"))
+
+            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+            server.starttls()
+            server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            server.send_message(email_message)
+            server.quit()
+        except Exception as e:
+            print(f"Failed Send Email to Admin {admin.email}: {e}")
+
     
     try:
         db.commit()

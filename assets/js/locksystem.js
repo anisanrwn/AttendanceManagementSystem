@@ -58,6 +58,12 @@ async function fetchLockStatus() {
     }
 }
 
+
+function toDateTimeLocal(date) {
+    const pad = (n) => n.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
 function openLockModal(roleId, roleName, actionType) {
     const modal = new bootstrap.Modal(document.getElementById('lockModal'));
     document.getElementById('roleId').value = roleId;
@@ -73,11 +79,10 @@ function openLockModal(roleId, roleName, actionType) {
         document.getElementById('confirmLock').textContent = 'Unlock Role';
     }
 
+    // 🕒 Isi waktu lokal di UI
     const now = new Date();
-    const later = new Date(now.getTime() + 60 * 60 * 1000);
-
-    document.getElementById('startDate').value = now.toISOString().slice(0, 16);
-    document.getElementById('endDate').value = later.toISOString().slice(0, 16);
+    document.getElementById('startDate').value = toDateTimeLocal(now);
+    document.getElementById('endDate').value = "";
 
     modal.show();
 }
@@ -85,11 +90,24 @@ function openLockModal(roleId, roleName, actionType) {
 document.getElementById('confirmLock').addEventListener('click', async () => {
     const roleId = document.getElementById('roleId').value;
     const actionType = document.getElementById('actionType').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
+    const startLocal = document.getElementById('startDate').value;
+    const endLocal = document.getElementById('endDate').value;
     const reason = document.getElementById('reason').value;
-
     const token = localStorage.getItem('token');
+
+    if (!endLocal) {
+        showSuccessToast("End date is required");
+        return;
+    }
+
+    if (new Date(endLocal) <= new Date(startLocal)) {
+        showSuccessToast("End date must be after start date");
+        return;
+    }
+
+
+    const startDateISO = new Date(startLocal).toISOString();
+    const endDateISO = new Date(endLocal).toISOString();
 
     try {
         const response = await fetch("http://localhost:8000/lock/manage", {
@@ -101,8 +119,8 @@ document.getElementById('confirmLock').addEventListener('click', async () => {
             body: JSON.stringify({
                 role_id: roleId,
                 action: actionType,
-                start_date: startDate,
-                end_date: endDate,
+                start_date: startDateISO,
+                end_date: endDateISO,
                 reason: reason
             })
         });
@@ -113,12 +131,6 @@ document.getElementById('confirmLock').addEventListener('click', async () => {
         setTimeout(() => {
             bootstrap.Modal.getInstance(document.getElementById('lockModal')).hide();
             fetchLockStatus();
-
-            // Jika ingin redirect
-            // window.location.href = "/dashboard";
-
-            // Jika ingin menutup tab (hanya jika dibuka lewat window.open)
-            // window.close();
         }, 1000);
 
     } catch (error) {
@@ -136,12 +148,11 @@ function showSuccessToast(message) {
         title: 'Success',
         text: message,
         toast: true,
-        position: 'center', // Bisa juga 'top-end', 'bottom', dll.
+        position: 'center',
         showConfirmButton: false,
         timer: 3000,
         timerProgressBar: true,
     });
 }
-
 
 document.addEventListener('DOMContentLoaded', fetchLockStatus);
