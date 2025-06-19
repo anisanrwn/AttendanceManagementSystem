@@ -48,7 +48,6 @@ function formatDuration(seconds) {
   return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-
 const filterStatus = document.getElementById('filterStatus');
 const filterMonth = document.getElementById('filterMonth');
 const filterYear = document.getElementById('filterYear');

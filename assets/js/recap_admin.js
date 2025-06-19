@@ -66,7 +66,6 @@ function formatDuration(seconds) {
   return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-
 const exportBtn = document.getElementById('exportButton');
 if (exportBtn) {
   exportBtn.addEventListener('click', function() {

@@ -18,7 +18,7 @@ OFFICE_END = time(16, 45, 0)
 @router.get("/server-time")
 def get_server_time():
     client = ntplib.NTPClient()
-    response = client.request('pool.ntp.org')  # Get time from real internet server
+    response = client.request('pool.ntp.org')
     now_utc = datetime.fromtimestamp(response.tx_time, tz=timezone.utc)
     now_wib = now_utc.astimezone(timezone(timedelta(hours=7)))
     return {"serverTime": now_wib.isoformat()}
