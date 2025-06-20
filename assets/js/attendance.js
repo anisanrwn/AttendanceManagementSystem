@@ -280,14 +280,11 @@ async function resetToAttendancePage() {
     if (!response.ok) throw new Error('Failed to fetch attendance data.');
 
     const data = await response.json();
-    console.log('Attendance data:', data);
-
     document.getElementById("inTime").textContent = data.clock_in ?? "--:--";
     document.getElementById("outTime").textContent = data.clock_out ?? "--:--";
     document.getElementById("totalHours").textContent = data.totalHours != null ? formatDuration(data.totalHours) : "--";
 
     const statusText = data.attendance_status ?? "Absent";
-    console.log('Status text:', statusText);
     const statusBadge = document.getElementById("status");
     statusBadge.textContent = statusText;
 

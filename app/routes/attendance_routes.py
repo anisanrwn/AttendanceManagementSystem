@@ -142,7 +142,7 @@ def get_attendance_status(employee_id: int, db: Session = Depends(get_db)):
             "employee_id": employee_id,
             "clock_in": None,
             "clock_out": None,
-            "working_hour": "--",
+            "totalHours": None,
             "attendance_status": "Absent",
             "clock_in_latitude": None,
             "clock_in_longitude": None,

@@ -147,7 +147,7 @@ class AttendanceOut(BaseModel):
     face_verified: bool
 
 class AttendanceStatusResponse(BaseModel):
-    attendance_id: int
+    attendance_id: Optional[int]
     attendance_date: date
     employee_id: int
     clock_in: Optional[str]
