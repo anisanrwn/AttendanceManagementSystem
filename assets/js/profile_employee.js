@@ -106,8 +106,8 @@ async function saveEmployee(e) {
         Swal.fire('Error!', 'Phone number must be 10–13 digits (numbers only) and starts with 08.', 'error');
         return;
     }
-    if (nrp.length !== 11) {
-        Swal.fire('Error!', 'NRP must be exactly 11 digits.', 'error');
+    if (nrp.length !== 9) {
+        Swal.fire('Error!', 'NRP must be exactly 9 digits.', 'error');
         return;
     }
     const formData = new FormData(employeeForm);
