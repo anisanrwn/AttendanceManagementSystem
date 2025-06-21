@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default" data-assets-path="../assets/" data-template="vertical-menu-template-free">
   <head>
     <meta charset="utf-8" />
@@ -32,7 +31,10 @@
 
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="../assets/js/config.js"></script>
-
+    
+    <!--Sweetalert-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <!--Extra-->
     <link rel="stylesheet" href="../assets/css/extra.css" />
   </head>
@@ -183,15 +185,18 @@
                   <h5 class="card-header"> Recap Attendance</h5>
                   <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                      <input type="text" id="searchAttendanceName" class="form-control me-2" style="flex: 1; max-width: 500px;" placeholder="Search by Name">
+                      <input type="text" id="searchAttendanceName" class="form-control me-2" style="flex: 1; max-width: 350px;" placeholder="Search by Name">
+                      <select id="filterAdminLate" class="form-select me-2" style="width: 140px;">
+                        <option value="">Late?</option>
+                      </select>
                       <select id="filterAdminStatus" class="form-select me-2" style="width: 140px;">
-                        <option value="">Select Status</option>
+                        <option value="">Status?</option>
                       </select>
                       <select id="filterAdminMonth" class="form-select me-2" style="width: 140px;">
-                        <option value="">Select Month</option>
+                        <option value="">Month?</option>
                       </select>
                       <select id="filterAdminYear" class="form-select me-2" style="width: 140px;">
-                        <option value="">Select Year</option>
+                        <option value="">Year?</option>
                       </select>
                       <button class="btn" id="clearFiltersButton" style="background-color: #7f82ff; color: white; max-width: 150px;">Clear Filters</button>
                       <button class="btn" id="exportButton" style="background-color: #7f82ff; color: white; max-width: 150px;">Export Excel</button>
@@ -212,7 +217,6 @@
                           <th class="text-center">Punch Out</th>
                           <th class="text-center">Punch Out Area</th>
                           <th class="text-center">Punch Out Reason</th>
-                          <th class="text-center">Face Verified</th>
                           <th class="text-center">Working Hour</th>
                           <th class="text-center">Overtime</th>
                         </tr>

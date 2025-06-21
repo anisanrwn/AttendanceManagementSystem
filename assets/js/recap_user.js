@@ -7,27 +7,49 @@ async function fetchAttendance() {
     
     const data = await response.json();
     const attendance = data.attendance || [];
+    const holidays = data.holidays || [];
     
     const tableBody = document.getElementById("attendanceTable").getElementsByTagName('tbody')[0];
     tableBody.innerHTML = '';
     
     attendance.forEach(record => {
+      const {
+        attendance_date, late, attendance_status, clock_in, clock_out, totalHours, overtime 
+      } = record;
+      const status = attendance_status || '-';
+      const dateObj = new Date(attendance_date);
+      const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
+      const isHoliday = holidays.includes(attendance_date);
+      const isHolidayOrWeekend = isWeekend || isHoliday;
+      let statusBadgeClass = 'bg-secondary';
+      switch (status.toLowerCase()) {
+        case 'punch in': statusBadgeClass = 'bg-label-primary'; break;
+        case 'punch out': statusBadgeClass = 'bg-label-primary'; break;
+        case 'permit': statusBadgeClass = 'bg-label-info'; break;
+        case 'holiday':
+        case 'weekend': statusBadgeClass = 'bg-label-danger'; break;
+        case 'absent': statusBadgeClass = 'bg-label-secondary'; break;
+      }
+      const dateStyle = isHolidayOrWeekend ? 'style="color:red; font-weight:bold"' : '';
       const row = document.createElement("tr");
+
       row.innerHTML = `
-        <td class="text-center">${record.date || '-'}</td>
+        <td class="text-center" ${dateStyle}>${attendance_date || '-'}</td>
         <td class="text-center">
-          ${record.late === 0 ? '<span class="badge bg-success">On Time</span>' 
-            : record.late ? `<span class="badge bg-warning" onclick="Swal.fire('Late Duration', '${formatDuration(record.late)}', 'info')">Late</span>`
+          ${late === 0 ? '<span class="badge bg-label-success">On Time</span>' 
+            : late ? `<span class="badge bg-label-danger" onclick="Swal.fire('Late Duration', '${formatDuration(late)}', 'info')">Late</span>`
             : '-'}
         </td>
-        <td class="text-center">${record.attendance_status || '-'}</td>
-        <td class="text-center">${record.punch_in || '-'}</td>
-        <td class="text-center">${record.punch_out || '-'}</td>
         <td class="text-center">
-          ${record.totalHours !== null && record.totalHours !== undefined ? formatDuration(record.totalHours): '-'}
+          <span class="badge badge-label ${statusBadgeClass}">${status}</span>
+        </td>
+        <td class="text-center">${clock_in || '-'}</td>
+        <td class="text-center">${clock_out || '-'}</td>
+        <td class="text-center">
+          ${totalHours !== null && totalHours !== undefined ? formatDuration(totalHours): '-'}
         </td>
         <td class="text-center">
-          ${record.overtime !== null && record.overtime !== undefined ? formatDuration(record.overtime) : '-'}
+          ${overtime !== null && overtime !== undefined ? formatDuration(overtime) : '-'}
         </td>
       `;
       tableBody.appendChild(row);
@@ -48,6 +70,7 @@ function formatDuration(seconds) {
   return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
+const filterLate = document.getElementById('filterLate');
 const filterStatus = document.getElementById('filterStatus');
 const filterMonth = document.getElementById('filterMonth');
 const filterYear = document.getElementById('filterYear');
@@ -60,11 +83,13 @@ const debounce = (callback, delay) => {
     };
 };
 
+filterLate.addEventListener('change', filterPersonalAttendance);
 filterStatus.addEventListener('change', filterPersonalAttendance);
 filterMonth.addEventListener('change', filterPersonalAttendance);
 filterYear.addEventListener('change', filterPersonalAttendance);
 
 document.getElementById('clearFiltersButton').addEventListener('click', () => {
+  filterLate.value = '';
   filterStatus.value = '';
   filterMonth.value = '';
   filterYear.value = '';
@@ -73,13 +98,15 @@ document.getElementById('clearFiltersButton').addEventListener('click', () => {
 
 function populatePersonalFilters() {
   const rows = document.querySelectorAll('#attendanceTable tbody tr');
+  const lateSet = new Set();
   const statusSet = new Set();
   const monthSet = new Set();
   const yearSet = new Set();
 
   rows.forEach(row => {
     const dateText = row.cells[0].textContent.trim().split(' ')[0];
-    const status = row.cells[1].textContent.trim().toLowerCase();
+    const late = row.cells[1].textContent.trim().toLowerCase();
+    const status = row.cells[2].textContent.trim().toLowerCase();
 
     const date = new Date(dateText);
     if (!isNaN(date)) {
@@ -88,10 +115,8 @@ function populatePersonalFilters() {
       monthSet.add(rowMonth);
       yearSet.add(rowYear);
     }
-
-    if (status) {
-      statusSet.add(status);
-    }
+    if (late) lateSet.add(late);
+    if (status) statusSet.add(status);
   });
 
   const addOptions = (selectEl, values, label) => {
@@ -104,13 +129,15 @@ function populatePersonalFilters() {
     });
   };
 
-  addOptions(filterStatus, [...statusSet].sort(), 'Select Status');
-  addOptions(filterMonth, [...monthSet].sort(), 'Select Month');
-  addOptions(filterYear, [...yearSet].sort(), 'Select Year');
+  addOptions(filterLate, [...lateSet].sort(), 'Late?');
+  addOptions(filterStatus, [...statusSet].sort(), 'Status?');
+  addOptions(filterMonth, [...monthSet].sort(), 'Month?');
+  addOptions(filterYear, [...yearSet].sort(), 'Year?');
 }
 
 function filterPersonalAttendance() {
-  const selectedStatus = filterStatus.value.toLowerCase();
+  const selectedLate = filterLate.value.toLowerCase(); 
+  const selectedStatus = filterStatus.value.toLowerCase(); 
   const selectedMonth = filterMonth.value;
   const selectedYear = filterYear.value;
 
@@ -118,17 +145,17 @@ function filterPersonalAttendance() {
 
     rows.forEach(row => {
       const dateText = row.cells[0].textContent.trim().split(' ')[0];
-      const status = row.cells[1].textContent.toLowerCase();
-        
+      const late = row.cells[1].textContent.trim().toLowerCase();
+      const status = row.cells[2].textContent.trim().toLowerCase();
       const date = new Date(dateText);
       const rowMonth = (date.getMonth() + 1).toString().padStart(2, '0');
       const rowYear = date.getFullYear().toString();
-
+      const matchesLate = selectedLate === '' || late === selectedLate;
       const matchesStatus = selectedStatus === '' || status === selectedStatus;
       const matchesMonth = selectedMonth === '' || rowMonth === selectedMonth;
       const matchesYear = selectedYear === '' || rowYear === selectedYear;
 
-      if (matchesStatus && matchesMonth && matchesYear) {
+      if (matchesLate && matchesStatus && matchesMonth && matchesYear) {
       row.style.display = '';
     } else {
       row.style.display = 'none';

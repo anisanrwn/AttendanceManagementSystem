@@ -6,6 +6,7 @@ from app.schemas import schemas as s
 from app.utils.face_recog import verify_face
 from app.utils.attendance import format_time, calculate_total_working,calculate_late, calculate_overtime
 from app.utils.time import get_ntp_time
+from app.utils.holiday import fetch_national_holidays 
 import json
 import ntplib
 from datetime import datetime, timedelta, timezone, date, time
@@ -172,21 +173,23 @@ def view_attendance(employee_id: int, db: Session = Depends(get_db)):
         .order_by(m.Attendance.attendance_date.desc())
         .all()
     )
+    current_year = date.today().year
+    holidays = fetch_national_holidays(current_year)
     
     result = []
     for rec in records:
         result.append({
-            "date": rec.attendance_date.isoformat(),
+            "attendance_date": rec.attendance_date.isoformat(),
             "attendance_status": rec.attendance_status,
-            "punch_in": rec.clock_in.strftime('%H:%M:%S') if rec.clock_in else None,
-            "punch_out": rec.clock_out.strftime('%H:%M:%S') if rec.clock_out else None,
+            "clock_in": rec.clock_in.strftime('%H:%M:%S') if rec.clock_in else None,
+            "clock_out": rec.clock_out.strftime('%H:%M:%S') if rec.clock_out else None,
             "totalHours": calculate_total_working(rec.clock_in, rec.clock_out, rec.attendance_date),
             "late": calculate_late(rec.clock_in, OFFICE_START, rec.attendance_date) if rec.clock_in else None,
             "overtime": calculate_overtime(rec.clock_out, OFFICE_END, rec.attendance_date) if rec.clock_out else None,
-
         })
-
-    return {"attendance": result}
+    return {
+        "attendance": result,
+        "holidays": [str(h) for h in holidays]}
 
 @router.get("/recap/all")
 def view_all_attendance(db: Session = Depends(get_db)):
@@ -196,6 +199,8 @@ def view_all_attendance(db: Session = Depends(get_db)):
         .order_by(m.Attendance.attendance_date.desc())
         .all()
     )
+    current_year = date.today().year
+    holidays = fetch_national_holidays(current_year)
 
     result = []
     for rec in records:
@@ -220,4 +225,6 @@ def view_all_attendance(db: Session = Depends(get_db)):
             "overtime": calculate_overtime(rec.clock_out, OFFICE_END, rec.attendance_date) if rec.clock_out else None,
         })
 
-    return {"attendance": result}
+    return {
+        "attendance": result,
+        "holidays": [str(h) for h in holidays]}

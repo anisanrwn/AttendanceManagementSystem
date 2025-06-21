@@ -245,6 +245,26 @@ async function editAccount(userId) {
     document.getElementById("editPassword").value = '';
     document.getElementById("editUserId").value = user.user_id;
 
+    const emailInput = document.getElementById("editEmail");
+    if (user.employee) {
+        emailInput.readOnly = true;
+        emailInput.style.backgroundColor = "#e9ecef";
+        emailInput.style.cursor = "pointer";
+        emailInput.onclick = () => {
+            Swal.fire({
+                title: "Cannot Edit Email Here",
+                text: "This email is linked to the employee profile. Please edit it from the Employee Profile page then click sync email in user list action.",
+                icon: "info",
+                confirmButtonText: "OK"
+            });
+        };
+    } else {
+        emailInput.readOnly = false;
+        emailInput.style.backgroundColor = "";
+        emailInput.style.cursor = "text";
+        emailInput.onclick = null;
+    }
+
     $('#editAccountModal').modal('show');
 }
 

@@ -7,48 +7,70 @@ async function fetchAllAttendance() {
 
     const data = await response.json();
     const attendance = data.attendance || [];
+    const holidays = data.holidays || [];
 
     const tableBody = document.getElementById("allAttendanceTable").getElementsByTagName('tbody')[0];
     tableBody.innerHTML = '';
 
     attendance.forEach(record => {
-      const name = record.employee_name || '-';
-      const punchInArea = record.clock_in_reason ? 'Outside' : (record.clock_in_lat !== null && record.clock_in_lng !== null) ? 'Inside' : 'None';
-      const punchOutArea = record.clock_out_reason ? 'Outside' : (record.clock_out_lat !== null && record.clock_out_lng !== null) ? 'Inside' : 'None';
-      const statusText = record.late === 0 ? "on time" : record.late ? "late" : "none";
+      const {
+        attendance_date, employee_name, late, attendance_status, clock_in, clock_out, clock_in_lat, clock_in_lng, clock_in_reason, clock_out_lat, clock_out_lng, clock_out_reason, totalHours,  overtime 
+      } = record;
+
+      const name = employee_name || '-';
+      const status = attendance_status || '-';
+      const dateObj = new Date(attendance_date);
+      const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
+      const isHoliday = holidays.includes(attendance_date);
+      const isHolidayOrWeekend = isWeekend || isHoliday;
+      const punchInArea = clock_in_reason ? 'Outside' :
+                          (clock_in_lat !== null && clock_in_lng !== null) ? 'Inside' : 'None';
+      const punchOutArea = clock_out_reason ? 'Outside' :
+                           (clock_out_lat !== null && clock_out_lng !== null) ? 'Inside' : 'None';
+      let statusBadgeClass = 'bg-secondary';
+      switch (status.toLowerCase()) {
+        case 'punch in': statusBadgeClass = 'bg-label-primary'; break;
+        case 'punch out': statusBadgeClass = 'bg-label-primary'; break;
+        case 'permit': statusBadgeClass = 'bg-label-info'; break;
+        case 'holiday':
+        case 'weekend': statusBadgeClass = 'bg-label-danger'; break;
+        case 'absent': statusBadgeClass = 'bg-label-secondary'; break;
+      }
+
+      const dateStyle = isHolidayOrWeekend ? 'style="color:red;"' : '';
       const row = document.createElement("tr");
-      row.setAttribute("data-status", statusText);
+      row.setAttribute("data-late", late === 0 ? "on time" : late ? "late" : "none");
+      row.setAttribute("data-status", status.toLowerCase());
+
       row.innerHTML = `
-        <td class="text-center">${record.attendance_date || '-'}</td>
+        <td class="text-center" ${dateStyle}>${attendance_date || '-'}</td>
         <td class="text-center">${name}</td>
         <td class="text-center">
-          ${record.late === 0 ? '<span class="badge bg-success">On Time</span>' 
-            : record.late ? `<span class="badge bg-warning" onclick="Swal.fire('Late Duration', '${formatDuration(record.late)}', 'info')">Late</span>`
+          ${late === 0 ? '<span class="badge bg-label-success">On Time</span>' 
+            : late ? `<span class="badge bg-label-danger" onclick="Swal.fire('Late Duration', '${formatDuration(late)}', 'info')">Late</span>`
             : '-'}
         </td>
-          <td class="text-center">${record.attendance_status || '-'}</td>
-          <td class="text-center">${record.clock_in || '-'}</td>
-          <td class="text-center">
-            <span class="badge ${punchInArea === 'Inside' ? 'bg-success' : punchInArea === 'Outside' ? 'bg-danger' : 'bg-secondary'}">${punchInArea}</span>
-          </td>
-          <td class="text-center">${record.clock_in_reason || '-'}</td>
-          <td class="text-center">${record.clock_out || '-'}</td>
-          <td class="text-center">
-            <span class="badge ${punchOutArea === 'Inside' ? 'bg-success' : punchOutArea === 'Outside' ? 'bg-danger' : 'bg-secondary'}">${punchOutArea}</span>
-          </td>
-          <td class="text-center">${record.clock_out_reason || '-'}</td>
-          <td class="text-center">
-            <span class="badge ${record.face_verified ? 'bg-success' : 'bg-secondary'}">
-                ${record.face_verified ? 'Yes' : 'No'}
-            </span>
-          </td>
-          <td class="text-center">
-            ${record.totalHours !== null && record.totalHours !== undefined ? formatDuration(record.totalHours): '-'}
-          </td>
-          <td class="text-center">
-            ${record.overtime !== null && record.overtime !== undefined ? formatDuration(record.overtime) : '-'}
-          </td>
+        <td class="text-center">
+          <span class="badge badge-label ${statusBadgeClass}">${status}</span>
+        </td>
+        <td class="text-center">${clock_in || '-'}</td>
+        <td class="text-center">
+          <span class="badge ${getAreaClass(punchInArea)}">${punchInArea}</span>
+        </td>
+        <td class="text-center">${clock_in_reason || '-'}</td>
+        <td class="text-center">${clock_out || '-'}</td>
+        <td class="text-center">
+          <span class="badge ${getAreaClass(punchOutArea)}">${punchOutArea}</span>
+        </td>
+        <td class="text-center">${clock_out_reason || '-'}</td>
+        <td class="text-center">
+          ${totalHours !== null && totalHours !== undefined ? formatDuration(totalHours) : '-'}
+        </td>
+        <td class="text-center">
+          ${overtime !== null && overtime !== undefined ? formatDuration(overtime) : '-'}
+        </td>
       `;
+
       tableBody.appendChild(row);
     });
 
@@ -58,6 +80,16 @@ async function fetchAllAttendance() {
     console.error("Error fetching attendance:", error);
   }
 }
+
+// Area Badge Class Generator
+function getAreaClass(area) {
+  switch (area) {
+    case 'Inside': return 'bg-label-success';
+    case 'Outside': return 'bg-label-danger';
+    default: return 'bg-label-secondary';
+  }
+}
+
 function formatDuration(seconds) {
   const hrs = Math.floor(seconds / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
@@ -77,6 +109,7 @@ if (exportBtn) {
 }
 
 const searchInput = document.getElementById('searchAttendanceName');
+const filterLate = document.getElementById('filterAdminLate');
 const filterStatus = document.getElementById('filterAdminStatus');
 const filterMonth = document.getElementById('filterAdminMonth');
 const filterYear = document.getElementById('filterAdminYear');
@@ -91,12 +124,14 @@ const debounce = (callback, delay) => {
 
 // Event listeners
 searchInput.addEventListener('input', debounce(filterAttendance, 300));
+filterLate.addEventListener('change', filterAttendance);
 filterStatus.addEventListener('change', filterAttendance);
 filterMonth.addEventListener('change', filterAttendance);
 filterYear.addEventListener('change', filterAttendance);
 
 document.getElementById('clearFiltersButton').addEventListener('click', () => {
   searchInput.value = '';
+  filterLate.value = '';
   filterStatus.value = '';
   filterMonth.value = '';
   filterYear.value = '';
@@ -105,12 +140,14 @@ document.getElementById('clearFiltersButton').addEventListener('click', () => {
 
 function populateFilters() {
   const rows = document.querySelectorAll('#allAttendanceTable tbody tr');
+  const lateSet = new Set();
   const statusSet = new Set();
   const monthSet = new Set();
   const yearSet = new Set();
 
   rows.forEach(row => {
     const dateText = row.cells[0].textContent.trim().split(' ')[0];
+    const late = row.getAttribute("data-late");
     const status = row.getAttribute("data-status");
 
     const date = new Date(dateText);
@@ -121,9 +158,8 @@ function populateFilters() {
       yearSet.add(rowYear);
     }
 
-    if (status) {
-      statusSet.add(status);
-    }
+    if (late) lateSet.add(late);
+    if (status) statusSet.add(status);
   });
 
   const addOptions = (selectEl, values, label) => {
@@ -135,15 +171,16 @@ function populateFilters() {
       selectEl.appendChild(option);
     });
   };
-
-  addOptions(filterStatus, [...statusSet].sort(), 'Select Status');
-  addOptions(filterMonth, [...monthSet].sort(), 'Select Month');
-  addOptions(filterYear, [...yearSet].sort(), 'Select Year');
+  addOptions(filterLate, [...lateSet].sort(), 'Late?');
+  addOptions(filterStatus, [...statusSet].sort(), 'Status?');
+  addOptions(filterMonth, [...monthSet].sort(), 'Month?');
+  addOptions(filterYear, [...yearSet].sort(), 'Year?');
 }
 
 function filterAttendance() {
   const searchValue = searchInput.value.toLowerCase();
-  const selectedStatus = filterStatus.value.toLowerCase();
+  const selectedLate = filterLate.value.toLowerCase(); 
+  const selectedStatus = filterStatus.value.toLowerCase(); 
   const selectedMonth = filterMonth.value;
   const selectedYear = filterYear.value;
 
@@ -152,18 +189,20 @@ function filterAttendance() {
   rows.forEach(row => {
     const dateText = row.cells[0].textContent.trim().split(' ')[0];
     const name = row.cells[1].textContent.toLowerCase();
+    const late = row.getAttribute("data-late");
     const status = row.getAttribute("data-status");
-
     const date = new Date(dateText);
     const rowMonth = (date.getMonth() + 1).toString().padStart(2, '0');
     const rowYear = date.getFullYear().toString();
 
     const matchesSearch = name.includes(searchValue);
+    const matchesLate = selectedLate === '' || late === selectedLate;
     const matchesStatus = selectedStatus === '' || status === selectedStatus;
     const matchesMonth = selectedMonth === '' || rowMonth === selectedMonth;
     const matchesYear = selectedYear === '' || rowYear === selectedYear;
 
-    if (matchesSearch && matchesStatus && matchesMonth && matchesYear) {
+    if (matchesSearch && matchesLate && matchesStatus && matchesMonth && matchesYear)
+    {
       row.style.display = '';
     } else {
       row.style.display = 'none';
