@@ -150,9 +150,6 @@ class RoleLock(Base):
 
     lock_id = Column(Integer, primary_key=True, index=True)
     role_id = Column(Integer, ForeignKey("roles.roles_id"))
-    start_date = Column(Date, nullable=False)
-    end_date = Column(Date, nullable=False)
-    reason = Column(Text, nullable=True)
-
+    
     role = relationship("Roles", back_populates="locks")
     

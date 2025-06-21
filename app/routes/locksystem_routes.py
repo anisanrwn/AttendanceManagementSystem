@@ -11,56 +11,42 @@ router = APIRouter(prefix="/lock", tags=["lock"])
 
 @router.get("/view", response_model=List[s.RoleLockStatus])
 def view_role_lock_status(db: Session = Depends(get_db)):
-    today = date.today()
-
     roles = db.query(m.Roles).options(joinedload(m.Roles.locks)).all()
     result = []
 
     for role in roles:
-        is_locked = any(
-            lock.start_date <= today <= lock.end_date
-            for lock in role.locks
-        )
+        is_locked = bool(role.locks)  # Kalau ada relasi berarti dikunci
         result.append(
             s.RoleLockStatus(
                 roles_id=role.roles_id,
                 roles_name=role.roles_name,
-                status=not is_locked       # False ⇒ Locked, True ⇒ Active
+                status=not is_locked  # True = active, False = locked
             )
         )
     return result
+
 
 
 @router.post("/manage")
 async def manage_role_lock(request: s.ManageRoleLock, db: Session = Depends(get_db),
                            current_user: m.User = Depends(get_current_user)):
 
-    start_date = datetime.fromisoformat(request.start_date).date()
-    end_date   = datetime.fromisoformat(request.end_date).date()
-
-    if start_date >= end_date:
-        raise HTTPException(status_code=400, detail="End date must be after start date")
-
     if request.action == "lock":
-        lock = m.RoleLock(
-            role_id    = request.role_id,
-            start_date = start_date,
-            end_date   = end_date,
-            reason     = request.reason
-        )
-        db.add(lock)
-        message = "Role locked successfully"
+        # Cek apakah sudah ada data lock untuk role ini
+        existing = db.query(m.RoleLock).filter_by(role_id=request.role_id).first()
+        if not existing:
+            db.add(m.RoleLock(role_id=request.role_id))
+            message = "Role locked successfully"
+        else:
+            message = "Role is already locked"
     else:
-        db.query(m.RoleLock).filter(
-            m.RoleLock.role_id == request.role_id,
-            m.RoleLock.end_date >= date.today()
-        ).delete(synchronize_session=False)
+        # Unlock: hapus entri lock dari tabel
+        db.query(m.RoleLock).filter_by(role_id=request.role_id).delete()
         message = "Role unlocked successfully"
 
     db.commit()
-    
     role = db.query(m.Roles).get(request.role_id)
-    action = f"{'Locked' if request.action == 'lock' else 'Unlocked'} role {role.roles_name}"
+    return {"message": f"{message} ({role.roles_name})"}
+
+
     
-    
-    return {"message": message}

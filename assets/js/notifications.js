@@ -1,22 +1,16 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Konfigurasi dasar
     const config = {
         apiBaseUrl: 'http://127.0.0.1:8000',
         maxNotifications: 20,
-        reconnectDelay: 31536000000,
-        
+        pollingInterval: 30000 // 30 detik
     };
-
-    // State management
-    let eventSource = null;
-    let isConnected = false;
-    let notificationCleanup = null;
 
     // Elemen UI
     const notificationDropdown = document.querySelector('.dropdown-menu[aria-labelledby="notification-area"]');
     const notificationBadge = document.getElementById('notification-badge');
 
-    
+    // Ambil user ID dari token
     async function getUserId() {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -27,15 +21,15 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const response = await authFetch(`${config.apiBaseUrl}/login/auth/check`);
             if (!response) return null;
-            
+
             const data = await response.json();
             return data.user_id;
         } catch (error) {
-            console.error('Auth check failed:', error);
             return null;
         }
     }
 
+    // Refresh token jika expired
     async function refreshToken() {
         const refreshToken = localStorage.getItem('refreshToken');
         if (!refreshToken) {
@@ -57,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             throw new Error('Refresh failed');
         } catch (error) {
-            console.error('Token refresh failed:', error);
             redirectToLogin();
             return null;
         }
@@ -65,7 +58,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function authFetch(url, options = {}) {
         try {
-            // Setup headers
             const token = localStorage.getItem('token');
             const headers = {
                 'Content-Type': 'application/json',
@@ -76,16 +68,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers['Authorization'] = `Bearer ${token}`;
             }
 
-            // First attempt
             let response = await fetch(url, { ...options, headers });
-            
-            // Token expired handling
+
             if (response.status === 401) {
                 const newToken = await refreshToken();
                 if (newToken) {
                     headers['Authorization'] = `Bearer ${newToken}`;
                     response = await fetch(url, { ...options, headers });
-                   
                 } else {
                     return null;
                 }
@@ -93,34 +82,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
             return response;
         } catch (error) {
-            console.error('API request failed:', error);
-            throw error;
+            return null;
         }
     }
 
     async function loadNotifications() {
         try {
-            
             notificationDropdown.innerHTML = '<li><a class="dropdown-item text-center py-3">Loading notifications...</a></li>';
 
             const userId = await getUserId();
             if (!userId) return;
 
-            const response = await authFetch(
-                `${config.apiBaseUrl}/login/notifications/history?user_id=${userId}`
-            );
-
-            if (!response) return;
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            const response = await authFetch(`${config.apiBaseUrl}/login/notifications/history?user_id=${userId}`);
+            if (!response || !response.ok) return;
 
             const notifications = await response.json();
             renderNotifications(notifications);
         } catch (error) {
-            console.error('Failed to load notifications:', error);
-            showNotificationMessage('Failed to load notifications. Please try again.');
+            showNotificationMessage('Failed to load notifications');
         }
     }
 
@@ -150,8 +129,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <p class="mb-0 text-muted" style="font-size: 0.85rem;">${escapeHtml(notification.message)}</p>
                                 <div class="d-flex justify-content-between mt-1">
                                     <small class="text-muted" style="font-size: 0.75rem;">${formatTimeAgo(notification.created_at)}</small>
-                                    ${notification.notification_type ? 
-                                        `<span class="badge bg-secondary" style="font-size: 0.65rem;">${notification.notification_type}</span>` : ''}
+                                    ${notification.notification_type ?
+                    `<span class="badge bg-secondary" style="font-size: 0.65rem;">${notification.notification_type}</span>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -160,155 +139,32 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }).join('');
 
-        html += `
-            <li><hr class="dropdown-divider my-1"></li>
-            
-        `;
-        
         notificationDropdown.innerHTML = html;
         updateBadge(unreadCount);
     }
 
-    window.markNotificationAsRead = async function(notificationId, element) {
+    window.markNotificationAsRead = async function (notificationId, element) {
         try {
             const response = await authFetch(
-                `${config.apiBaseUrl}/login/notifications/mark-as-read/${notificationId}`, {
+                `${config.apiBaseUrl}/login/notifications/mark-as-read/${notificationId}`,
+                {
                     method: 'POST',
                     credentials: 'include'
                 }
             );
 
-            if (!response) return;
+            if (!response || !response.ok) return;
 
-            if (!response.ok) {
-                throw new Error('Failed to mark as read');
-            }
-
-            // Update UI
             if (element) {
                 element.classList.remove('bg-light');
                 const unreadElements = notificationDropdown.querySelectorAll('.bg-light');
                 updateBadge(unreadElements.length);
             }
-            
         } catch (error) {
-            console.error('Error marking notification:', error);
             showNotificationMessage('Failed to update notification status');
         }
     };
 
-    // 3. Real-time SSE Connection
-    async function setupSSE() {
-        try {
-            if (isConnected) return;
-
-            const userId = await getUserId();
-            if (!userId) return;
-
-            const token = localStorage.getItem('token');
-            if (!token) {
-                redirectToLogin();
-                return;
-            }
-
-            eventSource = new EventSource(
-                `${config.apiBaseUrl}/login/notifications/stream?user_id=${userId}&token=${token}`
-            );
-
-            eventSource.onopen = () => {
-                console.log('SSE connection established');
-                isConnected = true;
-            };
-
-            eventSource.onmessage = (event) => {
-                if (event.data === ': heartbeat') return;
-
-                try {
-                    const { type, notification } = JSON.parse(event.data);
-                    if (type === 'new_notification') {
-                        handleNewNotification(notification);
-                    }
-                } catch (error) {
-                    console.error('Error parsing SSE data:', error);
-                }
-            };
-
-            eventSource.onerror = () => {
-                console.error('SSE connection error');
-                reconnectSSE();
-            };
-
-        } catch (error) {
-            console.error('SSE setup failed:', error);
-            reconnectSSE();
-        }
-    }
-
-    function handleNewNotification(notification) {
-        // Update UI
-        addNotificationToUI(notification);
-        
-        // Update badge
-        const currentCount = parseInt(notificationBadge.textContent) || 0;
-        updateBadge(currentCount + 1);
-
-        // Play sound if enabled
-        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-            new Notification(notification.title, { 
-                body: notification.message,
-                icon: '/img/notification-icon.png'
-            });
-            
-            playNotificationSound();
-        }
-    }
-
-    function addNotificationToUI(notification) {
-        if (!notificationDropdown) return;
-
-        // Remove "no notifications" message if exists
-        if (notificationDropdown.innerHTML.includes('No notifications') || 
-            notificationDropdown.innerHTML.includes('Loading notifications')) {
-            notificationDropdown.innerHTML = '';
-        }
-
-        const notificationElement = `
-            <li>
-                <a class="dropdown-item px-3 py-2 border-bottom bg-light" 
-                   href="#"
-                   data-id="${notification.notification_id}"
-                   onclick="markNotificationAsRead(${notification.notification_id}, this)">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            <h6 class="mb-1">${escapeHtml(notification.title)}</h6>
-                            <p class="mb-0 text-muted" style="font-size: 0.85rem;">${escapeHtml(notification.message)}</p>
-                            <div class="d-flex justify-content-between mt-1">
-                                <small class="text-muted" style="font-size: 0.75rem;">${formatTimeAgo(notification.created_at)}</small>
-                                <span class="badge bg-primary" style="font-size: 0.65rem;">New</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </li>
-        `;
-
-        const viewAllLink = notificationDropdown.querySelector('a[href="/notifications"]');
-        if (viewAllLink?.parentElement) {
-            viewAllLink.parentElement.insertAdjacentHTML('beforebegin', notificationElement);
-        } else {
-            notificationDropdown.insertAdjacentHTML('afterbegin', notificationElement);
-        }
-    }
-
-    function reconnectSSE() {
-        if (eventSource) {
-            eventSource.close();
-            isConnected = false;
-        }
-        setTimeout(setupSSE, config.reconnectDelay);
-    }
-
-    // 4. UI Helpers
     function updateBadge(count) {
         if (!notificationBadge) return;
 
@@ -333,81 +189,51 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function playNotificationSound() {
-        try {
-            if (config.notificationSound) {
-                const audio = new Audio(config.notificationSound);
-                audio.play().catch(e => console.error('Sound play failed:', e));
+    function formatTimeAgo(dateString) {
+        const now = new Date();
+        const date = new Date(dateString);
+        const jakartaTime = new Date(date.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
+        const diffInSeconds = Math.floor((now - jakartaTime) / 1000);
+        if (isNaN(diffInSeconds)) return '';
+        const intervals = [
+            { label: 'year', seconds: 31536000 },
+            { label: 'month', seconds: 2592000 },
+            { label: 'day', seconds: 86400 },
+            { label: 'hour', seconds: 3600 },
+            { label: 'minute', seconds: 60 },
+            { label: 'second', seconds: 1 }
+        ];
+        for (const interval of intervals) {
+            const count = Math.floor(diffInSeconds / interval.seconds);
+            if (count >= 1) {
+                return `${count} ${interval.label}${count !== 1 ? 's' : ''} ago`;
             }
-        } catch (error) {
-            console.error('Notification sound error:', error);
         }
+        return 'just now';
     }
-    
-function formatTimeAgo(dateString) {
-    const now = new Date();
-    const date = new Date(dateString);
-    
-    
-    const jakartaTime = new Date(date.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
-    const diffInSeconds = Math.floor((now - jakartaTime) / 1000);
-    if (isNaN(diffInSeconds)) return '';
-    const intervals = [
-        { label: 'year', seconds: 31536000 },
-        { label: 'month', seconds: 2592000 },
-        { label: 'day', seconds: 86400 },
-        { label: 'hour', seconds: 3600 },
-        { label: 'minute', seconds: 60 },
-        { label: 'second', seconds: 1 }
-    ];
-    for (const interval of intervals) {
-        const count = Math.floor(diffInSeconds / interval.seconds);
-        if (count >= 1) {
-            return `${count} ${interval.label}${count !== 1 ? 's' : ''} ago`;
-        }
-    }
-    return 'just now';
-}
 
-
-   // Escape HTML to prevent XSS
     function escapeHtml(unsafe) {
-    return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 
-  
+    function redirectToLogin() {
+        window.location.href = '/login';
+    }
 
-    // 6. Initialization and Cleanup
+    // Inisialisasi
     function initialize() {
-        // Load initial notifications
         loadNotifications();
-        
-        // Setup real-time connection
-        setupSSE();
-        
-        // Request notification permission
+        setInterval(loadNotifications, config.pollingInterval); 
+
         if (typeof Notification !== 'undefined' && Notification.permission !== 'denied') {
             Notification.requestPermission();
         }
-
-        // Return cleanup function
-        return () => {
-            if (eventSource) {
-                eventSource.close();
-                isConnected = false;
-            }
-        };
     }
 
-    // Start the system
-    notificationCleanup = initialize();
-
-    // Setup cleanup handlers
-    window.addEventListener('beforeunload', notificationCleanup);
-    window.addEventListener('pagehide', notificationCleanup);
+    initialize();
 });

@@ -23,9 +23,10 @@ async function fetchLockStatus() {
                 ? '<span class="badge bg-label-success">Active</span>'
                 : '<span class="badge bg-label-danger">Locked</span>';
 
-            const actionButton = lock.status
-                ? `<button class="btn btn-sm btn-danger lock-btn" data-role-id="${lock.roles_id}" data-role-name="${lock.roles_name}">Lock</button>`
-                : `<button class="btn btn-sm btn-success unlock-btn" data-role-id="${lock.roles_id}" data-role-name="${lock.roles_name}">Unlock</button>`;
+           const actionButton = lock.status
+            ? `<button class="btn btn-sm btn-danger lock-btn" data-role-id="${lock.roles_id}" data-role-name="${lock.roles_name}">Lock</button>`
+            : `<button class="btn btn-sm btn-success unlock-btn" data-role-id="${lock.roles_id}" data-role-name="${lock.roles_name}">Unlock</button>`;
+
 
             const row = `
             <tr>
@@ -36,21 +37,22 @@ async function fetchLockStatus() {
             tbody.innerHTML += row;
         });
 
-        document.querySelectorAll('.lock-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+       document.querySelectorAll('.lock-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
                 const roleId = e.target.getAttribute('data-role-id');
                 const roleName = e.target.getAttribute('data-role-name');
-                openLockModal(roleId, roleName, 'lock');
+                await confirmLockAction(roleId, roleName, 'lock');
             });
         });
 
         document.querySelectorAll('.unlock-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 const roleId = e.target.getAttribute('data-role-id');
                 const roleName = e.target.getAttribute('data-role-name');
-                openLockModal(roleId, roleName, 'unlock');
+                await confirmLockAction(roleId, roleName, 'unlock');
             });
         });
+
 
     } catch (error) {
         console.error("Error fetching role lock status:", error);
@@ -59,88 +61,57 @@ async function fetchLockStatus() {
 }
 
 
-function toDateTimeLocal(date) {
-    const pad = (n) => n.toString().padStart(2, '0');
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
 
-function openLockModal(roleId, roleName, actionType) {
-    const modal = new bootstrap.Modal(document.getElementById('lockModal'));
-    document.getElementById('roleId').value = roleId;
-    document.getElementById('actionType').value = actionType;
-
-    if (actionType === 'lock') {
-        document.getElementById('lockModalTitle').textContent = `Lock ${roleName} Role`;
-        document.getElementById('confirmLock').className = 'btn btn-danger';
-        document.getElementById('confirmLock').textContent = 'Lock Role';
-    } else {
-        document.getElementById('lockModalTitle').textContent = `Unlock ${roleName} Role`;
-        document.getElementById('confirmLock').className = 'btn btn-success';
-        document.getElementById('confirmLock').textContent = 'Unlock Role';
-    }
-
-    // 🕒 Isi waktu lokal di UI
-    const now = new Date();
-    document.getElementById('startDate').value = toDateTimeLocal(now);
-    document.getElementById('endDate').value = "";
-
-    modal.show();
-}
-
-document.getElementById('confirmLock').addEventListener('click', async () => {
-    const roleId = document.getElementById('roleId').value;
-    const actionType = document.getElementById('actionType').value;
-    const startLocal = document.getElementById('startDate').value;
-    const endLocal = document.getElementById('endDate').value;
-    const reason = document.getElementById('reason').value;
+async function confirmLockAction(roleId, roleName, actionType) {
     const token = localStorage.getItem('token');
+    const isLock = actionType === 'lock';
+    
+    const result = await Swal.fire({
+        title: `${isLock ? 'Lock' : 'Unlock'} ${roleName}?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: isLock ? 'Yes, Lock' : 'Yes, Unlock',
+        cancelButtonText: 'Cancel'
+    });
 
-    if (!endLocal) {
-        showSuccessToast("End date is required");
-        return;
-    }
-
-    if (new Date(endLocal) <= new Date(startLocal)) {
-        showSuccessToast("End date must be after start date");
-        return;
-    }
-
-
-    const startDateISO = new Date(startLocal).toISOString();
-    const endDateISO = new Date(endLocal).toISOString();
+    if (!result.isConfirmed) return;
 
     try {
+        const bodyData = {
+            role_id: roleId,
+            action: actionType
+        };
+
+        if (isLock) {
+            // Default to today until next 30 days (you can customize this)
+            const today = new Date();
+            const endDate = new Date();
+            endDate.setDate(today.getDate() + 30);
+
+            bodyData.start_date = today.toISOString();
+            bodyData.end_date = endDate.toISOString();
+            bodyData.reason = "Locked via quick action";
+        }
+
         const response = await fetch("http://localhost:8000/lock/manage", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             },
-            body: JSON.stringify({
-                role_id: roleId,
-                action: actionType,
-                start_date: startDateISO,
-                end_date: endDateISO,
-                reason: reason
-            })
+            body: JSON.stringify(bodyData)
         });
 
         const result = await response.json();
         showSuccessToast(result.message || "Action successful");
-
-        setTimeout(() => {
-            bootstrap.Modal.getInstance(document.getElementById('lockModal')).hide();
-            fetchLockStatus();
-        }, 1000);
+        fetchLockStatus();
 
     } catch (error) {
         console.error("Error:", error);
-        showSuccessToast("Action successful, Please Refresh Your Page");
-        setTimeout(() => {
-            bootstrap.Modal.getInstance(document.getElementById('lockModal')).hide();
-        }, 1000);
+        showSuccessToast("Something went wrong");
     }
-});
+}
+
 
 function showSuccessToast(message) {
     Swal.fire({

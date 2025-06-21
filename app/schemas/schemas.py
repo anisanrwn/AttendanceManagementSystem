@@ -10,9 +10,7 @@ class RoleLockStatus(BaseModel):
 class ManageRoleLock(BaseModel):
     role_id: int
     action: str
-    start_date: str  
-    end_date: str 
-    reason: Optional[str] = None
+   
     
 class PermissionBase(BaseModel):
     permission_type: str

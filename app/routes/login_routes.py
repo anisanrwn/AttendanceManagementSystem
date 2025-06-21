@@ -23,6 +23,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import Optional
+from fastapi import BackgroundTasks 
 
 
 
@@ -74,7 +75,39 @@ def send_otp_email(email, otp):
         print(f"Error mengirim email: {e}")
         return False
     
+def send_new_device_email(to_email: str, ip_address: str, device: str):
+    try:
+        email_message = MIMEMultipart()
+        email_message["From"] = EMAIL_ADDRESS
+        email_message["To"] = to_email
+        email_message["Subject"] = "Login Detected from New Device - Attendance System"
 
+        email_body = f"""
+        <html>
+        <body>
+            <h2>New Device Login Notification</h2>
+            <p>We've detected a login from a new device:</p>
+            <ul>
+                <li><strong>IP Address:</strong> {ip_address}</li>
+                <li><strong>Device:</strong> {device}</li>
+            </ul>
+            <p>If this was you, you can safely ignore this message.</p>
+            <p>If this wasn't you, we recommend changing your password immediately.</p>
+            <p>To change your password or if you need further assistance, please contact your HR or IT department responsible for managing the application.</p>
+        </body>
+        </html>
+        """
+
+        email_message.attach(MIMEText(email_body, "html"))
+
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
+        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+        server.send_message(email_message)
+        server.quit()
+    except Exception as e:
+        # log saja; jangan blokir alur utama
+        print(f"[BG-TASK] gagal kirim email new-device: {e}")
 
 @router.get("/notifications/stream")
 async def notification_stream(
@@ -277,8 +310,6 @@ async def login_user(
         current_time = datetime.utcnow()
         locks = db.query(m.RoleLock).filter(
             m.RoleLock.role_id.in_([role.roles_id for role in user.roles]),
-            m.RoleLock.start_date <= current_time,
-            m.RoleLock.end_date >= current_time
         ).all()
 
         if locks:
@@ -324,7 +355,7 @@ async def login_user(
                         <h2>Account Locked Notification</h2>
                         <p>We detected <strong>5 failed login attempts</strong> on your account.</p>
                         <p>Your account has been temporarily locked until <strong>{locked_until_str}</strong>.</p>
-                        <p>If this was not you, please contact support immediately.</p>
+                        <p>If this was not you, please contact your HR or IT department responsible for managing the application immediately.</p>
                     </body>
                     </html>
                     """
@@ -364,7 +395,7 @@ async def login_user(
                         <h2>Account Locked Notification</h2>
                         <p>We detected <strong>10 failed login attempts</strong> on your account.</p>
                         <p>Your account has been temporarily locked until <strong>{locked_until_str}</strong>.</p>
-                        <p>If this was not you, please contact support immediately.</p>
+                        <p>If this was not you, please contact your HR or IT department responsible for managing the application immediately.</p>
                     </body>
                     </html>
                     """
@@ -417,8 +448,9 @@ async def login_user(
 @router.post("/verify-otp")
 async def verify_otp(
     request: Request,
+    background_tasks: BackgroundTasks,
     email: str = Form(...),
-    otp: str = Form(...),
+    otp: str = Form(...), 
     db: Session = Depends(get_db)
 ):
     ip_address = request.headers.get("x-forwarded-for", request.client.host)
@@ -482,37 +514,11 @@ async def verify_otp(
                 created_at=datetime.utcnow() + timedelta(hours=7)
             )
             db.add(notification)
-            try:
-                email_message = MIMEMultipart()
-                email_message["From"] = EMAIL_ADDRESS
-                email_message["To"] = user.email
-                email_message["Subject"] = "Login Detected from New Device - Attendance System"
+            background_tasks.add_task(
+                send_new_device_email, user.email, ip_address, browser_name
+            )
 
-                email_body = f"""
-                <html>
-                <body>
-                    <h2>New Device Login Notification</h2>
-                    <p>We've detected a login from a new device:</p>
-                    <ul>
-                        <li><strong>IP Address:</strong> {ip_address}</li>
-                        <li><strong>Device:</strong> {browser_name}</li>
-                    </ul>
-                    <p>If this was you, you can safely ignore this message.</p>
-                    <p>If this wasn't you, we recommend changing your password immediately.</p>
-                </body>
-                </html>
-                """
-
-                email_message.attach(MIMEText(email_body, "html"))
-
-                server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-                server.starttls()
-                server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-                server.send_message(email_message)
-                server.quit()
-            except Exception as e:
-                print(f"Failed to send Email new device login: {e}")
-
+        
 
     db.commit()
     mark_absent_for_missing_days(db, user.employee_id)

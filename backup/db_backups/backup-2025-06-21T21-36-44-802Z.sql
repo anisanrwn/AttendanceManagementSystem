@@ -170,10 +170,7 @@ ALTER SEQUENCE public.employees_employee_id_seq OWNED BY public.employees.employ
 
 CREATE TABLE public.lock_system (
     lock_id integer NOT NULL,
-    role_id integer NOT NULL,
-    start_date date NOT NULL,
-    end_date date NOT NULL,
-    reason text
+    role_id integer NOT NULL
 );
 
 
@@ -501,18 +498,6 @@ COPY public.activity_logs (log_id, user_id, action, detail, ip_address, "timesta
 264	4	Login	User nabila.libasutaqwa@student.president.ac.id logged in successfully	127.0.0.1	2025-05-27 02:46:19.246378+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0
 265	6	Login	User yustinayunita86@gmail.com logged in successfully	127.0.0.1	2025-05-27 03:22:56.011375+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0
 266	4	Login	User nabila.libasutaqwa@student.president.ac.id logged in successfully	127.0.0.1	2025-05-27 13:27:41.738776+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0
-267	\N	Viewed employee profile	Viewed profile of employee ID 15	\N	2025-05-27 13:27:51.692004+00	\N
-268	\N	Viewed employee profile	Viewed profile of employee ID 5	\N	2025-05-27 13:27:59.524427+00	\N
-269	\N	Viewed employee profile	Viewed profile of employee ID 5	\N	2025-05-27 13:30:22.209017+00	\N
-270	19	Login	User adelaideufrasia@gmail.com logged in successfully	127.0.0.1	2025-05-27 18:08:49.966335+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0
-271	4	Login	User nabila.libasutaqwa@student.president.ac.id logged in successfully	127.0.0.1	2025-05-27 18:14:30.665093+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0
-272	4	Login	User nabila.libasutaqwa@student.president.ac.id logged in successfully	127.0.0.1	2025-05-27 20:06:06.628125+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0
-273	4	Login	User nabila.libasutaqwa@student.president.ac.id logged in successfully	127.0.0.1	2025-05-27 20:10:51.806151+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0
-274	17	Login	User nabilalb0109@gmail.com logged in successfully	127.0.0.1	2025-05-27 20:13:54.909637+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0
-275	17	Login	User nabilalb0109@gmail.com logged in successfully	127.0.0.1	2025-05-27 20:34:42.904699+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0
-276	4	Login	User nabila.libasutaqwa@student.president.ac.id logged in successfully	127.0.0.1	2025-05-27 20:41:32.116859+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0
-277	\N	Viewed employee profile	Viewed profile of employee ID 16	\N	2025-05-27 20:41:49.02171+00	\N
-278	\N	Viewed employee profile	Viewed profile of employee ID 4	\N	2025-05-27 20:47:11.333607+00	\N
 279	\N	Viewed employee profile	Viewed profile of employee ID 1	\N	2025-05-27 20:48:18.077268+00	\N
 280	4	Login	User nabila.libasutaqwa@student.president.ac.id logged in successfully	127.0.0.1	2025-05-27 20:52:54.477512+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0
 398	\N	Updated user	User Abid updated successfully	\N	2025-06-17 19:53:44.720908+00	\N
@@ -524,20 +509,6 @@ COPY public.activity_logs (log_id, user_id, action, detail, ip_address, "timesta
 286	4	Login	User nabila.libasutaqwa@student.president.ac.id logged in successfully	127.0.0.1	2025-05-27 23:29:43.242628+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0
 287	\N	Updated user	User HR updated successfully	\N	2025-05-27 23:30:17.268295+00	\N
 288	\N	Viewed employee profile	Viewed profile of employee ID 15	\N	2025-05-28 01:52:37.468383+00	\N
-289	4	Login	User nabila.libasutaqwa@student.president.ac.id logged in successfully	127.0.0.1	2025-05-28 01:55:21.286635+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0
-290	4	Login	User nabila.libasutaqwa@student.president.ac.id logged in successfully	127.0.0.1	2025-05-28 01:57:23.562468+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0
-291	19	Login	User adelaideufrasia@gmail.com logged in successfully	127.0.0.1	2025-05-28 02:05:13.285981+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0
-292	4	Login	User nabila.libasutaqwa@student.president.ac.id logged in successfully	127.0.0.1	2025-05-28 02:09:27.204663+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0
-293	\N	Updated user	User yuyusdaily updated successfully	\N	2025-05-28 03:03:42.100914+00	\N
-294	6	Login	User yustinayunita86@gmail.com logged in successfully	127.0.0.1	2025-05-28 03:11:08.355636+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0
-295	\N	Add employee failed	'image_filename' is an invalid keyword argument for Employee	\N	2025-05-28 03:14:12.195381+00	\N
-296	\N	Add employee failed	'image_filename' is an invalid keyword argument for Employee	\N	2025-05-28 03:15:39.482672+00	\N
-297	\N	Added employee	Employee Angeline Moore added successfully	\N	2025-05-28 03:17:49.470278+00	\N
-298	\N	Viewed employee profile	Viewed profile of employee ID 17	\N	2025-05-28 03:18:51.827946+00	\N
-299	\N	Viewed employee profile	Viewed profile of employee ID 17	\N	2025-05-28 03:18:54.234911+00	\N
-300	\N	Created user	User angelinemoore created successfully	\N	2025-05-28 03:19:14.758506+00	\N
-301	27	Login	User angelinemoore.notsafe@gmail.com logged in successfully	127.0.0.1	2025-05-28 03:20:04.126587+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0
-302	21	Login	User yustinayunitayy@gmail.com logged in successfully	127.0.0.1	2025-05-28 03:24:17.024742+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0
 303	\N	Updated user	User admin_nisa updated successfully	\N	2025-05-29 15:07:21.060998+00	\N
 304	21	Login	User yustinayunitayy@gmail.com logged in successfully	127.0.0.1	2025-06-07 08:03:37.059242+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0
 305	19	Login	User adelaideufrasia@gmail.com logged in successfully	127.0.0.1	2025-06-07 08:07:32.587835+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0
@@ -572,7 +543,6 @@ COPY public.activity_logs (log_id, user_id, action, detail, ip_address, "timesta
 334	6	Login	User yustinayunita86@gmail.com logged in successfully	127.0.0.1	2025-06-10 11:26:03.188223+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0
 335	6	Login	User yustinayunita86@gmail.com logged in successfully	127.0.0.1	2025-06-10 12:05:23.437376+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0
 336	6	Login	User yustinayunita86@gmail.com logged in successfully	127.0.0.1	2025-06-10 12:06:49.207977+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0
-337	\N	Updated user	User SuperadminNab updated successfully	\N	2025-06-10 12:08:42.925528+00	\N
 338	4	Login	User yustina.yunita@student.president.ac.id logged in successfully	127.0.0.1	2025-06-10 12:09:28.969362+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0
 339	\N	Updated user	User SuperadminNab updated successfully	\N	2025-06-10 12:10:41.165667+00	\N
 340	6	Login	User yustinayunita86@gmail.com logged in successfully	127.0.0.1	2025-06-10 12:22:00.410611+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0
@@ -743,6 +713,62 @@ COPY public.activity_logs (log_id, user_id, action, detail, ip_address, "timesta
 506	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-19 13:07:39.330503+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
 507	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-19 13:23:07.791818+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
 508	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-19 14:03:24.870955+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+509	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-19 14:46:39.166155+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+510	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-19 15:07:30.490765+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+511	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-20 12:27:26.460165+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+512	\N	Add employee failed	'image_filename' is an invalid keyword argument for Employee	\N	2025-06-20 12:31:15.967462+00	\N
+513	\N	Add employee failed	'image_filename' is an invalid keyword argument for Employee	\N	2025-06-20 12:31:58.366718+00	\N
+514	\N	Add employee failed	'image_filename' is an invalid keyword argument for Employee	\N	2025-06-20 12:32:12.195911+00	\N
+515	\N	Add employee failed	'image_filename' is an invalid keyword argument for Employee	\N	2025-06-20 12:33:35.712571+00	\N
+516	\N	Add employee failed	'image_filename' is an invalid keyword argument for Employee	\N	2025-06-20 12:34:47.982393+00	\N
+517	\N	Add employee failed	'image_filename' is an invalid keyword argument for Employee	\N	2025-06-20 12:35:56.612171+00	\N
+518	\N	Add employee failed	'image_filename' is an invalid keyword argument for Employee	\N	2025-06-20 12:36:19.942735+00	\N
+519	\N	Add employee failed	'image_filename' is an invalid keyword argument for Employee	\N	2025-06-20 12:36:51.370675+00	\N
+520	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-20 12:56:24.933847+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+522	6	Login	User yustinayunita86@gmail.com logged in successfully	127.0.0.1	2025-06-20 13:06:03.152444+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0
+523	\N	Added employee	Employee a a added successfully	\N	2025-06-20 13:06:46.555149+00	\N
+524	\N	Deleted employee	Employee 18 deleted successfully	\N	2025-06-20 13:06:49.89013+00	\N
+525	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-20 13:12:05.388271+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+526	\N	Added employee	Employee binti nurhayati added successfully	\N	2025-06-20 13:12:27.61463+00	\N
+527	\N	Created user	User mama created successfully	\N	2025-06-20 13:15:13.579932+00	\N
+529	21	Login	User yustinayunitayy@gmail.com logged in successfully	127.0.0.1	2025-06-20 13:30:45.336694+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0
+530	4	Login	User nabila.libasutaqwa@student.president.ac.id logged in successfully	127.0.0.1	2025-06-21 04:35:18.61437+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+531	4	Login	User nabila.libasutaqwa@student.president.ac.id logged in successfully	127.0.0.1	2025-06-21 04:47:43.484244+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+532	4	Login	User nabila.libasutaqwa@student.president.ac.id logged in successfully	127.0.0.1	2025-06-21 04:49:02.332893+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+533	4	Login	User nabila.libasutaqwa@student.president.ac.id logged in successfully	127.0.0.1	2025-06-21 05:08:51.946519+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+528	\N	Login	User bintinurhayati041@gmail.com logged in successfully	127.0.0.1	2025-06-20 13:17:01.386405+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+534	4	Login	User nabila.libasutaqwa@student.president.ac.id logged in successfully	127.0.0.1	2025-06-21 05:11:09.247026+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+535	4	Login	User nabila.libasutaqwa@student.president.ac.id logged in successfully	127.0.0.1	2025-06-21 05:15:19.654205+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+536	6	Login	User yustinayunita86@gmail.com logged in successfully	127.0.0.1	2025-06-21 10:03:39.62391+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0
+537	\N	Updated user	User angelinemoore updated successfully	\N	2025-06-21 10:28:54.786581+00	\N
+538	\N	Updated user	User angelinemoore updated successfully	\N	2025-06-21 10:28:55.424381+00	\N
+539	27	Login	User angelinemoore.notsafe@gmail.com logged in successfully	127.0.0.1	2025-06-21 10:29:29.825784+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0
+540	\N	Viewed employee profile	Viewed profile of employee ID 15	\N	2025-06-21 11:13:04.376731+00	\N
+541	21	Login	User yustinayunitayy@gmail.com logged in successfully	127.0.0.1	2025-06-21 13:20:14.486186+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0
+542	27	Login	User angelinemoore.notsafe@gmail.com logged in successfully	127.0.0.1	2025-06-21 13:20:21.692559+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0
+543	21	Login	User yustinayunitayy@gmail.com logged in successfully	127.0.0.1	2025-06-21 13:26:55.332868+00	Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Mobile Safari/537.36
+544	6	Login	User yustinayunita86@gmail.com logged in successfully	127.0.0.1	2025-06-21 13:28:34.097403+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0
+545	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-21 19:04:21.352048+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+546	\N	Viewed employee profile	Viewed profile of employee ID 3	\N	2025-06-21 19:05:39.404714+00	\N
+547	\N	Viewed employee profile	Viewed profile of employee ID 3	\N	2025-06-21 19:05:54.600724+00	\N
+548	\N	Viewed employee profile	Viewed profile of employee ID 14	\N	2025-06-21 19:06:02.156321+00	\N
+549	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-21 19:27:31.312267+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+550	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-21 19:30:08.480992+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+551	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-21 19:56:38.664659+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+552	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-21 19:57:39.115002+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+553	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-21 20:02:29.294514+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+554	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-21 20:15:02.21378+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+555	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-21 20:18:39.191806+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+556	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-21 20:26:07.593772+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+557	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-21 20:28:01.711934+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+558	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-21 20:28:45.116473+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+559	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-21 20:57:19.851555+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+560	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-21 20:58:11.181967+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36
+561	3	Login	User nirwanaanisa1508@gmail.com logged in successfully	127.0.0.1	2025-06-21 21:17:59.704983+00	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0
+562	\N	Deleted user	User 29 deleted successfully	\N	2025-06-21 21:18:45.931292+00	\N
+563	\N	Deleted employee	Employee 19 deleted successfully	\N	2025-06-21 21:18:57.323343+00	\N
+564	\N	Added employee	Employee do kyungso added successfully	\N	2025-06-21 21:32:58.658185+00	\N
+565	\N	Created user	User Kyungsoo created successfully	\N	2025-06-21 21:33:59.960088+00	\N
 \.
 
 
@@ -761,7 +787,6 @@ COPY public.alembic_version (version_num) FROM stdin;
 
 COPY public.attendance (attendance_id, employee_id, attendance_date, late, attendance_status, clock_in, clock_in_latitude, clock_in_longitude, clock_in_verified, clock_in_reason, clock_in_distance, clock_out, clock_out_latitude, clock_out_longitude, clock_out_verified, clock_out_reason, clock_out_distance, face_verified, working_hour, overtime) FROM stdin;
 1	12	2025-05-26	1200	Punch Out	08:20:00	-6.490243	106.833958	f	Overslept	0.5123	17:00:00	-6.473288657065961	106.85135874708021	t	\N	0.4152	t	31200	900
-13	1	2025-05-29	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
 44	16	2025-06-09	0	Punch Out	07:50:00	-6.473288657065961	106.85135874708021	t	\N	0.45	16:45:00	-6.473288657065961	106.85135874708021	t	\N	0.47	t	32100	0
 55	12	2025-06-12	0	Punch Out	08:00:00	-6.473536	106.851962	t	\N	0.46	17:00:00	-6.473536	106.851962	t	\N	0.47	t	32400	900
 56	16	2025-06-12	0	Punch Out	07:55:00	-6.473536	106.851962	t	\N	0.465	16:50:00	-6.473536	106.851962	t	\N	0.475	t	32100	300
@@ -777,9 +802,6 @@ COPY public.attendance (attendance_id, employee_id, attendance_date, late, atten
 10	12	2025-05-28	0	Punch Out	07:55:00	-6.473536	106.851962	t	\N	0.3542	16:40:00	-6.47928	106.844498	f	Clock out button did not register	0.5123	t	31500	0
 11	5	2025-05-28	300	Punch Out	08:05:00	-6.473536	106.851962	t	\N	0.5199	17:10:00	-6.473536	106.851962	t	\N	0.5888	t	32700	1500
 12	16	2025-05-28	0	Punch Out	07:50:00	-6.473536	106.851962	t	\N	0.4789	16:45:00	-6.473536	106.851962	t	\N	0.5772	t	32100	0
-14	5	2025-05-29	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
-15	12	2025-05-29	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
-16	16	2025-05-29	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
 17	12	2025-05-30	1200	Punch Out	08:20:00	-6.47184	106.853081	t	\N	0.4841	17:05:00	-6.473288657065961	106.85135874708021	t	\N	0.5199	t	32700	1200
 18	5	2025-05-30	0	Punch Out	07:50:00	-6.473288657065961	106.85135874708021	t	\N	0.4235	16:35:00	-6.47928	106.844498	f	Clock out button did not register	0.5821	t	31500	0
 19	1	2025-05-30	0	Punch Out	07:55:00	-6.473288657065961	106.85135874708021	t	\N	0.3924	16:45:00	-6.473288657065961	106.85135874708021	t	\N	0.5789	t	31800	0
@@ -818,8 +840,78 @@ COPY public.attendance (attendance_id, employee_id, attendance_date, late, atten
 51	12	2025-06-11	0	Punch Out	07:55:00	-6.47184	106.853081	t	\N	0.4521	16:50:00	-6.47184	106.853081	t	\N	0.46	t	32100	300
 52	16	2025-06-11	300	Punch Out	08:05:00	-6.47184	106.853081	t	\N	0.48	17:05:00	-6.47184	106.853081	t	\N	0.492	t	32400	1200
 54	5	2025-06-12	600	Punch Out	08:10:00	-6.473536	106.851962	t	\N	0.47	17:20:00	-6.473536	106.851962	t	\N	0.5001	t	33000	1800
+67	\N	2025-06-20	44263	Punch Out	20:17:43.664553	-0.5281930814609369	101.56439129433298	t	KEPO	0.3946596710527004	20:18:27.995699	-0.5281930814609369	101.56439129433298	t	HMM	0.39066993565664276	t	44	12807
 65	12	2025-06-16	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
 66	12	2025-06-17	49410	Punch Out	21:43:30.641242	-6.4790485	106.8466116	t	test	0.5618370114987319	21:44:05.356321	-6.4790485	106.8466116	t	testing	0.46418344244657966	t	34	17945
+68	12	2025-06-18	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+69	12	2025-06-19	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+70	12	2025-06-20	46511	Punch Out	20:55:11.58232	-6.473291	106.8513825	t		0.477972025254232	20:55:34.631764	-6.4733582	106.851444	t		0.5284248705519706	t	23	15034
+71	12	2025-05-29	0	Holiday	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+72	12	2025-05-31	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+73	12	2025-06-01	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+74	12	2025-06-07	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+75	12	2025-06-08	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+76	12	2025-06-15	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+77	2	2025-05-22	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+78	2	2025-05-23	0	Permit	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+79	2	2025-05-24	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+80	2	2025-05-25	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+81	2	2025-05-26	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+82	2	2025-05-27	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+83	2	2025-05-28	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+84	2	2025-05-29	0	Holiday	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+85	2	2025-05-30	0	Holiday	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+86	2	2025-05-31	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+87	2	2025-06-01	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+88	2	2025-06-02	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+89	2	2025-06-03	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+90	2	2025-06-04	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+91	2	2025-06-05	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+92	2	2025-06-06	0	Holiday	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+93	2	2025-06-07	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+94	2	2025-06-08	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+95	2	2025-06-09	0	Holiday	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+96	2	2025-06-10	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+97	2	2025-06-11	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+98	2	2025-06-12	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+99	2	2025-06-13	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+100	2	2025-06-14	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+101	2	2025-06-15	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+102	2	2025-06-16	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+103	2	2025-06-17	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+104	2	2025-06-18	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+105	2	2025-06-19	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+106	2	2025-06-20	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+107	3	2025-05-23	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+108	3	2025-05-24	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+109	3	2025-05-25	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+110	3	2025-05-26	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+111	3	2025-05-27	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+112	3	2025-05-28	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+113	3	2025-05-29	0	Holiday	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+114	3	2025-05-30	0	Holiday	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+115	3	2025-05-31	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+116	3	2025-06-01	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+117	3	2025-06-02	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+118	3	2025-06-03	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+119	3	2025-06-04	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+120	3	2025-06-05	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+121	3	2025-06-06	0	Holiday	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+122	3	2025-06-07	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+123	3	2025-06-08	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+124	3	2025-06-09	0	Holiday	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+125	3	2025-06-10	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+126	3	2025-06-11	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+127	3	2025-06-12	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+128	3	2025-06-13	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+129	3	2025-06-14	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+130	3	2025-06-15	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+131	3	2025-06-16	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+132	3	2025-06-17	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+133	3	2025-06-18	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+134	3	2025-06-19	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+135	3	2025-06-20	0	Absent	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
+136	3	2025-06-21	0	Weekend	\N	\N	\N	f	\N	\N	\N	\N	\N	f	\N	\N	f	\N	\N
 \.
 
 
@@ -838,7 +930,8 @@ COPY public.employees (employee_id, first_name, last_name, nrp_id, email, phone_
 14	Nirwana	Anisa	232434456	aku@gmail.com	08221478627	IT Support	General Affair	[-0.08705262839794159, 0.028314677998423576, -0.02192343771457672, -0.10766909271478653, -0.0378359854221344, -0.0771767869591713, -0.012423904612660408, -0.10465358197689056, 0.20991367101669312, -0.12996770441532135, 0.2618424594402313, -0.09420463442802429, -0.16922058165073395, -0.13514386117458344, -0.023006854578852654, 0.2143956869840622, -0.21800462901592255, -0.14555948972702026, -0.07178234308958054, 0.019305124878883362, 0.0611899271607399, -0.022431794553995132, 0.09242147207260132, 0.11043264716863632, -0.12326689064502716, -0.452635794878006, -0.10606089234352112, -0.07770831882953644, -0.04612206667661667, -0.01406253781169653, -0.022774379700422287, 0.15566261112689972, -0.24659276008605957, -0.09170137345790863, 0.03443208336830139, 0.16285422444343567, -0.005589225795120001, -0.06087765097618103, 0.19783011078834534, 0.0338364839553833, -0.26129186153411865, -0.04324609786272049, 0.04748415946960449, 0.2872742712497711, 0.12920653820037842, 0.007613310124725103, 0.02499564178287983, -0.0844765305519104, 0.06059001758694649, -0.25167974829673767, 0.03028874099254608, 0.1258591115474701, 0.032361652702093124, 0.007122025825083256, -0.03239835426211357, -0.08833154290914536, 0.02946528047323227, 0.138524129986763, -0.1973840445280075, -0.02251201868057251, 0.07179447263479233, -0.1270015686750412, -0.10023333132266998, -0.11575260013341904, 0.24565406143665314, 0.1841726452112198, -0.11953563243150711, -0.17247894406318665, 0.18022409081459045, -0.1067696064710617, -0.020057566463947296, 0.03702744096517563, -0.15482297539710999, -0.23280133306980133, -0.2956756353378296, -0.0213584266602993, 0.35210227966308594, 0.0816737711429596, -0.12993137538433075, 0.061271414160728455, -0.11381693929433823, 0.012884706258773804, 0.07352393865585327, 0.1552637219429016, 0.0380743145942688, 0.1021994799375534, -0.09148217737674713, 0.10116030275821686, 0.18677978217601776, -0.08925523608922958, -0.010435952804982662, 0.2613350450992584, -0.04561629891395569, 0.07503945380449295, 0.0041400776244699955, 0.00238929595798254, -0.03760264813899994, 0.10474572330713272, -0.21155020594596863, 0.06214817240834236, 0.06774457544088364, 0.020565593615174294, -0.0022452964913100004, 0.07133220881223679, -0.15793690085411072, 0.07148707658052444, 0.02279788814485073, -0.015991784632205963, 0.08306196331977844, -0.041770532727241516, -0.10044970363378525, -0.1508372724056244, 0.11841989308595657, -0.22482070326805115, 0.160581573843956, 0.20859745144844055, 0.07659950852394104, 0.16944147646427155, 0.10935617238283157, 0.07057564705610275, 0.040968891233205795, -0.08640743792057037, -0.3014596402645111, 0.05896034464240074, 0.1225651353597641, 0.005609716754406691, 0.003914719447493553, -0.0031596901826560497]
 16	juminten	lasmi	656575535	juminten@gmail.com	08221478627	Web Design	Web Programming	[-0.12919948995113373, 0.06666329503059387, 0.03344258666038513, -0.08404503762722015, -0.09008660167455673, -0.08720318973064423, -0.08245470374822617, -0.10234399884939194, 0.19635172188282013, -0.13135431706905365, 0.2677384316921234, -0.03503573685884476, -0.22508522868156433, -0.112706758081913, 0.03417070209980011, 0.19653455913066864, -0.2162640392780304, -0.1515597701072693, -0.023327000439167023, -0.004968846682459116, 0.0376853384077549, -0.06514094024896622, 0.08146794140338898, 0.07976383715867996, -0.10406520962715149, -0.45721232891082764, -0.10016806423664093, -0.05235406011343002, -0.04149402678012848, 0.0054552191868424416, -0.05616782233119011, 0.07495284825563431, -0.2324349284172058, -0.07747253775596619, 0.020301751792430878, 0.16606225073337555, -0.049775440245866776, -0.08939759433269501, 0.17369958758354187, -0.07171580195426941, -0.29493245482444763, -0.05096827819943428, 0.05974216386675835, 0.1934920996427536, 0.14177370071411133, 0.010161984711885452, 0.01671195775270462, -0.09920952469110489, 0.06554976105690002, -0.25490570068359375, 0.036633457988500595, 0.16162243485450745, 0.025041649118065834, 0.01508278213441372, 0.005302885547280312, -0.10272610187530518, 0.03740565478801727, 0.1506415456533432, -0.18771055340766907, -0.10580013692378998, 0.06068480387330055, -0.10924514383077621, -0.06539610028266907, -0.12561345100402832, 0.27128615975379944, 0.20287086069583893, -0.13297437131404877, -0.1762954741716385, 0.11034033447504044, -0.15277713537216187, -0.027844959869980812, 0.10175003111362457, -0.12501384317874908, -0.24999354779720306, -0.3338157832622528, 0.001971479505300522, 0.31238502264022827, 0.10100376605987549, -0.12357345223426819, 0.03959168493747711, -0.0815640240907669, -0.009729903191328049, 0.08266538381576538, 0.15124954283237457, 0.011230261996388435, 0.08069176226854324, -0.127456396818161, 0.044604912400245667, 0.19823633134365082, -0.07718481868505478, 0.011964729987084866, 0.24694783985614777, 0.012285180389881134, 0.10370013117790222, 0.01042763702571392, 0.07744865864515305, -0.047568030655384064, 0.02586311846971512, -0.20861658453941345, 0.04415066912770271, 0.05919310450553894, 0.039091210812330246, -0.04661335423588753, 0.07595592737197876, -0.1582529991865158, 0.036706939339637756, 0.008120217360556126, -0.026307284832000732, 0.045081302523612976, -0.0751051977276802, -0.04946199804544449, -0.17545470595359802, 0.07931462675333023, -0.2665981352329254, 0.1397392749786377, 0.20680955052375793, 0.05093002691864967, 0.18016910552978516, 0.08233986049890518, 0.03672053664922714, -0.021599942818284035, -0.13274571299552917, -0.24900546669960022, 0.04211864247918129, 0.10715876519680023, -0.018366381525993347, 0.012663201428949833, -0.01600147783756256]
 15	Abid	Laqoo	224353431	abid@gmail.com	08221478627	IT Support	General Affair	[-0.12919948995113373, 0.06666329503059387, 0.03344258666038513, -0.08404503762722015, -0.09008660167455673, -0.08720318973064423, -0.08245470374822617, -0.10234399884939194, 0.19635172188282013, -0.13135431706905365, 0.2677384316921234, -0.03503573685884476, -0.22508522868156433, -0.112706758081913, 0.03417070209980011, 0.19653455913066864, -0.2162640392780304, -0.1515597701072693, -0.023327000439167023, -0.004968846682459116, 0.0376853384077549, -0.06514094024896622, 0.08146794140338898, 0.07976383715867996, -0.10406520962715149, -0.45721232891082764, -0.10016806423664093, -0.05235406011343002, -0.04149402678012848, 0.0054552191868424416, -0.05616782233119011, 0.07495284825563431, -0.2324349284172058, -0.07747253775596619, 0.020301751792430878, 0.16606225073337555, -0.049775440245866776, -0.08939759433269501, 0.17369958758354187, -0.07171580195426941, -0.29493245482444763, -0.05096827819943428, 0.05974216386675835, 0.1934920996427536, 0.14177370071411133, 0.010161984711885452, 0.01671195775270462, -0.09920952469110489, 0.06554976105690002, -0.25490570068359375, 0.036633457988500595, 0.16162243485450745, 0.025041649118065834, 0.01508278213441372, 0.005302885547280312, -0.10272610187530518, 0.03740565478801727, 0.1506415456533432, -0.18771055340766907, -0.10580013692378998, 0.06068480387330055, -0.10924514383077621, -0.06539610028266907, -0.12561345100402832, 0.27128615975379944, 0.20287086069583893, -0.13297437131404877, -0.1762954741716385, 0.11034033447504044, -0.15277713537216187, -0.027844959869980812, 0.10175003111362457, -0.12501384317874908, -0.24999354779720306, -0.3338157832622528, 0.001971479505300522, 0.31238502264022827, 0.10100376605987549, -0.12357345223426819, 0.03959168493747711, -0.0815640240907669, -0.009729903191328049, 0.08266538381576538, 0.15124954283237457, 0.011230261996388435, 0.08069176226854324, -0.127456396818161, 0.044604912400245667, 0.19823633134365082, -0.07718481868505478, 0.011964729987084866, 0.24694783985614777, 0.012285180389881134, 0.10370013117790222, 0.01042763702571392, 0.07744865864515305, -0.047568030655384064, 0.02586311846971512, -0.20861658453941345, 0.04415066912770271, 0.05919310450553894, 0.039091210812330246, -0.04661335423588753, 0.07595592737197876, -0.1582529991865158, 0.036706939339637756, 0.008120217360556126, -0.026307284832000732, 0.045081302523612976, -0.0751051977276802, -0.04946199804544449, -0.17545470595359802, 0.07931462675333023, -0.2665981352329254, 0.1397392749786377, 0.20680955052375793, 0.05093002691864967, 0.18016910552978516, 0.08233986049890518, 0.03672053664922714, -0.021599942818284035, -0.13274571299552917, -0.24900546669960022, 0.04211864247918129, 0.10715876519680023, -0.018366381525993347, 0.012663201428949833, -0.01600147783756256]
-17	Angeline	Moore	1235465654	angelinemoore.notsafe@gmail.com	0891827392387	Back End Developer	Web Programming	[-0.12081847339868546, 0.038519058376550674, 0.01617797277867794, -0.11711333692073822, -0.1798979789018631, -0.09020186960697174, -0.08343029022216797, -0.11644374579191208, 0.14504992961883545, -0.20651744306087494, 0.26471689343452454, -0.08519832044839859, -0.2167043685913086, 0.014478392899036407, -0.1274823546409607, 0.24535933136940002, -0.14351284503936768, -0.1354047805070877, -0.016530517488718033, -0.05096457898616791, 0.08127860724925995, 0.025655200704932213, 0.06100502237677574, 0.08785732835531235, -0.08246975392103195, -0.3274708390235901, -0.13612331449985504, -0.030706165358424187, -0.05291849002242088, -0.014987347647547722, 0.01850481517612934, 0.061041995882987976, -0.19148553907871246, -0.023614443838596344, 0.05604158341884613, 0.14095266163349152, -0.03029518760740757, -0.12160660326480865, 0.17835865914821625, 0.002110738307237625, -0.24809561669826508, -0.022115252912044525, 0.1188221424818039, 0.23312923312187195, 0.10380479693412781, 0.01653021201491356, 0.04738154262304306, -0.191096231341362, 0.059532471001148224, -0.24096521735191345, 0.060559093952178955, 0.09311612695455551, 0.03054102137684822, 0.012061243876814842, 0.03946781903505325, -0.11079143732786179, 0.10112646967172623, 0.20197691023349762, -0.12143829464912415, 0.004151986446231604, 0.13035036623477936, -0.08705785870552063, -0.002701270394027233, -0.1368587166070938, 0.2985178232192993, 0.1288498193025589, -0.1383354514837265, -0.14450614154338837, 0.12208250910043716, -0.16815871000289917, -0.09256096929311752, 0.10865561664104462, -0.11663981527090073, -0.20802515745162964, -0.3321249783039093, -0.01939382404088974, 0.42114946246147156, 0.17391127347946167, -0.11147546768188477, 0.060409825295209885, -0.02171672135591507, 0.04094720631837845, 0.14692328870296478, 0.18827612698078156, 0.013831889256834984, -0.008111615665256977, -0.13498201966285706, 0.0005196882411837578, 0.2598588466644287, -0.08631325513124466, -0.044273246079683304, 0.22467535734176636, -0.0007641483098268509, 0.06848734617233276, 0.011925794184207916, 0.053894877433776855, -0.11671201884746552, -0.02115420438349247, -0.11701779067516327, 0.008025548420846462, -0.04275678098201752, -0.011377350427210331, -0.07139479368925095, 0.08291463553905487, -0.1427893042564392, 0.04708210378885269, -0.08601164072751999, -0.0622728131711483, -0.03447083383798599, -0.026589998975396156, -0.053609564900398254, -0.0772043988108635, 0.09081673622131348, -0.21906159818172455, 0.13878333568572998, 0.16576260328292847, 0.05053684860467911, 0.1921692043542862, 0.15153010189533234, 0.11393868923187256, -0.026383083313703537, -0.08832304924726486, -0.19168874621391296, -0.0186691265553236, 0.07096114009618759, -0.05210106447339058, 0.11873781681060791, -0.010129460133612156]
+17	Angeline	Moore	123546565	angelinemoore.notsafe@gmail.com	0891827392387	Back End Developer	Web Programming	[-0.12081847339868546, 0.038519058376550674, 0.01617797277867794, -0.11711333692073822, -0.1798979789018631, -0.09020186960697174, -0.08343029022216797, -0.11644374579191208, 0.14504992961883545, -0.20651744306087494, 0.26471689343452454, -0.08519832044839859, -0.2167043685913086, 0.014478392899036407, -0.1274823546409607, 0.24535933136940002, -0.14351284503936768, -0.1354047805070877, -0.016530517488718033, -0.05096457898616791, 0.08127860724925995, 0.025655200704932213, 0.06100502237677574, 0.08785732835531235, -0.08246975392103195, -0.3274708390235901, -0.13612331449985504, -0.030706165358424187, -0.05291849002242088, -0.014987347647547722, 0.01850481517612934, 0.061041995882987976, -0.19148553907871246, -0.023614443838596344, 0.05604158341884613, 0.14095266163349152, -0.03029518760740757, -0.12160660326480865, 0.17835865914821625, 0.002110738307237625, -0.24809561669826508, -0.022115252912044525, 0.1188221424818039, 0.23312923312187195, 0.10380479693412781, 0.01653021201491356, 0.04738154262304306, -0.191096231341362, 0.059532471001148224, -0.24096521735191345, 0.060559093952178955, 0.09311612695455551, 0.03054102137684822, 0.012061243876814842, 0.03946781903505325, -0.11079143732786179, 0.10112646967172623, 0.20197691023349762, -0.12143829464912415, 0.004151986446231604, 0.13035036623477936, -0.08705785870552063, -0.002701270394027233, -0.1368587166070938, 0.2985178232192993, 0.1288498193025589, -0.1383354514837265, -0.14450614154338837, 0.12208250910043716, -0.16815871000289917, -0.09256096929311752, 0.10865561664104462, -0.11663981527090073, -0.20802515745162964, -0.3321249783039093, -0.01939382404088974, 0.42114946246147156, 0.17391127347946167, -0.11147546768188477, 0.060409825295209885, -0.02171672135591507, 0.04094720631837845, 0.14692328870296478, 0.18827612698078156, 0.013831889256834984, -0.008111615665256977, -0.13498201966285706, 0.0005196882411837578, 0.2598588466644287, -0.08631325513124466, -0.044273246079683304, 0.22467535734176636, -0.0007641483098268509, 0.06848734617233276, 0.011925794184207916, 0.053894877433776855, -0.11671201884746552, -0.02115420438349247, -0.11701779067516327, 0.008025548420846462, -0.04275678098201752, -0.011377350427210331, -0.07139479368925095, 0.08291463553905487, -0.1427893042564392, 0.04708210378885269, -0.08601164072751999, -0.0622728131711483, -0.03447083383798599, -0.026589998975396156, -0.053609564900398254, -0.0772043988108635, 0.09081673622131348, -0.21906159818172455, 0.13878333568572998, 0.16576260328292847, 0.05053684860467911, 0.1921692043542862, 0.15153010189533234, 0.11393868923187256, -0.026383083313703537, -0.08832304924726486, -0.19168874621391296, -0.0186691265553236, 0.07096114009618759, -0.05210106447339058, 0.11873781681060791, -0.010129460133612156]
+20	do	kyungso	678790873	anisa.nrwn15@gmail.com	08221478627	CEO	UCO	[-0.07937885820865631, 0.05433671176433563, 0.03426268696784973, -0.09492199122905731, -0.09727062284946442, -0.036458659917116165, -0.046943727880716324, -0.0999530479311943, 0.2459191530942917, -0.19544826447963715, 0.2481934130191803, -0.08305905014276505, -0.20827363431453705, -0.13952171802520752, 0.0027770940214395523, 0.24264900386333466, -0.19843804836273193, -0.1986384093761444, -0.035869892686605453, 0.02310420572757721, 0.06135400012135506, -0.05767902359366417, 0.0985165387392044, 0.08105117082595825, -0.16170412302017212, -0.49142715334892273, -0.09689102321863174, -0.014192553237080574, -0.07514133304357529, -0.03547562658786774, -0.04812657833099365, 0.16063404083251953, -0.23265336453914642, -0.07113718241453171, 0.004837433807551861, 0.1816360056400299, -0.04660087451338768, -0.09193529933691025, 0.1862126886844635, -0.015584178268909454, -0.29571565985679626, -0.06377722322940826, 0.061035096645355225, 0.23993565142154694, 0.12889344990253448, -0.04186832159757614, 0.04752567782998085, -0.06248937547206879, 0.05992567539215088, -0.2716343104839325, 0.019584426656365395, 0.13113339245319366, 0.048540979623794556, 0.03197329491376877, -0.001515088602900505, -0.1291104406118393, 0.03330612927675247, 0.16207493841648102, -0.18196041882038116, -0.03299921378493309, 0.055741071701049805, -0.1586737036705017, -0.050771426409482956, -0.1039036363363266, 0.21983732283115387, 0.18671779334545135, -0.0943789854645729, -0.2251175045967102, 0.1273590326309204, -0.1161305233836174, -0.007783310487866402, 0.04775603488087654, -0.15629243850708008, -0.2519349455833435, -0.348398357629776, -0.035064343363046646, 0.3308085501194, 0.1067114770412445, -0.10929177701473236, 0.06136798486113548, -0.05713982507586479, -0.0060956720262765884, 0.024077972397208214, 0.15949806571006775, 0.016339590772986412, 0.10298486799001694, -0.13263173401355743, 0.10088010877370834, 0.18041719496250153, -0.08748679608106613, -0.021388821303844452, 0.24159637093544006, -0.022491291165351868, 0.08832745254039764, 0.003957570996135473, 0.013675995171070099, -0.07353216409683228, 0.12121402472257614, -0.20393458008766174, 0.08162958920001984, 0.006209724582731724, -0.017128679901361465, -0.012366274371743202, 0.05755702406167984, -0.15064206719398499, 0.09083399176597595, -0.005402958951890469, -0.009643392637372017, 0.016355596482753754, -0.019140245392918587, -0.1286143809556961, -0.13935256004333496, 0.1001749038696289, -0.24811193346977234, 0.12372562289237976, 0.23557546734809875, 0.09785636514425278, 0.2127576470375061, 0.13179871439933777, 0.07015064358711243, 0.03978126868605614, -0.06295114010572433, -0.2414284497499466, 0.06256103515625, 0.08457519859075546, -0.01768987812101841, 0.02013232931494713, 0.04308174550533295]
 \.
 
 
@@ -846,8 +939,8 @@ COPY public.employees (employee_id, first_name, last_name, nrp_id, email, phone_
 -- Data for Name: lock_system; Type: TABLE DATA; Schema: public; Owner: Project_owner
 --
 
-COPY public.lock_system (lock_id, role_id, start_date, end_date, reason) FROM stdin;
-38	2	2025-06-21	2025-08-09	ee
+COPY public.lock_system (lock_id, role_id) FROM stdin;
+43	3
 \.
 
 
@@ -2128,7 +2221,82 @@ COPY public.login_attempts ("logAtt_id", user_id, email, ip_address, attempt_tim
 1303	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-19 13:30:45.116442	f	Edge 137.0.0	0	\N
 1304	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-19 13:32:22.186282	f	Edge 137.0.0	0	\N
 1305	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-19 14:03:04.811288	f	Chrome 137.0.0	0	\N
-1306	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-19 14:03:20.43634	t	Chrome 137.0.0	10	2025-06-19 15:29:41.282054
+1337	4	nabila.libasutaqwa@student.president.ac.id	127.0.0.1	2025-06-21 05:10:51.687663	f	Edge 137.0.0	0	\N
+1338	4	nabila.libasutaqwa@student.president.ac.id	127.0.0.1	2025-06-21 05:11:08.882089	t	Edge 137.0.0	0	\N
+1339	4	nabila.libasutaqwa@student.president.ac.id	127.0.0.1	2025-06-21 05:15:03.124886	f	Edge 137.0.0	0	\N
+1340	4	nabila.libasutaqwa@student.president.ac.id	127.0.0.1	2025-06-21 05:15:19.304372	t	Edge 137.0.0	0	\N
+1341	6	yustinayunita86@gmail.com	127.0.0.1	2025-06-21 10:03:18.50522	f	Opera 119.0.0	0	\N
+1342	6	yustinayunita86@gmail.com	127.0.0.1	2025-06-21 10:03:39.310813	t	Opera 119.0.0	0	\N
+1343	27	angelinemoore.notsafe@gmail.com	127.0.0.1	2025-06-21 10:28:36.29698	f	Opera 119.0.0	1	\N
+1344	27	angelinemoore.notsafe@gmail.com	127.0.0.1	2025-06-21 10:28:59.380202	f	Opera 119.0.0	0	\N
+1345	27	angelinemoore.notsafe@gmail.com	127.0.0.1	2025-06-21 10:29:17.233956	t	Opera 119.0.0	0	\N
+1346	21	yustinayunitayy@gmail.com	127.0.0.1	2025-06-21 13:19:53.56578	f	Opera 119.0.0	0	\N
+1307	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-19 14:46:20.646219	f	Edge 137.0.0	0	\N
+1308	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-19 14:46:38.491311	t	Edge 137.0.0	1	\N
+1309	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-19 15:07:09.470499	f	Edge 137.0.0	0	\N
+1347	27	angelinemoore.notsafe@gmail.com	127.0.0.1	2025-06-21 13:20:03.220193	f	Opera 119.0.0	0	\N
+1348	21	yustinayunitayy@gmail.com	127.0.0.1	2025-06-21 13:20:12.842431	t	Opera 119.0.0	0	\N
+1349	27	angelinemoore.notsafe@gmail.com	127.0.0.1	2025-06-21 13:20:21.102863	t	Opera 119.0.0	0	\N
+1350	21	yustinayunitayy@gmail.com	127.0.0.1	2025-06-21 13:26:14.706338	f	Opera 119.0.0	0	\N
+1310	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-19 15:07:29.760667	t	Edge 137.0.0	5	2025-06-19 15:13:30.909453
+1311	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-20 12:27:05.418029	f	Edge 137.0.0	0	\N
+1312	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-20 12:27:25.940858	t	Edge 137.0.0	0	\N
+1313	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-20 12:55:56.66433	f	Edge 137.0.0	0	\N
+1314	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-20 12:56:24.49705	t	Edge 137.0.0	0	\N
+1315	6	yustinayunita86@gmail.com	127.0.0.1	2025-06-20 13:05:44.500843	f	Opera 119.0.0	0	\N
+1316	6	yustinayunita86@gmail.com	127.0.0.1	2025-06-20 13:06:02.877936	t	Opera 119.0.0	0	\N
+1317	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-20 13:11:51.876281	f	Edge 137.0.0	0	\N
+1318	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-20 13:12:04.945755	t	Edge 137.0.0	0	\N
+1321	21	yustinayunitayy@gmail.com	127.0.0.1	2025-06-20 13:30:03.729406	f	Opera 119.0.0	0	\N
+1322	21	yustinayunitayy@gmail.com	127.0.0.1	2025-06-20 13:30:26.138495	f	Opera 119.0.0	0	\N
+1323	21	yustinayunitayy@gmail.com	127.0.0.1	2025-06-20 13:30:44.930021	t	Opera 119.0.0	0	\N
+1324	4	nabila.libasutaqwa@student.president.ac.id	127.0.0.1	2025-06-21 04:26:26.845299	f	Edge 137.0.0	0	\N
+1325	4	nabila.libasutaqwa@student.president.ac.id	127.0.0.1	2025-06-21 04:27:18.698257	f	Edge 137.0.0	0	\N
+1326	4	nabila.libasutaqwa@student.president.ac.id	127.0.0.1	2025-06-21 04:27:24.301937	f	Edge 137.0.0	0	\N
+1327	4	nabila.libasutaqwa@student.president.ac.id	127.0.0.1	2025-06-21 04:29:29.304412	f	Edge 137.0.0	0	\N
+1328	1	nabilalb2004@gmail.com	127.0.0.1	2025-06-21 04:31:37.881167	f	Edge 137.0.0	0	\N
+1329	4	nabila.libasutaqwa@student.president.ac.id	127.0.0.1	2025-06-21 04:35:01.316642	f	Edge 137.0.0	0	\N
+1330	4	nabila.libasutaqwa@student.president.ac.id	127.0.0.1	2025-06-21 04:35:18.1001	t	Edge 137.0.0	0	\N
+1331	4	nabila.libasutaqwa@student.president.ac.id	127.0.0.1	2025-06-21 04:47:23.400665	f	Edge 137.0.0	0	\N
+1332	4	nabila.libasutaqwa@student.president.ac.id	127.0.0.1	2025-06-21 04:47:43.094231	t	Edge 137.0.0	0	\N
+1333	4	nabila.libasutaqwa@student.president.ac.id	127.0.0.1	2025-06-21 04:48:44.010211	f	Edge 137.0.0	0	\N
+1334	4	nabila.libasutaqwa@student.president.ac.id	127.0.0.1	2025-06-21 04:49:01.959142	t	Edge 137.0.0	0	\N
+1335	4	nabila.libasutaqwa@student.president.ac.id	127.0.0.1	2025-06-21 05:08:34.687132	f	Edge 137.0.0	0	\N
+1336	4	nabila.libasutaqwa@student.president.ac.id	127.0.0.1	2025-06-21 05:08:51.666581	t	Edge 137.0.0	0	\N
+1351	21	yustinayunitayy@gmail.com	127.0.0.1	2025-06-21 13:26:38.471458	t	Chrome Mobile 134.0.0	0	\N
+1352	6	yustinayunita86@gmail.com	127.0.0.1	2025-06-21 13:27:49.975265	f	Opera 119.0.0	0	\N
+1353	6	yustinayunita86@gmail.com	127.0.0.1	2025-06-21 13:28:23.873812	t	Opera 119.0.0	0	\N
+1354	21	yustinayunitayy@gmail.com	127.0.0.1	2025-06-21 16:00:06.10655	f	Opera 119.0.0	0	\N
+1355	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 19:03:53.352596	f	Edge 137.0.0	0	\N
+1356	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 19:04:17.747054	t	Edge 137.0.0	0	\N
+1357	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 19:27:00.492991	f	Chrome 137.0.0	0	\N
+1358	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 19:27:26.417005	t	Chrome 137.0.0	0	\N
+1359	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 19:29:39.170871	f	Edge 137.0.0	0	\N
+1360	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 19:30:02.916984	t	Edge 137.0.0	0	\N
+1361	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 19:56:18.409628	f	Edge 137.0.0	0	\N
+1362	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 19:56:36.371839	t	Edge 137.0.0	0	\N
+1363	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 19:57:18.801904	f	Chrome 137.0.0	0	\N
+1364	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 19:57:31.999919	t	Chrome 137.0.0	0	\N
+1365	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 20:02:05.511596	f	Edge 137.0.0	0	\N
+1366	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 20:02:26.756405	t	Edge 137.0.0	0	\N
+1367	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 20:14:46.542541	f	Edge 137.0.0	0	\N
+1368	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 20:14:59.702232	t	Edge 137.0.0	0	\N
+1369	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 20:18:14.712023	f	Edge 137.0.0	0	\N
+1370	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 20:18:36.876951	t	Edge 137.0.0	0	\N
+1371	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 20:25:50.31671	f	Edge 137.0.0	0	\N
+1372	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 20:26:05.340735	t	Edge 137.0.0	0	\N
+1373	7	maureengabriella1m@gmail.com	127.0.0.1	2025-06-21 20:26:26.116422	f	Edge 137.0.0	7	\N
+1374	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 20:27:43.937877	f	Edge 137.0.0	0	\N
+1375	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 20:27:59.512894	t	Edge 137.0.0	0	\N
+1376	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 20:28:26.542401	f	Chrome 137.0.0	0	\N
+1377	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 20:28:39.836019	t	Chrome 137.0.0	0	\N
+1378	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 20:47:30.707327	f	Edge 137.0.0	0	\N
+1379	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 20:57:01.79688	f	Edge 137.0.0	0	\N
+1380	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 20:57:17.516803	t	Edge 137.0.0	0	\N
+1381	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 20:57:54.816422	f	Chrome 137.0.0	0	\N
+1383	7	maureengabriella1m@gmail.com	127.0.0.1	2025-06-21 20:58:36.036108	f	Chrome 137.0.0	1	\N
+1384	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 21:17:32.744402	f	Edge 137.0.0	0	\N
+1385	3	nirwanaanisa1508@gmail.com	127.0.0.1	2025-06-21 21:17:57.311894	t	Edge 137.0.0	0	\N
 \.
 
 
@@ -2333,19 +2501,16 @@ COPY public.notifications (notification_id, user_id, title, message, notificatio
 211	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 137.0.0	new_device	f	2025-06-19 02:40:11.227582	\N
 213	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Edge 137.0.0	new_device	t	2025-06-19 03:19:43.691157	2025-06-18 20:25:28.336089
 212	3	Login dari Perangkat Baru	Login terdeteksi dari IP: 127.0.0.1, Perangkat: Chrome 137.0.0	new_device	t	2025-06-19 03:10:31.542393	2025-06-18 20:29:22.174073
-214	3	Failed Login Attempt	5 failed login attempts detected. Your account has been temporarily locked.	failed_login	f	2025-06-19 03:41:26.052561	\N
-215	3	Failed Login Attempt	10 failed login attempts detected. Your account has been temporarily locked.	failed_login	f	2025-06-19 03:53:13.87709	\N
 216	7	Failed Login Attempt	5 failed login attempts detected. Your account has been temporarily locked.	failed_login	f	2025-06-19 04:01:05.276701	\N
 217	7	Failed Login Attempt	10 failed login attempts detected. Your account has been temporarily locked.	failed_login	f	2025-06-19 04:12:07.834047	\N
 218	28	Failed Login Attempt	5 failed login attempts detected. Your account has been temporarily locked.	failed_login	f	2025-06-19 04:25:21.314494	\N
-219	3	Percobaan Login Gagal	Terdeteksi 10 kali percobaan login gagal. Akun Anda dikunci hingga pukul 10:47:32.	failed_login	f	2025-06-19 17:42:32.960806	\N
-222	3	Failed Login Attempt	Detected 5 failed login attempts. Your account has been locked until 18:24:34.	failed_login	f	2025-06-19 18:19:34.990696	\N
 223	3	Failed Login Attempt	Detected 5 failed login attempts. Your account has been locked until 18:36:55.	failed_login	t	2025-06-19 18:31:56.188061	2025-06-19 11:44:35.172791
+214	3	Failed Login Attempt	5 failed login attempts detected. Your account has been temporarily locked.	failed_login	t	2025-06-19 03:41:26.052561	2025-06-21 19:31:36.119458
+215	3	Failed Login Attempt	10 failed login attempts detected. Your account has been temporarily locked.	failed_login	t	2025-06-19 03:53:13.87709	2025-06-21 19:31:39.775395
+219	3	Percobaan Login Gagal	Terdeteksi 10 kali percobaan login gagal. Akun Anda dikunci hingga pukul 10:47:32.	failed_login	t	2025-06-19 17:42:32.960806	2025-06-21 19:31:41.859542
+222	3	Failed Login Attempt	Detected 5 failed login attempts. Your account has been locked until 18:24:34.	failed_login	t	2025-06-19 18:19:34.990696	2025-06-21 19:31:44.154423
 225	3	Failed Login Attempt	Detected 10 failed login attempts. Your account has been locked until 19:41:44.	failed_login	t	2025-06-19 18:41:44.725558	2025-06-19 11:44:30.489968
 224	3	Failed Login Attempt	Detected 5 failed login attempts. Your account has been locked until 18:42:04.	failed_login	t	2025-06-19 18:37:05.546239	2025-06-19 11:44:32.63451
-226	3	Failed Login Attempt	Detected 5 failed login attempts. Your account has been locked until 18:50:03.	failed_login	f	2025-06-19 18:45:04.65232	\N
-227	3	Failed Login Attempt	Detected 10 failed login attempts. Your account has been locked until 19:51:32.	failed_login	f	2025-06-19 18:51:33.577738	\N
-228	3	Login from New Device	Login detected from IP: 127.0.0.1, Device: Chrome 137.0.0	new_device	f	2025-06-19 18:55:06.887418	\N
 229	27	Permintaan Izin Baru	Ada permintaan izin baru dari Abid Laqoo.	permission	f	2025-06-19 19:02:03.661204	\N
 231	17	Permintaan Izin Baru	Ada permintaan izin baru dari Abid Laqoo.	permission	f	2025-06-19 19:02:03.662368	\N
 232	15	Permintaan Izin Baru	Ada permintaan izin baru dari Abid Laqoo.	permission	f	2025-06-19 19:02:03.663448	\N
@@ -2362,6 +2527,21 @@ COPY public.notifications (notification_id, user_id, title, message, notificatio
 246	3	Login from New Device	Login detected from IP: 127.0.0.1, Device: Chrome 137.0.0	new_device	f	2025-06-19 21:03:20.196529	\N
 247	3	Failed Login Attempt	Detected 5 failed login attempts. Your account has been locked until 21:28:35.	failed_login	f	2025-06-19 21:23:36.184068	\N
 248	3	Failed Login Attempt	Detected 10 failed login attempts. Your account has been locked until 22:29:41.	failed_login	f	2025-06-19 21:29:41.575959	\N
+250	27	Login from New Device	Login detected from IP: 127.0.0.1, Device: Opera 119.0.0	new_device	f	2025-06-21 17:29:17.410263	\N
+251	21	Login from New Device	Login detected from IP: 127.0.0.1, Device: Chrome Mobile 134.0.0	new_device	f	2025-06-21 20:26:37.789667	\N
+253	3	Login from New Device	Login detected from IP: 127.0.0.1, Device: Edge 137.0.0	new_device	f	2025-06-22 02:30:03.132291	\N
+249	3	Failed Login Attempt	Detected 5 failed login attempts. Your account has been locked until 22:13:30.	failed_login	t	2025-06-19 22:08:31.607626	2025-06-21 19:31:28.107371
+252	3	Login from New Device	Login detected from IP: 127.0.0.1, Device: Chrome 137.0.0	new_device	t	2025-06-22 02:27:26.612479	2025-06-21 19:31:31.399342
+227	3	Failed Login Attempt	Detected 10 failed login attempts. Your account has been locked until 19:51:32.	failed_login	t	2025-06-19 18:51:33.577738	2025-06-21 19:31:47.094407
+226	3	Failed Login Attempt	Detected 5 failed login attempts. Your account has been locked until 18:50:03.	failed_login	t	2025-06-19 18:45:04.65232	2025-06-21 19:31:49.075898
+228	3	Login from New Device	Login detected from IP: 127.0.0.1, Device: Chrome 137.0.0	new_device	t	2025-06-19 18:55:06.887418	2025-06-21 19:31:51.425268
+254	3	Login from New Device	Login detected from IP: 127.0.0.1, Device: Chrome 137.0.0	new_device	f	2025-06-22 02:57:32.173981	\N
+255	3	Login from New Device	Login detected from IP: 127.0.0.1, Device: Edge 137.0.0	new_device	f	2025-06-22 03:02:26.93269	\N
+256	3	Login from New Device	Login detected from IP: 127.0.0.1, Device: Chrome 137.0.0	new_device	f	2025-06-22 03:28:40.002956	\N
+257	3	Login from New Device	Login detected from IP: 127.0.0.1, Device: Edge 137.0.0	new_device	f	2025-06-22 03:57:17.690339	\N
+258	3	Login from New Device	Login detected from IP: 127.0.0.1, Device: Chrome 137.0.0	new_device	f	2025-06-22 03:58:09.163193	\N
+259	3	Failed Login Attempt	Detected 5 failed login attempts. Your account has been locked until 04:04:03.	failed_login	f	2025-06-22 03:59:03.804423	\N
+260	3	Failed Login Attempt	Detected 10 failed login attempts. Your account has been locked until 05:05:33.	failed_login	f	2025-06-22 04:05:34.57524	\N
 \.
 
 
@@ -2419,13 +2599,14 @@ COPY public."user" (user_id, employee_id, username, email, password) FROM stdin;
 4	4	SuperadminNab	nabila.libasutaqwa@student.president.ac.id	$2b$12$PaKgoLTSs5BP/JEF40n11ukzIxa04Umi65gyplrPX7uHGkaOAQP/.
 26	16	jumi	juminten@gmail.com	$2b$12$RFItqDzM14PoZ4ATk8pZZO8rmv6ab/F/ua1aUiqqJKrN8SUQQeHl2
 1	1	nblalb	nabilalb2004@gmail.com	$2b$12$JnBtsYTTsnhcD5tkNlT1Geo.vttLhfjPMY.Cw5IKyRxHE3bsDFDRG
-28	15	Abid	driveanisa4@gmail.com	$2b$12$I1.a5ptZKTMvhhwfimYZ0O1En0CJgYkCOkQmXDVHfvKc.JMgpPDIa
-27	17	angelinemoore	anisa.nrwn15@gmail.com	$2b$12$U93LY9vAS6Vp6jF24X8kF.xLfvz6JixnDAh8N3ascgIY.ftEokrJC
+28	15	Abid	abid@gmail.com	$2b$12$I1.a5ptZKTMvhhwfimYZ0O1En0CJgYkCOkQmXDVHfvKc.JMgpPDIa
 17	11	admin_nabila	nabilalb0109@gmail.com	$2b$12$vY6bp2xsUbSj3WrsbfAPt.Z6NTgzbOa97zYSFhhekVDaC8XJgMzo.
 15	\N	admin_yuyus	gwenrosevyn@gmail.com	$2b$12$n6BJe5tRoj7WuGWc8i9D8OdFzZZyGLAuf7GhuQJP2YXcBOo0lohAe
 21	12	yuyus	yustinayunitayy@gmail.com	$2b$12$oUIIzyyVooIUhSbT06hLzuqSPrR8uTbVT3yuPOGQhdv96daaQp5MC
 6	2	yuyusdaily	yustinayunita86@gmail.com	$2b$12$JiauegZlw836RvjlRD0Gq.i3rhIvI.X7/cK.1Ya62C1rPs8XjZMRC
 19	\N	superadmin	adelaideufrasia@gmail.com	$2b$12$9jeN9OEYKCN2rUJol0cUyOR3SoaRHUD/KfMISbt7DH/.EDSOu5A1u
+27	17	angelinemoore	angelinemoore.notsafe@gmail.com	$2b$12$z7iCEhRyI0pk761QExmnfOEBCjoFkqQqzbICTXmTlCKXiaPjxOAo6
+30	20	Kyungsoo	anisa.nrwn15@gmail.com	$2b$12$Kp2YeTrJXtbb5Lb2307Ym.N8fUY69/0hOpN5J/bz1VGNOPlmzCi/q
 \.
 
 
@@ -2446,6 +2627,7 @@ COPY public.user_roles (user_id, roles_id) FROM stdin;
 1	3
 28	3
 27	2
+30	3
 \.
 
 
@@ -2453,42 +2635,42 @@ COPY public.user_roles (user_id, roles_id) FROM stdin;
 -- Name: activity_logs_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: Project_owner
 --
 
-SELECT pg_catalog.setval('public.activity_logs_log_id_seq', 508, true);
+SELECT pg_catalog.setval('public.activity_logs_log_id_seq', 565, true);
 
 
 --
 -- Name: attendance_attendance_id_seq; Type: SEQUENCE SET; Schema: public; Owner: Project_owner
 --
 
-SELECT pg_catalog.setval('public.attendance_attendance_id_seq', 66, true);
+SELECT pg_catalog.setval('public.attendance_attendance_id_seq', 136, true);
 
 
 --
 -- Name: employees_employee_id_seq; Type: SEQUENCE SET; Schema: public; Owner: Project_owner
 --
 
-SELECT pg_catalog.setval('public.employees_employee_id_seq', 17, true);
+SELECT pg_catalog.setval('public.employees_employee_id_seq', 20, true);
 
 
 --
 -- Name: lock_system_lock_id_seq; Type: SEQUENCE SET; Schema: public; Owner: Project_owner
 --
 
-SELECT pg_catalog.setval('public.lock_system_lock_id_seq', 42, true);
+SELECT pg_catalog.setval('public.lock_system_lock_id_seq', 43, true);
 
 
 --
 -- Name: login_attempts_logAtt_id_seq; Type: SEQUENCE SET; Schema: public; Owner: Project_owner
 --
 
-SELECT pg_catalog.setval('public."login_attempts_logAtt_id_seq"', 1306, true);
+SELECT pg_catalog.setval('public."login_attempts_logAtt_id_seq"', 1385, true);
 
 
 --
 -- Name: notifications_notification_id_seq; Type: SEQUENCE SET; Schema: public; Owner: Project_owner
 --
 
-SELECT pg_catalog.setval('public.notifications_notification_id_seq', 248, true);
+SELECT pg_catalog.setval('public.notifications_notification_id_seq', 260, true);
 
 
 --
@@ -2509,7 +2691,7 @@ SELECT pg_catalog.setval('public.roles_roles_id_seq', 1, false);
 -- Name: user_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: Project_owner
 --
 
-SELECT pg_catalog.setval('public.user_user_id_seq', 28, true);
+SELECT pg_catalog.setval('public.user_user_id_seq', 30, true);
 
 
 --
