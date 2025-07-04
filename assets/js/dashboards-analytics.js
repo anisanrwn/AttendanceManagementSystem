@@ -111,7 +111,7 @@
           labels: { colors: axisColor },
           position: 'top',
         },
-        colors: [config.colors.primary, config.colors.info, config.colors.warning],
+        colors: [config.colors.primary, config.colors.skycolor, config.colors.bluecolor],
       };
 
       new ApexCharts(el, options).render();
@@ -184,7 +184,7 @@
 
       const options = {
         chart: { type: 'bar', height: 300, stacked: true },
-        colors: [config.colors.purplecolor, config.colors.bluecolor, config.colors.skycolor],
+        colors: [config.colors.primary, config.colors.skycolor, config.colors.bluecolor],
         series: data.series,
         xaxis: {
           categories: data.labels,

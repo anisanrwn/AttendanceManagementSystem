@@ -125,7 +125,7 @@ def get_monthly_attendance(employee_id: int, db: Session = Depends(get_db)):
         func.count().label('count')
     ).filter(
         m.Attendance.employee_id == employee_id,
-        m.Attendance.attendance_status.in_(["Punch Out", "Absent"])
+        m.Attendance.attendance_status.in_(["Punch Out", "Absent", "Permit"])
     ).group_by(
         m.Attendance.attendance_date,
         m.Attendance.attendance_status
