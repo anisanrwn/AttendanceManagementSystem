@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function redirectToLogin() {
-        window.location.href = '/login';
+        window.location.href = '/html/login.html';
     }
 
     // Inisialisasi

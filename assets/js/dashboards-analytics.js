@@ -9,23 +9,23 @@
   borderColor = config.colors.borderColor;
 
   // 1. Department Attendance Chart
-  async function renderDepartmentAttendanceChart() {
-    const deptAttendanceEl = document.querySelector("#departmentAttendanceChart");
-    if (!deptAttendanceEl) return;
+
+  async function loadTopAbsentChart() {
+    const el = document.querySelector("#topAbsentChart");
+    if (!el) return;
 
     try {
-      const response = await fetch('http://localhost:8000/dashboard/department-summary');
-      if (!response.ok) throw new Error('Network response was not ok');
-      const data = await response.json();
+      const res = await fetch('http://localhost:8000/dashboard/top-absent');
+      const data = await res.json();
 
-      const categories = data.map(item => item.department);
-      const seriesData = data.map(item => item.present);
+      const names = data.map(d => d.name);
+      const values = data.map(d => d.absent_count);
 
       const options = {
         chart: { type: 'bar', height: 350 },
-        series: [{ name: "Present", data: seriesData }],
+        series: [{ name: 'Absent Days', data: values }],
         xaxis: {
-          categories,
+          categories: names,
           labels: { style: { fontSize: '13px', colors: axisColor } }
         },
         colors: [config.colors.primary],
@@ -43,21 +43,21 @@
         },
         plotOptions: {
           bar: {
-            borderRadius: 12,
-            startingShape: 'rounded',
-            columnWidth: '40%',
-            distributed: true
+            horizontal: true,
+            borderRadius: 8,
+            barHeight: '60%'
           }
         },
         dataLabels: { enabled: false },
-        grid: { borderColor },
-        tooltip: { theme: 'light', y: { formatter: val => `${val} hadir` } },
+        tooltip: {
+          y: { formatter: val => `${val} kali absen` }
+        },
         legend: { labels: { colors: axisColor } }
       };
 
-      new ApexCharts(deptAttendanceEl, options).render();
-    } catch (error) {
-      console.error('Error fetching department attendance data:', error);
+      new ApexCharts(el, options).render();
+    } catch (err) {
+      console.error("Error loading top absent chart:", err);
     }
   }
 
@@ -70,8 +70,11 @@
       const res = await fetch('http://localhost:8000/dashboard/attendance-trend');
       const data = await res.json();
 
-      const dates = [...new Set(data.map(item => item.month))].sort();
-      const statuses = [...new Set(data.map(item => item.status))];
+      const allowedStatuses = ["Punch Out", "Absent", "Permit"];
+      const filteredData = data.filter(item => allowedStatuses.includes(item.status));
+
+      const dates = [...new Set(filteredData.map(item => item.month))].sort();
+      const statuses = [...new Set(filteredData.map(item => item.status))];
 
       const series = statuses.map(status => ({
         name: status,
@@ -216,7 +219,7 @@
       console.error('Failed to load monthly attendance data:', error);
     }
   }
-  renderDepartmentAttendanceChart();
+  loadTopAbsentChart();
   loadAttendanceTrendChart();
   loadWorkingHoursChart();
   loadMonthlyAttendanceChart();

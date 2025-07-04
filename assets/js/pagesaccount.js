@@ -32,7 +32,7 @@ async function loadProfile(employeeId) {
         loadProfile(employeeId);
       } else {
         alert('Please login first');
-        window.location.href = "login.html";
+        window.location.href = "Login.html";
       }
     });
 

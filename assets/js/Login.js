@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
             window.location.href = `/html/employee_dashboard.html`;
         } else {
             showAlert("Role not recognized");
-            window.location.href = "/login/login";
+            window.location.href = "/html/login.html";
         }
     }
 

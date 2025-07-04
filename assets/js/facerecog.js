@@ -9,8 +9,12 @@ export async function startFaceRecognition() {
     video.srcObject = stream;
 
     document.getElementById('captureFaceBtn').disabled = false;
-
-    showAlert('info', 'Camera started. Please position your face.');
+    Swal.fire({
+    title: 'Face recognition started',
+    text: "Please position your face in front of the camera and click the Capture and Verify button to proceed.",
+    icon: 'info',
+    confirmButtonText: 'OK'
+    })
     return stream;
   } catch (err) {
     showAlert('error', 'Could not access camera: ' + err.message);
@@ -45,7 +49,6 @@ export async function captureAndVerifyFace(stream, locationPayload, attendanceAc
     return null;
   }
 
-  // Tentukan endpoint dan payload berdasarkan action (clock_in / clock_out)
   const endpoint = attendanceAction === 'clock_in' ? '/clockin' : '/clockout';
   const bodyPayload = {
     employee_id: parseInt(employeeId),

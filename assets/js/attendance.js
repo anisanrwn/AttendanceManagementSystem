@@ -1,6 +1,7 @@
 import { requestLocationAccess, stopLocationTracking, insideGeofence, currentPosition } from './loctrack.js';
 import { startFaceRecognition, captureAndVerifyFace } from './facerecog.js';
 import { showAlert } from './alert.js';
+import { startLivenessCheck } from './liveness.js';
 let attendanceAction = null;
 let stream = null;
 
@@ -51,7 +52,7 @@ async function initTimeSync() {
   serverOffset = serverDate.getTime() - localDate.getTime();
 }
 
-function getTrustedNow() {
+export function getTrustedNow() {
   return new Date(Date.now() + serverOffset);
 }
 
@@ -123,38 +124,49 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // Set up event listeners
 function setupEventListeners() {
-    document.getElementById('punchInBtn').addEventListener('click', () => {
-        attendanceAction = 'clock_in'; 
-        attendancePage.style.display = 'none';
-        stepPage.style.display = 'block';
-        goToStep(1);
-    });
+  document.getElementById('punchInBtn').addEventListener('click', () => {
+      attendanceAction = 'clock_in'; 
+      attendancePage.style.display = 'none';
+      stepPage.style.display = 'block';
+      goToStep(1);
+  });
 
-    document.getElementById('punchOutBtn').addEventListener('click', () => {
-        attendanceAction = 'clock_out'; 
-        attendancePage.style.display = 'none';
-        stepPage.style.display = 'block';
-        goToStep(1);
-    });
+  document.getElementById('punchOutBtn').addEventListener('click', () => {
+      attendanceAction = 'clock_out'; 
+      attendancePage.style.display = 'none';
+      stepPage.style.display = 'block';
+      goToStep(1);
+  });
 
-    document.getElementById('allowLocationBtn').addEventListener('click', () => {
-        requestLocationAccess();
-    });
-    
-    document.getElementById('btn-back-step').addEventListener('click', () => {
-        stopLocationTracking();
-        goToStep(1);
-    });
-    
-    document.getElementById('verifyLocationBtn').addEventListener('click', async () => {
-      if (insideGeofence || document.getElementById('reasonText').value.trim() !== '') {
-        goToStep(3);
+  document.getElementById('allowLocationBtn').addEventListener('click', () => {
+      requestLocationAccess();
+  });
+  
+  document.getElementById('btn-back-step').addEventListener('click', () => {
+      stopLocationTracking();
+      goToStep(1);
+  });
+  
+  document.getElementById('verifyLocationBtn').addEventListener('click', async () => {
+    if (insideGeofence || document.getElementById('reasonText').value.trim() !== '') {
+      goToStep(3);
+      stream = await startFaceRecognition();
+
+      const passed = await handleLivenessCheck();
+
+      if (passed) {
+        if (stream) {
+          stream.getTracks().forEach(track => track.stop());
+          stream = null;
+        }
         stream = await startFaceRecognition();
-      } else {
-        showAlert('warning', 'Please provide a reason why you are not in the designated area.');
+        document.getElementById('captureFaceBtn').disabled = false;
       }
-    });
-  }
+    } else {
+      showAlert('warning', 'Please provide a reason why you are not in the designated area.');
+    }
+  });
+}
 
 export function goToStep(stepNumber) {
   document.querySelectorAll('.step-container').forEach(container => {
@@ -242,7 +254,6 @@ captureFaceBtn.onclick = async () => {
 
       await resetToAttendancePage();
 
-      // Set tombol sesuai action
       if (attendanceAction === 'clock_in') {
         punchInBtn.disabled = true;
         punchOutBtn.disabled = false;
@@ -250,7 +261,6 @@ captureFaceBtn.onclick = async () => {
         punchOutBtn.disabled = true;
       }
     } else {
-      // Face recognition gagal
       await Swal.fire({
         icon: 'error',
         title: 'Face Not Recognized',
@@ -258,8 +268,7 @@ captureFaceBtn.onclick = async () => {
         confirmButtonText: 'Retry'
       });
     }
-
-    // Enable ulang tombol capture
+    
     isProcessing = false;
     captureFaceBtn.disabled = false;
   }
@@ -314,5 +323,41 @@ async function resetToAttendancePage() {
 
   } catch (error) {
     console.error("Error:", error);
+  }
+}
+
+async function handleLivenessCheck() {
+  while (true) {
+    await Swal.fire({
+      title: 'Liveness Check Required',
+      text: 'For verification, please blink at least twice within the next few seconds. No need to rush, just blink naturally.',
+      icon: 'info',
+      confirmButtonText: 'Start'
+    });
+
+    const passedLiveness = await startLivenessCheck();
+
+    if (passedLiveness) {
+      await Swal.fire({
+        title: 'Blink Detected!',
+        text: 'Liveness check passed..',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      });
+      return true; 
+    } else {
+      const retry = await Swal.fire({
+        icon: 'error',
+        title: 'Liveness Check Failed',
+        text: 'We couldn’t detect enough blinks. Do you want to retry?',
+        showCancelButton: true,
+        confirmButtonText: 'Retry',
+        cancelButtonText: 'Cancel'
+      });
+
+      if (!retry.isConfirmed) {
+        return false;
+      }
+    }
   }
 }

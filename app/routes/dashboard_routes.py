@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import func
+from sqlalchemy import func, literal
 from collections import defaultdict
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -44,24 +44,32 @@ async def get_pending_permissions(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail="Failed to fetch pending permissions")
     
-@router.get("/department-summary")
-def department_attendance_summary(db: Session = Depends(get_db)):
+@router.get("/top-absent")
+def top_absent_employees(db: Session = Depends(get_db)):
     results = (
-        db.query(m.Employee.department, func.count(m.Attendance.attendance_id).label("present"))
+        db.query(
+            func.concat(m.Employee.first_name, literal(" "), m.Employee.last_name).label("full_name"),
+            func.count(m.Attendance.attendance_id).label("absent_count")
+        )
         .join(m.Attendance, m.Employee.employee_id == m.Attendance.employee_id)
-        .filter(m.Attendance.attendance_status == "Punch Out")
-        .group_by(m.Employee.department)
+        .filter(m.Attendance.attendance_status == "Absent")
+        .group_by("full_name")
+        .order_by(func.count(m.Attendance.attendance_id).desc())
+        .limit(5)
         .all()
     )
 
-    return [{"department": r[0], "present": r[1]} for r in results]
+    return [{"name": r.full_name, "absent_count": r.absent_count} for r in results]
 
 @router.get("/attendance-trend")
 def attendance_trend_monthly(db: Session = Depends(get_db)):
     results = db.query(
         func.date_trunc('month', m.Attendance.attendance_date).label('month'),
         m.Attendance.attendance_status,
-        func.count(m.Attendance.attendance_id)
+        func.count(m.Attendance.attendance_id
+    ).filter(
+        m.Attendance.attendance_status.in_(["Punch Out", "Absent", "Permit"])
+    )
     ).group_by(
         'month',
         m.Attendance.attendance_status
@@ -116,7 +124,8 @@ def get_monthly_attendance(employee_id: int, db: Session = Depends(get_db)):
         m.Attendance.attendance_status,
         func.count().label('count')
     ).filter(
-        m.Attendance.employee_id == employee_id
+        m.Attendance.employee_id == employee_id,
+        m.Attendance.attendance_status.in_(["Punch Out", "Absent"])
     ).group_by(
         m.Attendance.attendance_date,
         m.Attendance.attendance_status
