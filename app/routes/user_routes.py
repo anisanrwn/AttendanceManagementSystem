@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, Form, Path, Query
+from fastapi import APIRouter, Depends, HTTPException, Form, Path, Request, Query
 from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app.models import model as m
 from app.schemas import schemas as s
-from app.utils.logger import log_activity
+from app.services.activity_log import create_activity_log  
 from app.utils.verifpass import hash_password, validate_password_strength
 from typing import List, Optional
 
@@ -38,6 +38,7 @@ async def get_available_roles(db: Session = Depends(get_db)):
 
 @router.post("/create", response_model=s.UserRead)
 async def create_user(
+    request: Request,
     employee_id: Optional[int] = Form(None),
     username: str = Form(...),
     email: str = Form(...),
@@ -78,8 +79,8 @@ async def create_user(
         user_role = m.UserRoles(user_id=new_user.user_id, roles_id=role.roles_id)
         db.add(user_role)
         db.commit()
-
-        log_activity(db, "Created user", f"User {username} created successfully")
+        
+        create_activity_log(db, "Created user", f"User {username} created successfully")
         return db.query(m.User).options(
             joinedload(m.User.employee),
             joinedload(m.User.roles)
@@ -89,11 +90,12 @@ async def create_user(
         raise
     except Exception as e:
         db.rollback()
-        log_activity(db, "User creation failed", str(e))
+        create_activity_log(db, "User creation failed", str(e))
         raise HTTPException(status_code=500, detail="Failed to create user")
 
 @router.put("/update/{user_id}", response_model=s.UserRead)
 def update_user(
+    request: Request,
     user_id: int,
     username: str = Form(...),
     email: str = Form(...),
@@ -122,18 +124,35 @@ def update_user(
             db.add(m.UserRoles(user_id=user_id, roles_id=role.roles_id))
 
         db.commit()
-        log_activity(db, "Updated user", f"User {username} updated successfully")
+        create_activity_log(
+            db=db,
+            request=request,
+            user_id=user.user_id,
+            action="Updated user",
+            detail=f"User {username} updated successfully"
+        )
+
         return db.query(m.User).options(
             joinedload(m.User.employee),
             joinedload(m.User.roles)
         ).filter(m.User.user_id == user_id).first()
+    
     except HTTPException:
         db.rollback()
         raise
     except Exception as e:
         db.rollback()
-        log_activity(db, "User update failed", str(e))
+
+        create_activity_log(
+            db=db,
+            request=request,
+            user_id=user_id,
+            action="User update failed",
+            detail=str(e)
+        )
+
         raise HTTPException(status_code=500, detail="Failed to update user")
+        
 
 @router.delete("/delete/{user_id}", response_model=s.UserRead)
 async def delete_user(
@@ -147,11 +166,11 @@ async def delete_user(
 
         db.delete(user)
         db.commit()
-        log_activity(db, "Deleted user", f"User {user_id} deleted successfully")
+        create_activity_log(db, "Deleted user", f"User {user_id} deleted successfully")
         return user
     except Exception as e:
         db.rollback()
-        log_activity(db, "User deletion failed", str(e))
+        create_activity_log(db, "User deletion failed", str(e))
         raise HTTPException(status_code=500, detail="Failed to delete account")
 
 @router.put("/sync-email/{user_id}")

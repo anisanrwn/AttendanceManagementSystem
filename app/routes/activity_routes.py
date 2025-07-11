@@ -6,6 +6,7 @@ from app.models import model as m
 from app.schemas import schemas as s
 from app.utils.auth import get_current_user
 from fastapi.responses import JSONResponse
+from zoneinfo import ZoneInfo  
 
 router = APIRouter( prefix="/activitylogs",
     tags=["Activity Logs"])
@@ -34,7 +35,7 @@ def get_activity_logs(db: Session = Depends(get_db)):
             user_role_class = "warning"
 
         results.append(s.ActivityLogResponse(
-            timestamp=log.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            timestamp=log.timestamp.astimezone(ZoneInfo("Asia/Jakarta")).strftime("%Y-%m-%d %H:%M:%S"),
             user_name=user_name,
             user_role_class=user_role_class,
             action=log.detail or log.action,  

@@ -57,6 +57,30 @@ def update_permission_status(permission_id: int, action: str, db: Session = Depe
         status_str = "Approved" if action == "approved" else "Declined"
         body = f"Dear {employee.first_name},\n\nYour permission request has been {status_str} from HR.\n\nBest Regards, \n\nHRD PT United Tractors Jambi."
         send_email(user.email, subject, body)
+        
+    if action == "approved":
+        from datetime import timedelta
+
+        current_date = permission.start_date
+        while current_date <= permission.end_date:
+            attendance = db.query(m.Attendance).filter(
+                m.Attendance.employee_id == permission.employee_id,
+                m.Attendance.attendance_date == current_date
+            ).first()
+
+            if attendance:
+                attendance.attendance_status = "Permit"
+            else:
+                new_attendance = m.Attendance(
+                    employee_id=permission.employee_id,
+                    attendance_date=current_date,
+                    attendance_status="Permit"
+                )
+                db.add(new_attendance)
+
+            current_date += timedelta(days=1)
+
+        db.commit()
 
     return {
         "message": f"Permission has been {action}.",

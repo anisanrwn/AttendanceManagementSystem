@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 from dotenv import load_dotenv
 
-from app.routes import employee_routes, permissionlist_routes, user_routes, login_routes, locksystem_routes, attendance_routes, maps_routes, permission_routes, profile_routes, dashboard_routes, activity_routes
+from app.routes import employee_routes, permissionlist_routes, user_routes, login_routes, locksystem_routes, attendance_routes, maps_routes, permission_routes, profile_routes, dashboard_routes, activity_routes, profileemployee_routes
 
 load_dotenv()
 
@@ -60,3 +60,4 @@ main_app.include_router(profile_routes.router)
 main_app.include_router(permissionlist_routes.router)
 main_app.include_router(dashboard_routes.router)
 main_app.include_router(activity_routes.router)
+main_app.include_router(profileemployee_routes.router)

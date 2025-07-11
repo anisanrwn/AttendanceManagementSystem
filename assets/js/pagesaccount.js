@@ -1,6 +1,6 @@
 async function loadProfile(employeeId) {
   try {
-    const response = await fetch(`http://localhost:8000/profile/${employeeId}`);
+    const response = await fetch(`http://localhost:8000/profileemployee/${employeeId}`);
     if (!response.ok) throw new Error('Employee profile not found');
     const profile = await response.json();
 

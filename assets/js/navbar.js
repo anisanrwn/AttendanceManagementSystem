@@ -1,7 +1,7 @@
-async function loadNavbarProfile(employeeId) {
+async function loadNavbarProfile(userId) {
   try {
-    const response = await fetch(`http://localhost:8000/profile/${employeeId}`);
-    if (!response.ok) throw new Error('Employee profile not found');
+    const response = await fetch(`http://localhost:8000/profile/${userId}`);
+    if (!response.ok) throw new Error('User profile not found');
 
     const profile = await response.json();
 
@@ -14,9 +14,8 @@ async function loadNavbarProfile(employeeId) {
     document.getElementById('dropdownProfileAvatar').src = avatarUrl;
 
     // Set Name and Role/Position
-    const fullName = `${profile.first_name} ${profile.last_name}`;
-    document.getElementById('navbarProfileName').innerText = fullName;
-    document.getElementById('navbarProfileRole').innerText = profile.position;
+    document.getElementById('navbarUsername').innerText = profile.username;
+    document.getElementById('navbarEmail').innerText = profile.email;
 
   } catch (error) {
     console.error("Failed to load navbar profile:", error);
@@ -26,9 +25,9 @@ async function loadNavbarProfile(employeeId) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const employeeId = sessionStorage.getItem('employee_id');
-  if (employeeId) {
-    loadNavbarProfile(employeeId);
+  const userId = sessionStorage.getItem('user_id');
+  if (userId) {
+    loadNavbarProfile(userId);
   } else {
     alert('Please login first');
     window.location.href = "login.html";

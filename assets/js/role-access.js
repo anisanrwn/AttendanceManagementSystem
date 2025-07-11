@@ -9,7 +9,6 @@
           const restrictedPages = {
             'LockSystem.html': ['Admin'],
             'LogActivity.html': ['Admin'],
-            'UserList.html': ['Super Admin'],
             'PermissionList.html': ['Super Admin'],
             'RecapAttendance.html': ['Super Admin']
           };

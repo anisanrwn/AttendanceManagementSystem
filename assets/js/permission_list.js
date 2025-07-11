@@ -34,20 +34,23 @@ document.addEventListener("DOMContentLoaded", function () {
     renderTable(filtered);
   });
 
-  // Filter bulan/tahun
-  document.getElementById('filterButton').addEventListener('click', function () {
-    const month = document.getElementById('filterMonth').value;
-    const year = document.getElementById('filterYear').value;
-
-    const filtered = allPermissions.filter(permission => {
-      const date = new Date(permission.request_date);
-      return (!month || (String(date.getMonth() + 1).padStart(2, '0') === month)) &&
-             (!year || (date.getFullYear().toString() === year));
-    });
-
-    renderTable(filtered);
-  });
+  // Filter bulan/tahun otomatis tanpa tombol cari
+  document.getElementById('filterMonth').addEventListener('change', applyMonthYearFilter);
+  document.getElementById('filterYear').addEventListener('change', applyMonthYearFilter);
 });
+
+function applyMonthYearFilter() {
+  const month = document.getElementById('filterMonth').value;
+  const year = document.getElementById('filterYear').value;
+
+  const filtered = allPermissions.filter(permission => {
+    const date = new Date(permission.request_date);
+    return (!month || (String(date.getMonth() + 1).padStart(2, '0') === month)) &&
+           (!year || (date.getFullYear().toString() === year));
+  });
+
+  renderTable(filtered);
+}
 
 function renderTable(data) {
   const tbody = document.getElementById("permission-body");

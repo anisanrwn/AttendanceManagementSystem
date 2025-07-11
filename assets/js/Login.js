@@ -89,8 +89,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 otpForm.classList.remove('hidden');
                 document.getElementById('otp').focus();
                 startCountdown();
-                return;
-            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'OTP Sent',
+                text: 'An OTP has been sent to your email. Please check your inbox.',
+                confirmButtonColor: '#3085d6'
+            });
+
+            return;
+        }
 
             // Jika login sukses langsung
             handleSuccessfulLogin(data);

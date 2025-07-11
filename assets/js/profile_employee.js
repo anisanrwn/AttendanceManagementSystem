@@ -38,11 +38,19 @@ async function fetchEmployees() {
 // View Profile Employee
 async function viewProfile(id) {
     try {
-        const response = await fetch(`http://localhost:8000/employee/profile/${id}`);
+        const token = localStorage.getItem("token"); 
+
+        const response = await fetch(`http://localhost:8000/employee/profile/${id}`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`  
+            }
+        });
+
         if (!response.ok) {
             throw new Error('Employee not found');
         }
-        
+
         const employee = await response.json();
         
         document.getElementById('modalFirstName').innerText = employee.first_name;
@@ -59,6 +67,7 @@ async function viewProfile(id) {
         Swal.fire('Error', error.message, 'error');
     }
 }
+
 
 async function isEmailAvail(email, id = null) {
     try {
@@ -111,6 +120,7 @@ async function saveEmployee(e) {
         return;
     }
     const formData = new FormData(employeeForm);
+    const token = localStorage.getItem('token');
     try {
         $('#addEmployeeModal').modal('hide');
         Swal.fire({
@@ -123,6 +133,9 @@ async function saveEmployee(e) {
         });
         const response = await fetch("http://localhost:8000/employee/add", {
             method: "POST",
+             headers: {
+                "Authorization": `Bearer ${token}`
+            },
             body: formData
         });
         Swal.close();
@@ -149,7 +162,12 @@ async function saveEmployee(e) {
 document.getElementById('submitEdit').addEventListener('click', saveEditedEmployee);
 async function editEmployee(id) {
     try {
-        const response = await fetch(`http://localhost:8000/employee/profile/${id}`);
+        const token = localStorage.getItem("token");
+        const response = await fetch(`http://localhost:8000/employee/profile/${id}`, {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
         if (!response.ok) {
             throw new Error('Employee not found');
         }
@@ -217,12 +235,16 @@ async function saveEditedEmployee(e) {
     }
 
     const formData = new FormData(editEmployeeForm);
+    const token = localStorage.getItem('token');
 
     try {
         $('#editEmployeeModal').modal('hide');
 
         const response = await fetch(`http://localhost:8000/employee/edit/${employeeId}`, {
             method: "POST",
+             headers: {
+                "Authorization": `Bearer ${token}`
+            },
             body: formData
         });
 
@@ -264,8 +286,12 @@ async function deleteEmployee(id) {
 
     if (confirmResult.isConfirmed) {
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch(`http://localhost:8000/employee/delete/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
             });
 
             if (response.ok) {

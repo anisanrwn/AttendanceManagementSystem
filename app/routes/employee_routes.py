@@ -1,9 +1,10 @@
-from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, Path
+from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, Request, Path
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import model as m
 from app.schemas import schemas as s
-from app.utils.logger import log_activity
+from app.services.activity_log import create_activity_log
+from app.utils.auth_log import get_current_user  
 from app.utils.face_recog import read_image, encode_face
 import json
 from typing import Optional, List
@@ -59,22 +60,24 @@ async def add_employee(
         db.commit()
         db.refresh(employee)
 
-        log_activity(db, "Added employee", f"Employee {first_name} {last_name} added successfully")           
+        create_activity_log(db, "Added employee", f"Employee {first_name} {last_name} added successfully")           
         return employee
 
     except Exception as e:
         db.rollback()
-        log_activity(db, "Add employee failed", str(e))
+        create_activity_log(db, "Add employee failed", str(e))
         raise HTTPException(status_code=400, detail=f"Error processing request: {str(e)}")
     
     except Exception as e:
         db.rollback()
-        log_activity(db, "Add employee failed", str(e))
+        create_activity_log(db, "Add employee failed", str(e))
         raise HTTPException(status_code=400, detail=f"Error processing request: {str(e)}")
 
 #edit atau update employee data
 @router.post("/edit/{employee_id}", response_model=s.EmployeeUpdate)
 async def edit_employee(
+    request: Request,
+    current_user: m.User = Depends(get_current_user),
     employee_id: int = Path(..., title="The ID of the employee to update"),
     first_name: Optional[str] = Form(None),
     last_name: Optional[str] = Form(None),
@@ -85,10 +88,10 @@ async def edit_employee(
     db: Session = Depends(get_db)
 ):
     employee = db.query(m.Employee).filter(m.Employee.employee_id == employee_id).first()
-    
+
     if employee is None:
         raise HTTPException(status_code=404, detail="Employee not found")
-    
+
     try:
         if first_name is not None:
             employee.first_name = first_name
@@ -105,13 +108,29 @@ async def edit_employee(
 
         db.commit()
         db.refresh(employee)
-        log_activity(db, "Updated employee", f"Employee {employee_id} updated successfully")
+
+        create_activity_log(
+            db=db,
+            request=request,
+            user_id=current_user.user_id,
+            action="Updated employee",
+            detail=f"Employee {first_name} updated by {current_user.username}"
+        )
+
         return employee
-    
+
     except Exception as e:
         db.rollback()
-        log_activity(db, "Update employee failed", str(e))
-        raise HTTPException(status_code=400, detail=f"Error updating employee: {str(e)}")
+        create_activity_log(
+            db=db,
+            request=request,
+            user_id=current_user.user_id,
+            action="Update employee failed",
+            detail=str(e)
+        )
+        raise HTTPException(status_code=400, detail=f"Error processing request: {str(e)}")
+
+
 
 #delete employee data
 @router.delete("/delete/{employee_id}", response_model=s.EmployeeRead)
@@ -126,31 +145,35 @@ async def delete_employee(
     try:
         db.delete(employee)
         db.commit()
-        log_activity(db, "Deleted employee", f"Employee {employee_id} deleted successfully")
+        create_activity_log(db, "Deleted employee", f"Employee {employee_id} deleted successfully")
         return employee
     except Exception as e:
         db.rollback()
-        log_activity(db, "Delete employee failed", str(e))
+        create_activity_log(db, "Delete employee failed", str(e))
         raise HTTPException(status_code=400, detail=f"Error deleting employee: {str(e)}")
 
 #view profile
 @router.get("/profile/{employee_id}", response_model=s.EmployeeRead)
-def get_employee_profile(employee_id: int, db: Session = Depends(get_db)):
+def get_employee_profile(
+    employee_id: int,
+    db: Session = Depends(get_db),
+    current_user: m.User = Depends(get_current_user),
+    request: Request = None
+):
     employee = db.query(m.Employee).filter(m.Employee.employee_id == employee_id).first()
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
-        
-    log_activity(db, "Viewed employee profile", f"Viewed profile of employee ID {employee_id}")
-    return {
-        "employee_id": employee.employee_id,
-        "first_name": employee.first_name,
-        "last_name": employee.last_name,
-        "nrp_id": employee.nrp_id,
-        "email": employee.email,
-        "phone_number": employee.phone_number,
-        "position": employee.position,
-        "department": employee.department,
-    }
+
+    create_activity_log(
+        db=db,
+        request=request,
+        user_id=current_user.user_id,
+        action="Viewed employee profile",
+        detail=f"{current_user.username} viewed profile of employee ID {employee_id}"
+    )
+
+    return employee
+
 
 @router.get("/departmentfilter")
 async def get_departments(db: Session = Depends(get_db)):

@@ -6,9 +6,9 @@ from app.schemas import schemas as s
 
 router = APIRouter(prefix="/profile", tags=["Profile"])
 
-@router.get("/{employee_id}", response_model=s.EmployeeRead)
-def get__profile(employee_id: int, db: Session = Depends(get_db)):
-    employee = db.query(m.Employee).filter(m.Employee.employee_id == employee_id).first()
-    if not employee:
-        raise HTTPException(status_code=404, detail="Employee not found")
-    return employee
+@router.get("/{user_id}", response_model=s.UserRead)
+def get__profile(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(m.User).filter(m.User.user_id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
