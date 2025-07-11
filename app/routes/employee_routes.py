@@ -20,6 +20,8 @@ async def get_all_employees(db: Session = Depends(get_db)):
 #add employee data
 @router.post("/add", response_model=s.EmployeeRead)
 async def add_employee(
+    request: Request,
+    current_user: m.User = Depends(get_current_user),
     first_name: str = Form(...),
     last_name: str = Form(...),
     nrp_id: int = Form(...),
@@ -53,25 +55,33 @@ async def add_employee(
             position=position,
             department=department,
             face_encoding=encoding_json,
-            #image_filename=file.filename
         )
 
         db.add(employee)
         db.commit()
         db.refresh(employee)
 
-        create_activity_log(db, "Added employee", f"Employee {first_name} {last_name} added successfully")           
+        create_activity_log(
+            db=db,
+            request=request,
+            user_id=current_user.user_id,
+            action="Added employee",
+            detail=f"Employee {first_name} {last_name} added by {current_user.username}"
+        )
+
         return employee
 
     except Exception as e:
         db.rollback()
-        create_activity_log(db, "Add employee failed", str(e))
+        create_activity_log(
+            db=db,
+            request=request,
+            user_id=current_user.user_id,
+            action="Add employee failed",
+            detail=str(e)
+        )
         raise HTTPException(status_code=400, detail=f"Error processing request: {str(e)}")
-    
-    except Exception as e:
-        db.rollback()
-        create_activity_log(db, "Add employee failed", str(e))
-        raise HTTPException(status_code=400, detail=f"Error processing request: {str(e)}")
+
 
 #edit atau update employee data
 @router.post("/edit/{employee_id}", response_model=s.EmployeeUpdate)
