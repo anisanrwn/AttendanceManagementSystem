@@ -15,12 +15,12 @@ def view_role_lock_status(db: Session = Depends(get_db)):
     result = []
 
     for role in roles:
-        is_locked = bool(role.locks)  # Kalau ada relasi berarti dikunci
+        is_locked = bool(role.locks) 
         result.append(
             s.RoleLockStatus(
                 roles_id=role.roles_id,
                 roles_name=role.roles_name,
-                status=not is_locked  # True = active, False = locked
+                status=not is_locked  
             )
         )
     return result
@@ -32,7 +32,7 @@ async def manage_role_lock(request: s.ManageRoleLock, db: Session = Depends(get_
                            current_user: m.User = Depends(get_current_user)):
 
     if request.action == "lock":
-        # Cek apakah sudah ada data lock untuk role ini
+        # Check if there’s any lock data for each role
         existing = db.query(m.RoleLock).filter_by(role_id=request.role_id).first()
         if not existing:
             db.add(m.RoleLock(role_id=request.role_id))
@@ -40,7 +40,6 @@ async def manage_role_lock(request: s.ManageRoleLock, db: Session = Depends(get_
         else:
             message = "Role is already locked"
     else:
-        # Unlock: hapus entri lock dari tabel
         db.query(m.RoleLock).filter_by(role_id=request.role_id).delete()
         message = "Role unlocked successfully"
 
