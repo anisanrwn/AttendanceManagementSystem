@@ -1,11 +1,8 @@
 from datetime import datetime, date, time,  timedelta
 from sqlalchemy.orm import Session
 from app.models import model as m
-import pytz
 from app.utils.time import get_ntp_time
 from app.utils.holiday import fetch_national_holidays 
-
-wib = pytz.timezone("Asia/Jakarta")
 
 def format_time(dt: datetime | None):
     if not dt:
