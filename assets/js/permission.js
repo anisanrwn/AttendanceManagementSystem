@@ -4,26 +4,26 @@ document.addEventListener('DOMContentLoaded', function () {
     // API Configuration
     const apiBaseUrl = 'http://127.0.0.1:8000';
 
-    // Set tanggal request otomatis ke hari ini
+    
     document.getElementById('request_date').value = new Date().toISOString().split('T')[0];
 
-    // --- SweetAlert2 Helpers ---
-    function showSuccessPopup(message = "Berhasil!") {
+   
+    function showSuccessPopup(message = "Succsess!") {
         Swal.fire({
             icon: 'success',
             title: message,
             timer: 1800,
             showConfirmButton: false,
-            // posisi default Swal di tengah
+            
         });
     }
 
-    function showErrorPopup(message = "Terjadi kesalahan!") {
+    function showErrorPopup(message = "An error occurred!") {
         Swal.fire({
             icon: 'error',
             title: message,
             showConfirmButton: true,
-            // posisi default Swal di tengah
+            
         });
     }
 
@@ -106,18 +106,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function redirectToLogin() {
-        window.location.href = '/Login.html'; // Sesuaikan dengan halaman login kamu
+        window.location.href = '/Login.html'; 
     }
 
-    // Event listener untuk form submission
+    
     permissionForm.addEventListener('submit', async function (e) {
         e.preventDefault();
 
         try {
             const userId = await getUserId();
-            if (!userId) throw new Error('Gagal mengambil user ID');
+            if (!userId) throw new Error('Failed to retrieve user ID');
 
-            // Ambil data dari form
+            
             const formData = {
                 employee_id: parseInt(userId),
                 permission_type: document.getElementById('permission_type').value,
@@ -130,11 +130,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Validasi
             if (!formData.start_date || !formData.end_date || !formData.permission_type || !formData.reason) {
-                throw new Error('Semua field harus diisi!');
+                throw new Error('All fields must be filled in!');
             }
 
             if (new Date(formData.start_date) > new Date(formData.end_date)) {
-                throw new Error('Tanggal mulai tidak boleh lebih besar dari tanggal selesai!');
+                throw new Error('Start date cannot be later than end date!');
             }
 
             const response = await authFetch(`${apiBaseUrl}/permissions/request`, {
@@ -144,17 +144,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (!response || !response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.detail || 'Gagal mengirim permohonan');
+                throw new Error(errorData.detail || 'Failed to submit the request');
             }
 
             const result = await response.json();
 
-            showSuccessPopup(result.message || 'Permohonan izin berhasil dikirim!');
+            showSuccessPopup(result.message || 'Permission request submitted successfully!');
             permissionForm.reset();
 
         } catch (error) {
             console.error("Error:", error);
-            showErrorPopup(error.message || 'Terjadi kesalahan saat mengirim permohonan');
+            showErrorPopup(error.message || 'An error occurred while submitting the request');
         }
     });
 });
