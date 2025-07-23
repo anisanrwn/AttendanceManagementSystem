@@ -40,6 +40,7 @@ async def manage_role_lock(request: s.ManageRoleLock, db: Session = Depends(get_
         else:
             message = "Role is already locked"
     else:
+        # Unlock: Delete lock data entry from the table
         db.query(m.RoleLock).filter_by(role_id=request.role_id).delete()
         message = "Role unlocked successfully"
 
