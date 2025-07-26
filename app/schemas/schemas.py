@@ -49,6 +49,7 @@ class EmployeeBase(BaseModel):
     phone_number: str
     position: str
     department: str
+    join_date: date
     
 class UserLoginResponse(BaseModel):
     access_token: str
@@ -159,6 +160,11 @@ class AttendanceStatusResponse(BaseModel):
     
     class Config:
         from_attributes = True
+
+class AttendanceVerifyIdentity(BaseModel):
+    employee_id: int
+    image_base64: str
+
 
 class UserLogin(BaseModel):
     email: EmailStr

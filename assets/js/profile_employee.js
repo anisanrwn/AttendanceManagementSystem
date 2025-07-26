@@ -60,7 +60,8 @@ async function viewProfile(id) {
         document.getElementById('modalPhoneNumber').innerText = employee.phone_number;
         document.getElementById('modalPosition').innerText = employee.position;
         document.getElementById('modalDepartment').innerText = employee.department;
-        
+        document.getElementById('modalDate').innerText = employee.join_date;
+
         const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
         profileModal.show();
     } catch (error) {
@@ -95,11 +96,12 @@ async function saveEmployee(e) {
     const phone = document.getElementById('phone_number').value.trim();
     const position = document.getElementById('position').value.trim();
     const department = document.getElementById('department').value.trim();
+    const joinDate = document.getElementById('join_date').value.trim();
     const image = document.getElementById('photo').value.trim();
     const emailAvailable = await isEmailAvail(email);
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^08[0-9]{8,11}$/;
-    if (!firstName || !lastName || !email || !phone || !nrp || !position || !department|| !image) {
+    if (!firstName || !lastName || !email || !phone || !nrp || !position || !department|| !joinDate || !image) {
         Swal.fire('Error!', 'Please fill in all required fields.', 'error');
         return;
     }

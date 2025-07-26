@@ -8,6 +8,7 @@ from app.utils.auth_log import get_current_user
 from app.utils.face_recog import read_image, encode_face
 import json
 from typing import Optional, List
+from datetime import date
 
 router = APIRouter(prefix="/employee", tags=["Employee"])
 
@@ -29,6 +30,7 @@ async def add_employee(
     phone_number: str = Form(...),
     position: str = Form(...),
     department: str = Form(...),
+    join_date: date = Form(...),
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
@@ -54,6 +56,7 @@ async def add_employee(
             phone_number=phone_number,
             position=position,
             department=department,
+            join_date=join_date,
             face_encoding=encoding_json,
         )
 
@@ -141,8 +144,6 @@ async def edit_employee(
         raise HTTPException(status_code=400, detail=f"Error processing request: {str(e)}")
 
 
-
-#delete employee data
 @router.delete("/delete/{employee_id}", response_model=s.EmployeeRead)
 async def delete_employee(
     employee_id: int = Path(..., title="The ID of the employee to delete"),
@@ -151,12 +152,23 @@ async def delete_employee(
     employee = db.query(m.Employee).filter(m.Employee.employee_id == employee_id).first()
     if employee is None:
         raise HTTPException(status_code=404, detail="Employee not found")
-    
+
     try:
+        db.query(m.Attendance).filter(m.Attendance.employee_id == employee_id).delete()
+        user = db.query(m.User).filter(m.User.employee_id == employee_id).first()
+        if user:
+            db.delete(user)
+
         db.delete(employee)
         db.commit()
-        create_activity_log(db, "Deleted employee", f"Employee {employee_id} deleted successfully")
+
+        create_activity_log(
+            db,
+            "Deleted employee",
+            f"Employee {employee_id}, linked user, and attendance data deleted successfully"
+        )
         return employee
+
     except Exception as e:
         db.rollback()
         create_activity_log(db, "Delete employee failed", str(e))

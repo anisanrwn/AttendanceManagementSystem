@@ -33,14 +33,11 @@ def mark_absent_for_missing_days(db: Session, employee_id: int):
     today = get_ntp_time().date()
     holidays = fetch_national_holidays(today.year)
 
-    # Mulai dari 30 hari ke belakang kalau tidak ada record
-    first_attendance = (
-        db.query(m.Attendance)
-        .filter(m.Attendance.employee_id == employee_id)
-        .order_by(m.Attendance.attendance_date.asc())
-        .first()
-    )
-    start_date = first_attendance.attendance_date if first_attendance else today - timedelta(days=30)
+    employee = db.query(m.Employee).filter(m.Employee.employee_id == employee_id).first()
+    if not employee or not employee.join_date:
+        return
+
+    start_date = employee.join_date
     current_date = start_date
 
     while current_date < today:

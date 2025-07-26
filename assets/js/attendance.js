@@ -77,9 +77,16 @@ async function updateClock() {
   const status = document.getElementById("status").textContent;
 
   if (status === "Absent") {
-    if (now < punchIn) {
+    const maxClockIn = toTimeToday("13:00");
+    if (now > maxClockIn) {
+      attendanceStatus.textContent = "Clock-in time is over.";
+      countdownText.textContent = "You cannot clock in anymore.";
+      punchInBtn.disabled = true;
+
+    } else if (now < punchIn) {
       attendanceStatus.textContent = `Office hour starts at ${punchInTime}`;
       countdownText.textContent = `Starts in ${formatTime(punchIn - now)}`;
+
     } else {
       attendanceStatus.textContent = `Office hour started at ${punchInTime}`;
       countdownText.textContent = `You're late by ${formatTime(now - punchIn)}`;

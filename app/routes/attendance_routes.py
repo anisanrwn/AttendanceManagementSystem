@@ -8,22 +8,19 @@ from app.utils.attendance import format_time, calculate_total_working,calculate_
 from app.utils.time import get_ntp_time
 from app.utils.holiday import fetch_national_holidays 
 import json
-import ntplib
+import requests
 from datetime import datetime, timedelta, timezone, date, time
 
 router = APIRouter(prefix="/attendance", tags=["Attendance"])
 
 OFFICE_START = time(8, 0, 0)
+MAX_PUNCH_IN = time(13, 0)
 OFFICE_END = time(16, 45, 0)
 
 @router.get("/server-time")
 def get_server_time():
-    client = ntplib.NTPClient()
-    response = client.request('pool.ntp.org')
-    now_utc = datetime.fromtimestamp(response.tx_time, tz=timezone.utc)
-    now_wib = now_utc.astimezone(timezone(timedelta(hours=7)))
-    return {"serverTime": now_wib.isoformat()}
-
+    return {"serverTime": get_ntp_time().isoformat()}
+    
 @router.post("/clockin", response_model=s.AttendanceOut)
 def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depends(get_db)):
     employee_id = int(payload.dict().get("employee_id"))
@@ -52,6 +49,10 @@ def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depen
         raise HTTPException(status_code=400, detail="Already clocked in today")
     
     now = get_ntp_time()
+
+    if now.time() > MAX_PUNCH_IN:
+        raise HTTPException(status_code=400, detail="Clock-in time exceeded")
+
     attendance = m.Attendance(
         employee_id=employee_id,
         clock_in=now.time(),
@@ -228,3 +229,20 @@ def view_all_attendance(db: Session = Depends(get_db)):
     return {
         "attendance": result,
         "holidays": [str(h) for h in holidays]}
+
+@router.post("/verify")
+def verify_route(payload: s.AttendanceVerifyIdentity, db: Session = Depends(get_db)):
+    employee = db.query(m.Employee).filter(m.Employee.employee_id == payload.employee_id).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+
+    if not employee.face_encoding:
+        raise HTTPException(status_code=400, detail="No face encoding for this employee")
+
+    known_encoding = json.loads(employee.face_encoding)
+    is_verified, distance = verify_face(payload.image_base64, known_encoding)
+
+    if distance is None:
+        raise HTTPException(status_code=400, detail="No face detected")
+
+    return {"is_verified": bool(is_verified), "distance": float(distance)}
