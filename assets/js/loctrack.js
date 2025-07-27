@@ -183,26 +183,13 @@ function calculateDistance(point1, point2) {
 }
 
 async function initializeMap() {
-    const api_key = await fetchMapsApiKey();
-    // Register global callback
     window.renderMap = renderMap;
 
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${api_key}&libraries=geometry&callback=renderMap`;
+    script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyC3z5BxV4E1cIKB2jbstiGGYbfShO5NLtc&libraries=geometry&callback=renderMap";
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
-}
-
-async function fetchMapsApiKey() {
-    try {
-        const response = await fetch('http://localhost:8000/api/maps-key');
-        const data = await response.json();
-        return data.api_key;
-    } catch (error) {
-        showAlert('warning', 'Could not fetch Maps API key. Using fallback.');
-        return null;
-    }
 }
 
 // Render the map with current position

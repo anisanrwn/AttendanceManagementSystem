@@ -34,7 +34,12 @@ def mark_absent_for_missing_days(db: Session, employee_id: int):
     holidays = fetch_national_holidays(today.year)
 
     employee = db.query(m.Employee).filter(m.Employee.employee_id == employee_id).first()
-    if not employee or not employee.join_date:
+    if (
+        not employee
+        or not employee.join_date
+        or not employee.user
+        or all(role.roles_id != 3 for role in employee.user.roles) 
+    ):
         return
 
     start_date = employee.join_date
