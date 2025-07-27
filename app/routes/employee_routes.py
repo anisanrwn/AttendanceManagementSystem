@@ -155,6 +155,7 @@ async def delete_employee(
 
     try:
         db.query(m.Attendance).filter(m.Attendance.employee_id == employee_id).delete()
+        db.query(m.Permission).filter(m.Permission.employee_id == employee_id).delete()
         user = db.query(m.User).filter(m.User.employee_id == employee_id).first()
         if user:
             db.delete(user)
@@ -165,7 +166,7 @@ async def delete_employee(
         create_activity_log(
             db,
             "Deleted employee",
-            f"Employee {employee_id}, linked user, and attendance data deleted successfully"
+            f"Employee {employee_id}, linked user, and attendance data deleted successfullylinked user, permission, and attendance data deleted successfully"
         )
         return employee
 

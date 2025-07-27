@@ -2,8 +2,11 @@ import { requestLocationAccess, stopLocationTracking, insideGeofence, currentPos
 import { startFaceRecognition, captureAndVerifyFace } from './facerecog.js';
 import { showAlert } from './alert.js';
 import { startLivenessCheck } from './liveness.js';
+
 let attendanceAction = null;
 let stream = null;
+let holidays = [];
+let serverOffset = 0;
 
 // Live Clock
 const punchInTime = "08:00";
@@ -31,7 +34,16 @@ function getGreeting(hour) {
   return "Good Night!";
 }
 
-let serverOffset = 0;
+async function fetchHolidays() {
+  try {
+    const response = await fetch("http://localhost:8000/attendance/holidays");
+    if (!response.ok) throw new Error("Failed to fetch holidays");
+    const data = await response.json();
+    holidays = data.holidays || [];
+  } catch (error) {
+    console.error("Error fetching holidays:", error);
+  }
+}
 
 async function getServerTime() {
   try {
@@ -47,6 +59,7 @@ async function getServerTime() {
 }
 
 async function initTimeSync() {
+  await fetchHolidays(); 
   const serverDate = await getServerTime();
   const localDate = new Date();
   serverOffset = serverDate.getTime() - localDate.getTime();
@@ -75,8 +88,20 @@ async function updateClock() {
   const punchOut = toTimeToday(punchOutTime);
 
   const status = document.getElementById("status").textContent;
+  const isWeekend = now.getDay() === 0 || now.getDay() === 6;
+  const isHoliday = holidays.includes(now.toISOString().split("T")[0]);
 
-  if (status === "Absent") {
+  if (isHoliday) {
+    attendanceStatus.textContent = "Happy Holiday!";
+    countdownText.textContent = "Enjoy your day off!";
+    punchInBtn.disabled = true;
+
+  } else if (isWeekend) {
+    attendanceStatus.textContent = "Happy Weekend!";
+    countdownText.textContent = "Enjoy your weekend!";
+    punchInBtn.disabled = true;
+
+  } else if (status === "Absent") {
     const maxClockIn = toTimeToday("13:00");
     if (now > maxClockIn) {
       attendanceStatus.textContent = "Clock-in time is over.";
@@ -368,3 +393,4 @@ async function handleLivenessCheck() {
     }
   }
 }
+

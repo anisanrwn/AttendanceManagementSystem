@@ -15,7 +15,7 @@ class Employee(Base):
     phone_number = Column(String(13))
     position = Column(String(100))
     department = Column(String(100))
-    join_date = Column(Date, nullable=True)
+    join_date = Column(Date, nullable=False)
     face_encoding = Column(Text) 
 
     user = relationship("User", back_populates="employee", uselist=False, cascade="all, delete")
