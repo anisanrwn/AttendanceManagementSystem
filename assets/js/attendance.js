@@ -91,16 +91,20 @@ async function updateClock() {
   const isWeekend = now.getDay() === 0 || now.getDay() === 6;
   const isHoliday = holidays.includes(now.toISOString().split("T")[0]);
 
-  if (isHoliday) {
-    attendanceStatus.textContent = "Happy Holiday!";
-    countdownText.textContent = "Enjoy your day off!";
-    punchInBtn.disabled = true;
+   if (isHoliday) {
+     attendanceStatus.textContent = "Happy Holiday!";
+     countdownText.textContent = "Enjoy your day off!";
+     punchInBtn.disabled = true;
+
+   } else if (isWeekend) {
+     attendanceStatus.textContent = "Happy Weekend!";
+     countdownText.textContent = "Enjoy your weekend!";
+     punchInBtn.disabled = true;
 
   } else if (isWeekend) {
-    attendanceStatus.textContent = "Happy Weekend!";
-    countdownText.textContent = "Enjoy your weekend!";
-    punchInBtn.disabled = true;
-
+  attendanceStatus.textContent = "Weekend detected, but attendance is open.";
+  countdownText.textContent = "You may still clock in.";
+  
   } else if (status === "Absent") {
     const maxClockIn = toTimeToday("13:00");
     if (now > maxClockIn) {

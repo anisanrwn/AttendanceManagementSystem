@@ -96,7 +96,7 @@ export async function startLivenessCheck() {
             faceMesh.close();
             isLivenessActive = false;
             setTimeout(() => {
-              window.location.href = "/html/Login.html";
+              window.location.replace("/html/Login.html");
             }, 1500);
             return;
           }

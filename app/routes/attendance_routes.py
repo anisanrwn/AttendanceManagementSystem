@@ -8,8 +8,7 @@ from app.utils.attendance import format_time, calculate_total_working,calculate_
 from app.utils.time import get_ntp_time
 from app.utils.holiday import fetch_national_holidays 
 import json
-import requests
-from datetime import datetime, timedelta, timezone, date, time
+from datetime import datetime, date, time
 
 router = APIRouter(prefix="/attendance", tags=["Attendance"])
 
@@ -20,6 +19,13 @@ OFFICE_END = time(16, 45, 0)
 @router.get("/server-time")
 def get_server_time():
     return {"serverTime": get_ntp_time().isoformat()}
+
+@router.get("/holidays")
+def get_holidays():
+    today_year = datetime.today().year
+    holidays = fetch_national_holidays(today_year)
+    return {"holidays": sorted(str(d) for d in holidays)}
+
     
 @router.post("/clockin", response_model=s.AttendanceOut)
 def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depends(get_db)):
