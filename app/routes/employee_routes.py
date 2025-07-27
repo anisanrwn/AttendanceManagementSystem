@@ -85,6 +85,7 @@ async def add_employee(
         )
         raise HTTPException(status_code=400, detail=f"Error processing request: {str(e)}")
 
+
 #edit atau update employee data
 @router.post("/edit/{employee_id}", response_model=s.EmployeeUpdate)
 async def edit_employee(
@@ -142,6 +143,7 @@ async def edit_employee(
         )
         raise HTTPException(status_code=400, detail=f"Error processing request: {str(e)}")
 
+
 @router.delete("/delete/{employee_id}", response_model=s.EmployeeRead)
 async def delete_employee(
     employee_id: int = Path(..., title="The ID of the employee to delete"),
@@ -153,7 +155,6 @@ async def delete_employee(
 
     try:
         db.query(m.Attendance).filter(m.Attendance.employee_id == employee_id).delete()
-        db.query(m.Permission).filter(m.Permission.employee_id == employee_id).delete()
         user = db.query(m.User).filter(m.User.employee_id == employee_id).first()
         if user:
             db.delete(user)
@@ -164,7 +165,7 @@ async def delete_employee(
         create_activity_log(
             db,
             "Deleted employee",
-            f"Employee {employee_id}, linked user, and attendance data deleted successfullylinked user, permission, and attendance data deleted successfully"
+            f"Employee {employee_id}, linked user, and attendance data deleted successfully"
         )
         return employee
 
@@ -195,6 +196,7 @@ def get_employee_profile(
 
     return employee
 
+
 @router.get("/departmentfilter")
 async def get_departments(db: Session = Depends(get_db)):
     try:
@@ -221,3 +223,4 @@ def check_email(email: str, exclude_id: Optional[int] = None, db: Session = Depe
     if employee:
         return {"available": False}
     return {"available": True}
+

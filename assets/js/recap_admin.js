@@ -55,23 +55,13 @@ async function fetchAllAttendance() {
         </td>
         <td class="text-center">${clock_in || '-'}</td>
         <td class="text-center">
-          ${punchInArea !== 'None' && clock_in_lat && clock_in_lng
-            ? `<a href="https://www.google.com/maps?q=${clock_in_lat},${clock_in_lng}" target="_blank">
-                <span class="badge ${getAreaClass(punchInArea)}" style="cursor:pointer">${punchInArea}</span>
-              </a>`
-            : `<span class="badge ${getAreaClass(punchInArea)}">${punchInArea}</span>`}
+          <span class="badge ${getAreaClass(punchInArea)}">${punchInArea}</span>
         </td>
-
         <td class="text-center">${clock_in_reason || '-'}</td>
         <td class="text-center">${clock_out || '-'}</td>
         <td class="text-center">
-          ${punchOutArea !== 'None' && clock_out_lat && clock_out_lng
-            ? `<a href="https://www.google.com/maps?q=${clock_out_lat},${clock_out_lng}" target="_blank">
-                <span class="badge ${getAreaClass(punchOutArea)}" style="cursor:pointer">${punchOutArea}</span>
-              </a>`
-            : `<span class="badge ${getAreaClass(punchOutArea)}">${punchOutArea}</span>`}
+          <span class="badge ${getAreaClass(punchOutArea)}">${punchOutArea}</span>
         </td>
-
         <td class="text-center">${clock_out_reason || '-'}</td>
         <td class="text-center">
           ${totalHours !== null && totalHours !== undefined ? formatDuration(totalHours) : '-'}
