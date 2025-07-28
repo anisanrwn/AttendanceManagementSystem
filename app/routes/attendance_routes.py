@@ -13,7 +13,7 @@ from datetime import datetime, date, time
 router = APIRouter(prefix="/attendance", tags=["Attendance"])
 
 OFFICE_START = time(8, 0, 0)
-MAX_PUNCH_IN = time(13, 0)
+MAX_PUNCH_IN = time(17, 0)
 OFFICE_END = time(16, 45, 0)
 
 @router.get("/server-time")

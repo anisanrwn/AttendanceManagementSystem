@@ -106,7 +106,7 @@ async function updateClock() {
   countdownText.textContent = "You may still clock in.";
   
   } else if (status === "Absent") {
-    const maxClockIn = toTimeToday("13:00");
+    const maxClockIn = toTimeToday("17:00");
     if (now > maxClockIn) {
       attendanceStatus.textContent = "Clock-in time is over.";
       countdownText.textContent = "You cannot clock in anymore.";
