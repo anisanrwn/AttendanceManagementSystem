@@ -91,14 +91,21 @@ export async function startLivenessCheck() {
           hasVerifiedIdentity = true;
           const verified = await silentVerify(videoElement);
           if (!verified) {
-            showAlert("error", "You are not the valid user!");
-            camera.stop();
-            faceMesh.close();
-            isLivenessActive = false;
-            setTimeout(() => {
-              window.location.replace("/html/Login.html");
-            }, 1500);
-            return;
+           Swal.fire({
+            icon: 'error',
+            title: 'You are not the valid user!',
+            showConfirmButton: false,
+            timer: 1000,
+            timerProgressBar: true,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didClose: () => {
+              window.location.href = "/html/Login.html";
+            }
+          });
+          camera.stop();
+          faceMesh.close();
+          isLivenessActive = false;
           }
         }
         if (!blinkDetected && (lastEAR - currentEAR > 0.08) && currentEAR < 0.22) {
