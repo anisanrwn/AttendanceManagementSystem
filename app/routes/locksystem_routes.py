@@ -6,6 +6,8 @@ from app.schemas import schemas as s
 from typing import List
 from datetime import datetime, date
 from app.utils.auth import get_current_user
+from app.services.activity_log import create_activity_log
+from app.utils.auth_log import get_current_user  
 
 router = APIRouter(prefix="/lock", tags=["lock"])
 
@@ -25,28 +27,48 @@ def view_role_lock_status(db: Session = Depends(get_db)):
         )
     return result
 
-
-
 @router.post("/manage")
-async def manage_role_lock(request: s.ManageRoleLock, db: Session = Depends(get_db),
-                           current_user: m.User = Depends(get_current_user)):
-
-    if request.action == "lock":
-        # Check if there’s any lock data for each role
-        existing = db.query(m.RoleLock).filter_by(role_id=request.role_id).first()
-        if not existing:
-            db.add(m.RoleLock(role_id=request.role_id))
-            message = "Role locked successfully"
+async def manage_role_lock(
+    request_data: s.ManageRoleLock,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: m.User = Depends(get_current_user)
+):
+    try:
+        if request_data.action == "lock":
+            existing = db.query(m.RoleLock).filter_by(role_id=request_data.role_id).first()
+            if not existing:
+                db.add(m.RoleLock(role_id=request_data.role_id))
+                message = "Role locked successfully"
+            else:
+                message = "Role is already locked"
         else:
-            message = "Role is already locked"
-    else:
-        # Unlock: Delete lock data entry from the table
-        db.query(m.RoleLock).filter_by(role_id=request.role_id).delete()
-        message = "Role unlocked successfully"
+            db.query(m.RoleLock).filter_by(role_id=request_data.role_id).delete()
+            message = "Role unlocked successfully"
 
-    db.commit()
-    role = db.query(m.Roles).get(request.role_id)
-    return {"message": f"{message} ({role.roles_name})"}
+        db.commit()
 
+        role = db.query(m.Roles).get(request_data.role_id)
 
-    
+        # ✅ Tambahkan log activity
+        create_activity_log(
+            db=db,
+            request=request,
+            user_id=current_user.user_id,
+            action="Manage Role Lock",
+            detail=f"{message} for role: {role.roles_name} by {current_user.username}"
+        )
+
+        return {"message": f"{message} ({role.roles_name})"}
+
+    except Exception as e:
+        db.rollback()
+        create_activity_log(
+            db=db,
+            request=request,
+            user_id=current_user.user_id,
+            action="Manage Role Lock Failed",
+            detail=str(e)
+        )
+        raise HTTPException(status_code=500, detail="Failed to manage role lock")
+

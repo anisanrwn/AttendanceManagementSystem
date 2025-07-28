@@ -106,7 +106,14 @@ function updatePermissionStatus(id, status, button) {
       row.querySelector(".status").textContent = status;
       row.querySelector(".approved-date").textContent = result.approved_date;
       row.querySelectorAll("button").forEach(btn => btn.disabled = true);
-      alert(result.message);
+
+      // SweetAlert muncul setelah update berhasil
+      Swal.fire({
+        icon: status === 'Approved' ? 'success' : 'error',
+        title: result.message,
+        showConfirmButton: false,
+        timer: 2000
+      });
 
       // Update data lokal
       const index = allPermissions.findIndex(p => p.permissions_id == id);
@@ -119,6 +126,7 @@ function updatePermissionStatus(id, status, button) {
       console.error("Error:", error);
     });
 }
+
 
 document.getElementById('exportButton').addEventListener('click', function () {
   const table = document.getElementById('attendanceTable');

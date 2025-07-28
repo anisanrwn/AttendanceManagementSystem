@@ -4,6 +4,7 @@ from app.database import get_db
 from app.models import model as m
 from app.schemas import schemas as s
 from app.services.activity_log import create_activity_log  
+from app.utils.auth_log import get_current_user  
 from app.utils.verifpass import hash_password, validate_password_strength
 from typing import List, Optional
 
@@ -39,6 +40,7 @@ async def get_available_roles(db: Session = Depends(get_db)):
 @router.post("/create", response_model=s.UserRead)
 async def create_user(
     request: Request,
+    current_user: m.User = Depends(get_current_user),  # ✅ Tambahkan ini
     employee_id: Optional[int] = Form(None),
     username: str = Form(...),
     email: str = Form(...),
@@ -80,23 +82,41 @@ async def create_user(
         db.add(user_role)
         db.commit()
         
-        create_activity_log(db, "Created user", f"User {username} created successfully")
+        create_activity_log(
+            db=db,
+            request=request,
+            user_id=current_user.user_id,
+            action="Created user",
+            detail=f"User {username} created successfully by {current_user.username}"
+        )
+
         return db.query(m.User).options(
             joinedload(m.User.employee),
             joinedload(m.User.roles)
         ).filter(m.User.user_id == new_user.user_id).first()
+
     except HTTPException:
         db.rollback()
         raise
+
     except Exception as e:
         db.rollback()
-        create_activity_log(db, "User creation failed", str(e))
+        
+        create_activity_log(
+            db=db,
+            request=request,
+            user_id=current_user.user_id,
+            action="User creation failed",
+            detail=str(e)
+        )
+
         raise HTTPException(status_code=500, detail="Failed to create user")
 
 @router.put("/update/{user_id}", response_model=s.UserRead)
 def update_user(
     request: Request,
     user_id: int,
+    current_user: m.User = Depends(get_current_user),  
     username: str = Form(...),
     email: str = Form(...),
     password: Optional[str] = Form(None),
@@ -124,12 +144,13 @@ def update_user(
             db.add(m.UserRoles(user_id=user_id, roles_id=role.roles_id))
 
         db.commit()
+
         create_activity_log(
             db=db,
             request=request,
-            user_id=user.user_id,
+            user_id=current_user.user_id,
             action="Updated user",
-            detail=f"User {username} updated successfully"
+            detail=f"User {username} updated successfully by {current_user.username}"
         )
 
         return db.query(m.User).options(
@@ -146,16 +167,17 @@ def update_user(
         create_activity_log(
             db=db,
             request=request,
-            user_id=user_id,
+            user_id=current_user.user_id,
             action="User update failed",
             detail=str(e)
         )
 
         raise HTTPException(status_code=500, detail="Failed to update user")
-        
 
 @router.delete("/delete/{user_id}", response_model=s.UserRead)
 async def delete_user(
+    request: Request,
+    current_user: m.User = Depends(get_current_user),  
     user_id: int = Path(..., title="The ID of the account to delete"),
     db: Session = Depends(get_db)
 ):
@@ -166,12 +188,30 @@ async def delete_user(
 
         db.delete(user)
         db.commit()
-        create_activity_log(db, "Deleted user", f"User {user_id} deleted successfully")
+
+        create_activity_log(
+            db=db,
+            request=request,
+            user_id=current_user.user_id,
+            action="Deleted user",
+            detail=f"User {user_id} deleted successfully by {current_user.username}"
+        )
+
         return user
+
     except Exception as e:
         db.rollback()
-        create_activity_log(db, "User deletion failed", str(e))
+
+        create_activity_log(
+            db=db,
+            request=request,
+            user_id=current_user.user_id,
+            action="User deletion failed",
+            detail=str(e)
+        )
+
         raise HTTPException(status_code=500, detail="Failed to delete account")
+
 
 @router.put("/sync-email/{user_id}")
 def sync_email_from_employee(user_id: int, db: Session = Depends(get_db)):

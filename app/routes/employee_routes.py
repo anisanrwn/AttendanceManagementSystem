@@ -146,6 +146,8 @@ async def edit_employee(
 
 @router.delete("/delete/{employee_id}", response_model=s.EmployeeRead)
 async def delete_employee(
+    request: Request,
+    current_user: m.User = Depends(get_current_user),
     employee_id: int = Path(..., title="The ID of the employee to delete"),
     db: Session = Depends(get_db)
 ):
@@ -164,9 +166,11 @@ async def delete_employee(
         db.commit()
 
         create_activity_log(
-            db,
-            "Deleted employee",
-            f"Employee {employee_id}, linked user, and attendance data deleted successfullylinked user, permission, and attendance data deleted successfully"
+           db=db,
+           request=request,
+           user_id=current_user.user_id,
+           action="Deleted employee",
+           detail=f"Employee {employee_id}, linked user, permission, and attendance data deleted successfully by {current_user.username}"
         )
         return employee
 

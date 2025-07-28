@@ -136,6 +136,18 @@ async function isUsernameAvailable(username, userId = null) {
     }
 }
 
+function getAuthHeaders() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        Swal.fire("Unauthorized!", "Please login first.", "warning");
+        throw new Error("Unauthorized");
+    }
+    return {
+        "Authorization": `Bearer ${token}`
+    };
+}
+
+
 // add user
 document.getElementById('submitAccount').addEventListener('click', saveAccount);
 async function saveAccount(e) {
@@ -188,8 +200,9 @@ async function saveAccount(e) {
         });
 
         const response = await fetch("http://localhost:8000/user/create", {
-            method: "POST",
-            body: formData
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: formData
         });
 
         Swal.close();
@@ -315,6 +328,7 @@ async function saveUserChanges() {
     try {
         const response = await fetch(`http://localhost:8000/user/update/${userId}`, {
             method: "PUT",
+            headers: getAuthHeaders(),
             body: formData,
         });
 
@@ -347,7 +361,8 @@ async function deleteAccount(id) {
     if (confirmResult.isConfirmed) {
         try {
             const response = await fetch(`http://localhost:8000/user/delete/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: getAuthHeaders(),
             });
 
             if (response.ok) {
