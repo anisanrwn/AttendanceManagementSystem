@@ -19,8 +19,6 @@ async function fetchUsers() {
         const employee = user.employee || {};
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td class="text-center">${employee.first_name || '-'}</td>
-            <td class="text-center">${employee.last_name || '-'}</td>
             <td class="text-center">${user.username}</td>
             <td class="text-center">${user.email}</td>
             <td class="text-center">
@@ -36,10 +34,10 @@ async function fetchUsers() {
             </td>
             
             <td class="text-center">
-                <button class="btn btn-sm btn-warning" onclick="editAccount(${user.user_id})">Edit</button>
+                <button class="btn btn-sm btn-info" onclick="viewAccount(${user.user_id})">View</button>
                 <button class="btn btn-sm btn-danger" onclick="deleteAccount(${user.user_id})">Delete</button>
-                <button class="btn btn-sm btn-info" onclick="syncEmail(${user.user_id})">Sync Email</button>
-
+                <button class="btn btn-sm btn-warning" onclick="editAccount(${user.user_id})">Edit</button>
+                <button class="btn btn-sm btn-primary" onclick="syncEmail(${user.user_id})">Sync Email</button>
             </td>
         `;
         tableBody.appendChild(row);
@@ -49,7 +47,6 @@ async function fetchUsers() {
     }
   }
   fetchUsers();
-
 
 // load employee list in form add user
 async function loadEmployee() {
@@ -62,8 +59,7 @@ async function loadEmployee() {
 
         const defaultOption = document.createElement('option');
         defaultOption.value = '';
-        defaultOption.textContent = 'Select Employee';
-        defaultOption.disabled = true;
+        defaultOption.textContent = '(Optional) Assign this account to an employee';
         defaultOption.selected = true;
         employeeSelect.appendChild(defaultOption);
 
@@ -427,6 +423,39 @@ async function syncEmail(id) {
   }
 }
 
+async function viewAccount(id) {
+    try {
+        const token = localStorage.getItem("token");
+
+        const response = await fetch(`http://localhost:8000/user/view/${id}`, {
+            method: "GET",
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error("User not found");
+
+        const user = await response.json();
+
+        document.getElementById("modalFirstName").innerText = user.first_name;
+        document.getElementById("modalLastName").innerText = user.last_name;
+        document.getElementById("modalUsername").innerText = user.username;
+        document.getElementById("modalEmail").innerText = user.email;
+        document.getElementById("modalRoles").innerText = user.roles.join(", ");
+
+        let activityText = `Created on ${user.created.when} by ${user.created.by}`;
+
+        if (user.last_modified) {
+            activityText = `Last modified on ${user.last_modified.when} by ${user.last_modified.by}`;
+        }
+
+        document.getElementById("modalActivity").innerText = activityText;
+
+        new bootstrap.Modal(document.getElementById("dataModal")).show();
+
+    } catch (err) {
+        Swal.fire("Error", err.message, "error");
+    }
+}
 
 // Filter search
 const searchInput = document.getElementById('searchInput');
@@ -456,16 +485,12 @@ function filterUser() {
     const rows = document.querySelectorAll('#userTable tbody tr');
 
     rows.forEach(row => {
-        const firstName = row.cells[0].textContent.toLowerCase();
-        const lastName = row.cells[1].textContent.toLowerCase();
-        const username = row.cells[2].textContent.toLowerCase();
+        const username = row.cells[0].textContent.toLowerCase();
         
-        const rolesCell = row.cells[4];
+        const rolesCell = row.cells[2];
         const firstRole = rolesCell.querySelector('.badge')?.textContent.toLowerCase() || '';
 
-        const matchesSearch = firstName.includes(searchValue) ||
-                              lastName.includes(searchValue) ||
-                              username.includes(searchValue);
+        const matchesSearch = username.includes(searchValue);
 
         const matchesRole = selectedRole === '' || firstRole === selectedRole;
 

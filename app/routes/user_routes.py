@@ -6,7 +6,9 @@ from app.schemas import schemas as s
 from app.services.activity_log import create_activity_log  
 from app.utils.auth_log import get_current_user  
 from app.utils.verifpass import hash_password, validate_password_strength
+from app.utils.time import get_ntp_time 
 from typing import List, Optional
+from datetime import timezone, timedelta
 
 router = APIRouter(prefix="/user", tags=["User"])
 
@@ -36,11 +38,108 @@ async def get_available_roles(db: Session = Depends(get_db)):
         return roles
     except Exception as e:
         raise HTTPException(status_code=500, detail="Failed to fetch roles")
+    
+@router.get("/view/{user_id}")
+def get_user_detail(user_id: int, db: Session = Depends(get_db)):
+    wib = timezone(timedelta(hours=7))
+
+    user = db.query(m.User).options(
+        joinedload(m.User.employee),
+        joinedload(m.User.roles)
+    ).filter(m.User.user_id == user_id).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    logs = (
+        db.query(m.ActivityLog)
+        .filter(m.ActivityLog.detail.ilike(f"%{user.username}%"))
+        .order_by(m.ActivityLog.timestamp.asc())
+        .all()
+    )
+
+    created_by = "-"
+    created_when = None
+    last_modified_by = None
+    last_modified_when = None
+
+    created_logs = [log for log in logs if "created" in log.detail.lower()]
+    updated_logs = [log for log in logs if "updated" in log.detail.lower()]
+    deleted_logs = [log for log in logs if "deleted" in log.detail.lower()]
+
+    # Cari deleted terakhir
+    last_deleted_time = deleted_logs[-1].timestamp if deleted_logs else None
+
+    # Cari created terbaru setelah delete
+    final_created_log = None
+    for log in reversed(created_logs):
+        if not last_deleted_time or log.timestamp > last_deleted_time:
+            final_created_log = log
+            break
+
+    # Set created kalau ada
+    if final_created_log:
+        created_by = final_created_log.user.username if final_created_log.user else "-"
+        created_when = final_created_log.timestamp.astimezone(wib).strftime("%Y-%m-%d %H:%M:%S")
+
+    # Cari updated terbaru SETELAH created terbaru (atau semua updated kalau ga ada created)
+    for log in reversed(updated_logs):
+        if not final_created_log or log.timestamp > final_created_log.timestamp:
+            last_modified_by = log.user.username if log.user else "-"
+            last_modified_when = log.timestamp.astimezone(wib).strftime("%Y-%m-%d %H:%M:%S")
+            break
+
+    # ==== FINAL DECISION ====
+    # 1. Ada created + ada updated → pakai updated
+    # 2. Ada created + ga ada updated → pakai created
+    # 3. Ga ada created + ada updated → pakai updated sebagai created
+    # 4. Ga ada created + ga ada updated tapi ada user di DB → pakai activity_date
+    if final_created_log:
+        if last_modified_by:  # ada update setelah create
+            result_created_by = last_modified_by
+            result_created_when = last_modified_when
+        else:  # tidak ada update, pakai created
+            result_created_by = created_by
+            result_created_when = created_when
+    else:
+        if last_modified_by:  # tidak ada created, tapi ada update
+            result_created_by = last_modified_by
+            result_created_when = last_modified_when
+        elif user.activity_date:  # fallback ke activity_date
+            result_created_by = "-"
+            result_created_when = user.activity_date.astimezone(wib).strftime("%Y-%m-%d %H:%M:%S")
+        else:  # benar-benar kosong
+            result_created_by = "-"
+            result_created_when = None
+
+    result = {
+        "user_id": user.user_id,
+        "first_name": user.employee.first_name if user.employee else "-",
+        "last_name": user.employee.last_name if user.employee else "-",
+        "username": user.username,
+        "email": user.email,
+        "roles": [r.roles_name for r in user.roles],
+        "created": {
+            "when": result_created_when,
+            "by": result_created_by
+        }
+    }
+
+    # Kirim last_modified kalau ada update
+    if last_modified_by:
+        result["last_modified"] = {
+            "when": last_modified_when,
+            "by": last_modified_by
+        }
+
+    return result
+
+
 
 @router.post("/create", response_model=s.UserRead)
 async def create_user(
     request: Request,
-    current_user: m.User = Depends(get_current_user),  # ✅ Tambahkan ini
+    current_user: m.User = Depends(get_current_user),
     employee_id: Optional[int] = Form(None),
     username: str = Form(...),
     email: str = Form(...),
@@ -68,7 +167,8 @@ async def create_user(
             employee_id=employee_id,
             username=username,
             email=email,
-            password=hashed_password
+            password=hashed_password,
+            activity_date=get_ntp_time()
         )
         db.add(new_user)
         db.commit()
@@ -135,6 +235,7 @@ def update_user(
             validate_password_strength(password)
             hashed_password = hash_password(password)
             user.password = hashed_password
+            user.activity_date = get_ntp_time()
 
         if role_name:
             role = db.query(m.Roles).filter_by(roles_name=role_name).first()

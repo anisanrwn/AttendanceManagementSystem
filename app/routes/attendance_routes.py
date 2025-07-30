@@ -13,7 +13,7 @@ from datetime import datetime, date, time
 router = APIRouter(prefix="/attendance", tags=["Attendance"])
 
 OFFICE_START = time(8, 0, 0)
-MAX_PUNCH_IN = time(17, 0)
+#MAX_PUNCH_IN = time(17, 0)
 OFFICE_END = time(16, 45, 0)
 
 @router.get("/server-time")
@@ -56,8 +56,8 @@ def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depen
     
     now = get_ntp_time()
 
-    if now.time() > MAX_PUNCH_IN:
-        raise HTTPException(status_code=400, detail="Clock-in time exceeded")
+    #if now.time() > MAX_PUNCH_IN:
+    #    raise HTTPException(status_code=400, detail="Clock-in time exceeded")
 
     attendance = m.Attendance(
         employee_id=employee_id,

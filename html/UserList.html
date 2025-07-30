@@ -216,27 +216,27 @@
                       <div class="modal-body">
                         <form id="addAccountForm">
                           <div class="mb-3">
-                            <label for="employeeSelect" class="form-label">Select Employee</label>
+                            <label for="employeeSelect" class="form-label">Assign Employee</label>
                             <select id="employeeSelect" class="form-control" name="employee_id"required >
-                              <option value="">Select Employee</option>
+                              <option value="">(Optional) Assign this account to an employee</option>
                             </select>
                           </div>
                           <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
                           </div>
                           <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter active email (example: user@gmail.com)"required>
                           </div>
                           <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter password"required>
                           </div>
                           <div class="mb-3">
                             <label for="roleSelect" class="form-label">Select Roles</label>
                             <select id="roleSelect" class="form-control" name="role_name"required >
-                              <option value="">Select Roles</option>
+                              <option value="">Select a role for this account</option>
                             </select>
                           </div>
                           <div class="modal-footer">
@@ -254,12 +254,9 @@
                   <table class="table table-sm" id="userTable">
                     <thead>
                       <tr>
-                        <th class="text-center">First Name</th>
-                        <th class="text-center">Last Name</th>
                         <th class="text-center">Username</th>
                         <th class="text-center">Email</th>
                         <th class="text-center">Role</th>
-                        <!-- <th class="text-center">Status</th> -->
                         <th class="text-center">Actions</th>
                       </tr>
                     </thead>
@@ -305,6 +302,29 @@
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="button" class="btn btn-primary" onclick="saveUserChanges()">Save changes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Modal for Viewing data -->
+                <div class="modal fade" id="dataModal" tabindex="-1" aria-labelledby="dataModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="dataModalLabel">User Data</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <p><strong>First Name:</strong> <span id="modalFirstName"></span></p>
+                        <p><strong>Last Name:</strong> <span id="modalLastName"></span></p>
+                        <p><strong>Username:</strong> <span id="modalUsername"></span></p>
+                        <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+                        <p><strong>Roles:</strong> <span id="modalRoles"></span></p>
+                        <p><span id="modalActivity"></span></p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                       </div>
                     </div>
                   </div>

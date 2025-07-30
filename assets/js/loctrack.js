@@ -3,8 +3,8 @@ import { goToStep } from './attendance.js';
 export { insideGeofence, currentPosition };
 
 // Configuration
-const OFFICE_LOCATION = { lat: -6.284991637884827, lng: 107.1705739392145 };  
-const GEOFENCE_RADIUS = 500; 
+const OFFICE_LOCATION = { lat: -6.285542, lng: 107.170443 };
+const GEOFENCE_RADIUS = 100; 
 const LOCATION_UPDATE_INTERVAL = 10000; 
 const LOCATION_TIMEOUT = 30000; 
 
@@ -17,7 +17,7 @@ let currentPosition = null;
 let locationWatchId = null;
 let userPath = null;
 let userPathCoordinates = [];
-let officeLocation = { lat: -6.284991637884827, lng: 107.1705739392145 }; // Default location
+let officeLocation = { lat: -6.285542, lng: 107.170443 };
 let locationUpdateTimeoutId = null;
 
 // Request access to device location

@@ -17,7 +17,7 @@ def encode_face(img) -> list:
         raise ValueError("No face found in the image.")
 
 
-def verify_face(image_base64, known_encoding, threshold=0.6):
+def verify_face(image_base64, known_encoding, threshold=0.5):
     image_bytes = base64.b64decode(image_base64)
     np_arr = np.frombuffer(image_bytes, np.uint8)
     img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)

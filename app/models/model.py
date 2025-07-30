@@ -31,7 +31,8 @@ class User(Base):
     username = Column(String(100), unique=True)
     email = Column(String(100), unique=True)
     password = Column(String(500))
-
+    activity_date= Column(DateTime(timezone=True), server_default=func.now())
+    
     employee = relationship("Employee", back_populates="user")
     roles = relationship("Roles", secondary="user_roles", back_populates="users")
     activity_logs = relationship("ActivityLog", back_populates="user")
