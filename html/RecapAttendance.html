@@ -175,16 +175,16 @@
                 </ul>
               </div>
             </nav>
-
-            <!-- Main Content -->
-            <div class="container-xxl flex-grow-1 container-p-y">
-              <h4 class="fw-bold mt-6 mb-4"><span class="text-muted fw-light">Pages /</span> Recap Attendance </h4>
-         
-                <!-- User List with Filters and Search -->
+            <!-- Content wrapper -->
+            <div class="content-wrapper">
+  
+              <!-- Main Content -->
+              <div class="container-xxl flex-grow-1 container-p-y">
+                <h4 class="fw-bold mt-6 mb-4"><span class="text-muted fw-light">Pages /</span> Attendance Recap </h4>
                 <div class="card">
-                  <h5 class="card-header"> Recap Attendance</h5>
+                  <h5 class="card-header">Recap Attendance</h5>
                   <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
                       <input type="text" id="searchAttendanceName" class="form-control me-2" style="flex: 1; max-width: 300px; " placeholder="Search by Name">
                       <select id="filterAdminLate" class="form-select me-2" style="width: 140px;">
                         <option value="">Late?</option>
@@ -197,54 +197,52 @@
                       <button class="btn" id="clearFiltersButton" style="background-color: #7f82ff; color: white; max-width: 150px;">Clear Filters</button>
                       <button class="btn" id="exportButton" style="background-color: #7f82ff; color: white; max-width: 150px;">Export Excel</button>
                     </div>
-                  </div>
-                  <div class="table-responsive text-nowrap" style="max-height: 500px; overflow-y: auto; ">
-                    <table class="table table-striped table-hover" id="allAttendanceTable">
-                      <thead style="position: sticky; top: 0; background: white; z-index: 2;">
-                        <tr>
-                          <th class="text-center">Date</th>
-                          <th class="text-center">Name</th>
-                          <th class="text-center">Late</th>
-                          <th class="text-center">Status</th>
-                          <th class="text-center">Punch In</th>
-                          <th class="text-center">Punch In Area</th>
-                          <th class="text-center">Punch In Reason</th>
-                          <th class="text-center">Punch Out</th>
-                          <th class="text-center">Punch Out Area</th>
-                          <th class="text-center">Punch Out Reason</th>
-                          <th class="text-center">Working Hour</th>
-                          <th class="text-center">Overtime</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <!--Attendance data-->
-                      </tbody>
-                    </table>
-                  </div>
-                  <div class="mt-4 p-3 card" style="margin-bottom: 0px;">
-                    <h5 class="mb-3">Summary Attendance</h5>
-                    <!-- Row 1 -->
-                    <div class="row text-left">
-                      <div class="col-md-4">
-                        <p><strong>Total Punch Out:</strong> <span class="badge bg-label-primary" id="summaryPunchOut">0</span></p>
-                      </div>
-                      <div class="col-md-4">
-                        <p><strong>Total Permit:</strong> <span class="badge bg-label-info"id="summaryPermit">0</span></p>
-                      </div>
-                      <div class="col-md-4">
-                        <p><strong>Total Absent:</strong> <span class="badge bg-label-secondary" id="summaryAbsent">0</span></p>
-                      </div>
+                    <div class="table-responsive text-nowrap" style="max-height: 500px; overflow-y: auto; ">
+                      <table class="table table-striped table-hover" id="allAttendanceTable">
+                        <thead style="position: sticky; top: 0; background: white; z-index: 2;">
+                          <tr>
+                            <th class="text-center">Date</th>
+                            <th class="text-center">Name</th>
+                            <th class="text-center">Late</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Punch In</th>
+                            <th class="text-center">Punch In Area</th>
+                            <th class="text-center">Punch In Reason</th>
+                            <th class="text-center">Punch Out</th>
+                            <th class="text-center">Punch Out Area</th>
+                            <th class="text-center">Punch Out Reason</th>
+                            <th class="text-center">Working Hour</th>
+                            <th class="text-center">Overtime</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <!--Attendance data-->
+                        </tbody>
+                      </table>
                     </div>
-                    <!-- Row 2 -->
-                    <div class="row text-left">
-                      <div class="col-md-4">
-                        <p><strong>Total Late:</strong> <span class="badge bg-label-danger"class="badge bg-label-danger" id="summaryLate">0</span></p>
+                    <div class="mt-4 p-3 card" style="margin-bottom: 0px;">
+                      <h5 class="mb-3">Summary Attendance</h5>
+                      <div class="row text-left">
+                        <div class="col-md-4">
+                          <p><strong>Total Punch Out:</strong> <span class="badge bg-label-primary" id="summaryPunchOut">0</span></p>
+                        </div>
+                        <div class="col-md-4">
+                          <p><strong>Total Permit:</strong> <span class="badge bg-label-info"id="summaryPermit">0</span></p>
+                        </div>
+                        <div class="col-md-4">
+                          <p><strong>Total Absent:</strong> <span class="badge bg-label-secondary" id="summaryAbsent">0</span></p>
+                        </div>
                       </div>
-                      <div class="col-md-4">
-                        <p><strong>Clock In:</strong> <span class="badge bg-label-success" id="clockInInside">0</span> Inside / <span class="badge bg-label-danger" id="clockInOutside">0</span> Outside</p>
-                      </div>
-                      <div class="col-md-4">
-                        <p><strong>Clock Out:</strong> <span class="badge bg-label-success" id="clockOutInside">0</span> Inside / <span class="badge bg-label-danger" id="clockOutOutside">0</span> Outside</p>
+                      <div class="row text-left">
+                        <div class="col-md-4">
+                          <p><strong>Total Late:</strong> <span class="badge bg-label-danger"class="badge bg-label-danger" id="summaryLate">0</span></p>
+                        </div>
+                        <div class="col-md-4">
+                          <p><strong>Clock In:</strong> <span class="badge bg-label-success" id="clockInInside">0</span> Inside / <span class="badge bg-label-danger" id="clockInOutside">0</span> Outside</p>
+                        </div>
+                        <div class="col-md-4">
+                          <p><strong>Clock Out:</strong> <span class="badge bg-label-success" id="clockOutInside">0</span> Inside / <span class="badge bg-label-danger" id="clockOutOutside">0</span> Outside</p>
+                        </div>
                       </div>
                     </div>
                   </div>

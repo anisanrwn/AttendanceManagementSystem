@@ -137,7 +137,6 @@ function updateSummary() {
     if (punchOutArea.includes("outside")) clockOutOutside++;
   });
 
-  // ✅ Update ke DOM
   document.getElementById("summaryPunchOut").textContent = totalPunchOut;
   document.getElementById("summaryPermit").textContent = totalPermit;
   document.getElementById("summaryAbsent").textContent = totalAbsent;
