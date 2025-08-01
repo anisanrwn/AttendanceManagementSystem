@@ -67,48 +67,39 @@ def get_user_detail(user_id: int, db: Session = Depends(get_db)):
     updated_logs = [log for log in logs if "updated" in log.detail.lower()]
     deleted_logs = [log for log in logs if "deleted" in log.detail.lower()]
 
-    # Cari deleted terakhir
     last_deleted_time = deleted_logs[-1].timestamp if deleted_logs else None
 
-    # Cari created terbaru setelah delete
     final_created_log = None
     for log in reversed(created_logs):
         if not last_deleted_time or log.timestamp > last_deleted_time:
             final_created_log = log
             break
 
-    # Set created kalau ada
     if final_created_log:
         created_by = final_created_log.user.username if final_created_log.user else "-"
         created_when = final_created_log.timestamp.astimezone(wib).strftime("%Y-%m-%d %H:%M:%S")
 
-    # Cari updated terbaru SETELAH created terbaru (atau semua updated kalau ga ada created)
     for log in reversed(updated_logs):
         if not final_created_log or log.timestamp > final_created_log.timestamp:
             last_modified_by = log.user.username if log.user else "-"
             last_modified_when = log.timestamp.astimezone(wib).strftime("%Y-%m-%d %H:%M:%S")
             break
 
-    # ==== FINAL DECISION ====
-    # 1. Ada created + ada updated → pakai updated
-    # 2. Ada created + ga ada updated → pakai created
-    # 3. Ga ada created + ada updated → pakai updated sebagai created
-    # 4. Ga ada created + ga ada updated tapi ada user di DB → pakai activity_date
     if final_created_log:
-        if last_modified_by:  # ada update setelah create
+        if last_modified_by: 
             result_created_by = last_modified_by
             result_created_when = last_modified_when
-        else:  # tidak ada update, pakai created
+        else:
             result_created_by = created_by
             result_created_when = created_when
     else:
-        if last_modified_by:  # tidak ada created, tapi ada update
+        if last_modified_by:  
             result_created_by = last_modified_by
             result_created_when = last_modified_when
-        elif user.activity_date:  # fallback ke activity_date
+        elif user.activity_date:
             result_created_by = "-"
             result_created_when = user.activity_date.astimezone(wib).strftime("%Y-%m-%d %H:%M:%S")
-        else:  # benar-benar kosong
+        else: 
             result_created_by = "-"
             result_created_when = None
 
@@ -125,7 +116,6 @@ def get_user_detail(user_id: int, db: Session = Depends(get_db)):
         }
     }
 
-    # Kirim last_modified kalau ada update
     if last_modified_by:
         result["last_modified"] = {
             "when": last_modified_when,
@@ -133,8 +123,6 @@ def get_user_detail(user_id: int, db: Session = Depends(get_db)):
         }
 
     return result
-
-
 
 @router.post("/create", response_model=s.UserRead)
 async def create_user(

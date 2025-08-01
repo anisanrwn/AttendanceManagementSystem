@@ -81,7 +81,7 @@ async function fetchAllAttendance() {
 
       tableBody.appendChild(row);
     });
-
+    updateSummary();
     populateFilters();
 
   } catch (error) {
@@ -105,6 +105,48 @@ function formatDuration(seconds) {
 
   return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
+function updateSummary() {
+  const rows = document.querySelectorAll("#allAttendanceTable tbody tr:not([style*='display: none'])");
+
+  let totalPunchOut = 0;
+  let totalPermit = 0;
+  let totalAbsent = 0;
+  let totalLate = 0;
+
+  let clockInInside = 0;
+  let clockInOutside = 0;
+  let clockOutInside = 0;
+  let clockOutOutside = 0;
+
+  rows.forEach(row => {
+    const cols = row.querySelectorAll("td");
+
+    const lateText = cols[2]?.textContent.trim().toLowerCase();
+    const status = cols[3]?.textContent.trim().toLowerCase();
+    const punchOut = cols[7]?.textContent.trim();
+    const punchInArea = cols[5]?.textContent.trim().toLowerCase();
+    const punchOutArea = cols[8]?.textContent.trim().toLowerCase();
+
+    if (punchOut && punchOut !== "-") totalPunchOut++;
+    if (status.includes("permit")) totalPermit++;
+    if (status.includes("absent")) totalAbsent++;
+    if (lateText.includes("late")) totalLate++;
+    if (punchInArea.includes("inside")) clockInInside++;
+    if (punchInArea.includes("outside")) clockInOutside++;
+    if (punchOutArea.includes("inside")) clockOutInside++;
+    if (punchOutArea.includes("outside")) clockOutOutside++;
+  });
+
+  // ✅ Update ke DOM
+  document.getElementById("summaryPunchOut").textContent = totalPunchOut;
+  document.getElementById("summaryPermit").textContent = totalPermit;
+  document.getElementById("summaryAbsent").textContent = totalAbsent;
+  document.getElementById("summaryLate").textContent = totalLate;
+  document.getElementById("clockInInside").textContent = clockInInside;
+  document.getElementById("clockInOutside").textContent = clockInOutside;
+  document.getElementById("clockOutInside").textContent = clockOutInside;
+  document.getElementById("clockOutOutside").textContent = clockOutOutside;
+}
 
 const exportBtn = document.getElementById('exportButton');
 if (exportBtn) {
@@ -119,8 +161,8 @@ if (exportBtn) {
 const searchInput = document.getElementById('searchAttendanceName');
 const filterLate = document.getElementById('filterAdminLate');
 const filterStatus = document.getElementById('filterAdminStatus');
-const filterMonth = document.getElementById('filterAdminMonth');
-const filterYear = document.getElementById('filterAdminYear');
+const filterFromDate = document.getElementById('filterFromDate');
+const filterToDate = document.getElementById('filterToDate');
 
 let debounceTimer;
 const debounce = (callback, delay) => {
@@ -130,19 +172,20 @@ const debounce = (callback, delay) => {
   };
 };
 
-// Event listeners
 searchInput.addEventListener('input', debounce(filterAttendance, 300));
 filterLate.addEventListener('change', filterAttendance);
 filterStatus.addEventListener('change', filterAttendance);
-filterMonth.addEventListener('change', filterAttendance);
-filterYear.addEventListener('change', filterAttendance);
+filterFromDate.addEventListener('change', filterAttendance);
+filterToDate.addEventListener('change', filterAttendance);
 
 document.getElementById('clearFiltersButton').addEventListener('click', () => {
   searchInput.value = '';
   filterLate.value = '';
   filterStatus.value = '';
-  filterMonth.value = '';
-  filterYear.value = '';
+  filterFromDate.value = '';
+  filterToDate.value = '';
+  filterFromDate.type = 'text';
+  filterToDate.type = 'text';
   filterAttendance();
 });
 
@@ -150,21 +193,10 @@ function populateFilters() {
   const rows = document.querySelectorAll('#allAttendanceTable tbody tr');
   const lateSet = new Set();
   const statusSet = new Set();
-  const monthSet = new Set();
-  const yearSet = new Set();
 
   rows.forEach(row => {
-    const dateText = row.cells[0].textContent.trim().split(' ')[0];
     const late = row.getAttribute("data-late");
     const status = row.getAttribute("data-status");
-
-    const date = new Date(dateText);
-    if (!isNaN(date)) {
-      const rowMonth = (date.getMonth() + 1).toString().padStart(2, '0');
-      const rowYear = date.getFullYear().toString();
-      monthSet.add(rowMonth);
-      yearSet.add(rowYear);
-    }
 
     if (late) lateSet.add(late);
     if (status) statusSet.add(status);
@@ -181,39 +213,34 @@ function populateFilters() {
   };
   addOptions(filterLate, [...lateSet].sort(), 'Late?');
   addOptions(filterStatus, [...statusSet].sort(), 'Status?');
-  addOptions(filterMonth, [...monthSet].sort(), 'Month?');
-  addOptions(filterYear, [...yearSet].sort(), 'Year?');
 }
 
 function filterAttendance() {
   const searchValue = searchInput.value.toLowerCase();
   const selectedLate = filterLate.value.toLowerCase(); 
   const selectedStatus = filterStatus.value.toLowerCase(); 
-  const selectedMonth = filterMonth.value;
-  const selectedYear = filterYear.value;
+  const fromDate = filterFromDate.value ? new Date(filterFromDate.value) : null;
+  const toDate = filterToDate.value ? new Date(filterToDate.value) : null;
 
   const rows = document.querySelectorAll('#allAttendanceTable tbody tr');
 
   rows.forEach(row => {
     const dateText = row.cells[0].textContent.trim().split(' ')[0];
+    const rowDate = new Date(dateText);
+
     const name = row.cells[1].textContent.toLowerCase();
     const late = row.getAttribute("data-late");
     const status = row.getAttribute("data-status");
-    const date = new Date(dateText);
-    const rowMonth = (date.getMonth() + 1).toString().padStart(2, '0');
-    const rowYear = date.getFullYear().toString();
 
     const matchesSearch = name.includes(searchValue);
     const matchesLate = selectedLate === '' || late === selectedLate;
     const matchesStatus = selectedStatus === '' || status === selectedStatus;
-    const matchesMonth = selectedMonth === '' || rowMonth === selectedMonth;
-    const matchesYear = selectedYear === '' || rowYear === selectedYear;
 
-    if (matchesSearch && matchesLate && matchesStatus && matchesMonth && matchesYear)
-    {
-      row.style.display = '';
-    } else {
-      row.style.display = 'none';
-    }
+    let matchesDate = true;
+    if (fromDate && rowDate < fromDate) matchesDate = false;
+    if (toDate && rowDate > toDate) matchesDate = false;
+
+    row.style.display = (matchesSearch && matchesLate && matchesStatus && matchesDate) ? '' : 'none';
   });
+  updateSummary();
 }

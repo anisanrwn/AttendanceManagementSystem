@@ -184,28 +184,23 @@
                 <div class="card">
                   <h5 class="card-header"> Recap Attendance</h5>
                   <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                      <input type="text" id="searchAttendanceName" class="form-control me-2" style="flex: 1; max-width: 350px;" placeholder="Search by Name">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <input type="text" id="searchAttendanceName" class="form-control me-2" style="flex: 1; max-width: 300px; " placeholder="Search by Name">
                       <select id="filterAdminLate" class="form-select me-2" style="width: 140px;">
                         <option value="">Late?</option>
                       </select>
                       <select id="filterAdminStatus" class="form-select me-2" style="width: 140px;">
                         <option value="">Status?</option>
                       </select>
-                      <select id="filterAdminMonth" class="form-select me-2" style="width: 140px;">
-                        <option value="">Month?</option>
-                      </select>
-                      <select id="filterAdminYear" class="form-select me-2" style="width: 140px;">
-                        <option value="">Year?</option>
-                      </select>
+                      <input type="text" id="filterFromDate" class="form-control" style="width:150px;" placeholder="From Date" onfocus="this.type='date'" onblur="if(!this.value) this.type='text'">
+                      <input type="text" id="filterToDate" class="form-control" style="width:150px;" placeholder="To Date" onfocus="this.type='date'" onblur="if(!this.value) this.type='text'">
                       <button class="btn" id="clearFiltersButton" style="background-color: #7f82ff; color: white; max-width: 150px;">Clear Filters</button>
                       <button class="btn" id="exportButton" style="background-color: #7f82ff; color: white; max-width: 150px;">Export Excel</button>
                     </div>
                   </div>
-  
-                  <div class="table-responsive text-nowrap">
-                    <table class="table" id="allAttendanceTable">
-                      <thead>
+                  <div class="table-responsive text-nowrap" style="max-height: 500px; overflow-y: auto; ">
+                    <table class="table table-striped table-hover" id="allAttendanceTable">
+                      <thead style="position: sticky; top: 0; background: white; z-index: 2;">
                         <tr>
                           <th class="text-center">Date</th>
                           <th class="text-center">Name</th>
@@ -222,9 +217,36 @@
                         </tr>
                       </thead>
                       <tbody>
-  
+                        <!--Attendance data-->
                       </tbody>
                     </table>
+                  </div>
+                  <div class="mt-4 p-3 card" style="margin-bottom: 0px;">
+                    <h5 class="mb-3">Summary Attendance</h5>
+                    <!-- Row 1 -->
+                    <div class="row text-left">
+                      <div class="col-md-4">
+                        <p><strong>Total Punch Out:</strong> <span class="badge bg-label-primary" id="summaryPunchOut">0</span></p>
+                      </div>
+                      <div class="col-md-4">
+                        <p><strong>Total Permit:</strong> <span class="badge bg-label-info"id="summaryPermit">0</span></p>
+                      </div>
+                      <div class="col-md-4">
+                        <p><strong>Total Absent:</strong> <span class="badge bg-label-secondary" id="summaryAbsent">0</span></p>
+                      </div>
+                    </div>
+                    <!-- Row 2 -->
+                    <div class="row text-left">
+                      <div class="col-md-4">
+                        <p><strong>Total Late:</strong> <span class="badge bg-label-danger"class="badge bg-label-danger" id="summaryLate">0</span></p>
+                      </div>
+                      <div class="col-md-4">
+                        <p><strong>Clock In:</strong> <span class="badge bg-label-success" id="clockInInside">0</span> Inside / <span class="badge bg-label-danger" id="clockInOutside">0</span> Outside</p>
+                      </div>
+                      <div class="col-md-4">
+                        <p><strong>Clock Out:</strong> <span class="badge bg-label-success" id="clockOutInside">0</span> Inside / <span class="badge bg-label-danger" id="clockOutOutside">0</span> Outside</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               <div class="layout-overlay layout-menu-toggle"></div>
