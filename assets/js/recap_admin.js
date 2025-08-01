@@ -89,7 +89,6 @@ async function fetchAllAttendance() {
   }
 }
 
-// Area Badge Class Generator
 function getAreaClass(area) {
   switch (area) {
     case 'Inside': return 'bg-label-success';
@@ -105,6 +104,7 @@ function formatDuration(seconds) {
 
   return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
+
 function updateSummary() {
   const rows = document.querySelectorAll("#allAttendanceTable tbody tr:not([style*='display: none'])");
 
