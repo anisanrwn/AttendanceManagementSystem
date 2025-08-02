@@ -278,13 +278,13 @@ function createEditorPasswordModal() {
   `;
 document.body.insertAdjacentHTML("beforeend", modalHtml);
 
-  // Tambahkan event listener untuk reset input ketika modal ditampilkan
+  
   const editorPasswordModal = document.getElementById('editorPasswordModal');
   if (editorPasswordModal) {
     editorPasswordModal.addEventListener('shown.bs.modal', function () {
       const input = document.getElementById('editorPasswordInput');
       if (input) {
-        input.value = ''; // reset input tiap kali modal dibuka
+        input.value = ''; 
       }
     });
   }
