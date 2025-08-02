@@ -183,6 +183,10 @@ async function saveAccount(e) {
     //add account
     const formData = new FormData(accountForm);
 
+    if (!formData.get("employee_id")) {
+        formData.delete("employee_id");
+    }
+
     try {
         $('#addAccountModal').modal('hide');
 
@@ -218,7 +222,16 @@ async function saveAccount(e) {
         
         } else {
             const errorData = await response.json();
-            Swal.fire('Error!', errorData.detail || 'Failed to register account.', 'error');
+            let message = "Failed to register account.";
+
+            if (typeof errorData.detail === "string") {
+            message = errorData.detail;
+            } else if (typeof errorData.detail === "object") {
+            message = errorData.detail.msg || JSON.stringify(errorData.detail);
+            }
+
+            Swal.fire('Error!', message, 'error');
+
         }
 
     } catch (error) {
