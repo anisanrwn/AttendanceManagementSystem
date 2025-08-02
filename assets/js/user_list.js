@@ -145,11 +145,28 @@ function getAuthHeaders() {
 
 
 // add user
-document.getElementById('submitAccount').addEventListener('click', saveAccount);
-async function saveAccount(e) {
-    e.preventDefault(); 
+document.getElementById('submitAccount').addEventListener('click', function (e) {
+    e.preventDefault();
+    $('#addAccountModal').modal('hide');
 
-    // manual validate
+    const confirmModal = new bootstrap.Modal(document.getElementById("editorPasswordModal"));
+    confirmModal.show();
+
+    const form = document.getElementById("editorPasswordForm");
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+
+    newForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const editorPassword = document.getElementById("editorPasswordInput").value.trim();
+        if (!editorPassword) return;
+
+        confirmModal.hide();
+        await saveAccount(editorPassword);
+    }, { once: true });
+});
+
+async function saveAccount(editorPassword) {
     const username = document.getElementById('username').value.trim();
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
@@ -166,7 +183,7 @@ async function saveAccount(e) {
     if (!usernameAvailable) {
         Swal.fire('Error!', 'Username already exists. Please choose another one.', 'error');
         return;
-     }
+    }
     if (!emailRegex.test(email)) {
         Swal.fire('Error!', 'Please enter a valid email address. Example : yourname@gmail.com', 'error');
         return;
@@ -179,30 +196,25 @@ async function saveAccount(e) {
         Swal.fire('Error!', 'Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and symbols', 'error');
         return;
     }
-    
-    //add account
-    const formData = new FormData(accountForm);
 
+    const formData = new FormData(accountForm);
     if (!formData.get("employee_id")) {
         formData.delete("employee_id");
     }
+    formData.append("editor_password", editorPassword); 
 
     try {
-        $('#addAccountModal').modal('hide');
-
         Swal.fire({
             title: 'Registering...',
             text: 'Please wait while we save the account data.',
             allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
+            didOpen: () => Swal.showLoading()
         });
 
         const response = await fetch("http://localhost:8000/user/create", {
-          method: "POST",
-          headers: getAuthHeaders(),
-          body: formData
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: formData
         });
 
         Swal.close();
@@ -219,181 +231,259 @@ async function saveAccount(e) {
             accountForm.reset();
             fetchUsers();
             loadEmployee(); 
-        
         } else {
             const errorData = await response.json();
-            let message = "Failed to register account.";
-
-            if (typeof errorData.detail === "string") {
-            message = errorData.detail;
-            } else if (typeof errorData.detail === "object") {
-            message = errorData.detail.msg || JSON.stringify(errorData.detail);
-            }
-
+            let message = errorData.detail || 'Failed to register account.';
             Swal.fire('Error!', message, 'error');
-
         }
-
     } catch (error) {
         Swal.fire('Error!', `An error occurred: ${error.message}`, 'error');
     }
 }
-fetchUsers();
+
 
 //edit account
-async function editAccount(userId) {
-    const [userResponse, roleResponse] = await Promise.all([
-        fetch("http://localhost:8000/user/view"),
-        fetch("http://localhost:8000/user/available_roles")
-    ]);
-    const users = await userResponse.json();
-    const roles = await roleResponse.json();
-    const user = users.find(u => u.user_id === userId);
-    if (!user) return;
 
-    const roleSelect = document.getElementById("editRole");
-    roleSelect.innerHTML = "";
+function createEditorPasswordModal() {
+  const modalHtml = `
+    <div class="modal fade" id="editorPasswordModal" tabindex="-1" aria-labelledby="editorPasswordModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow-lg border-0">
+          <div class="modal-header bg-light">
+            <h5 class="modal-title fw-semibold" id="editorPasswordModalLabel">Confirm Your Password</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="editorPasswordForm">
+              <div class="mb-3">
+                <label for="editorPasswordInput" class="form-label">Please enter your password to proceed:</label>
+                <input 
+                  type="password" 
+                  class="form-control" 
+                  id="editorPasswordInput" 
+                  placeholder="" 
+                  required
+                >
+              </div>
+              <div class="text-end">
+                <button type="submit" class="btn btn-primary px-4">
+                  Confirm
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+document.body.insertAdjacentHTML("beforeend", modalHtml);
 
-    roles.forEach(role => {
-        const option = document.createElement("option");
-        option.value = role.roles_name;
-        option.textContent = role.roles_name;
-        roleSelect.appendChild(option);
+  // Tambahkan event listener untuk reset input ketika modal ditampilkan
+  const editorPasswordModal = document.getElementById('editorPasswordModal');
+  if (editorPasswordModal) {
+    editorPasswordModal.addEventListener('shown.bs.modal', function () {
+      const input = document.getElementById('editorPasswordInput');
+      if (input) {
+        input.value = ''; // reset input tiap kali modal dibuka
+      }
     });
+  }
 
-    document.getElementById("editUsername").value = user.username;
-    document.getElementById("editEmail").value = user.email;
-    document.getElementById("editRole").value = user.roles[0]?.roles_name || '';
-    document.getElementById("editPassword").value = '';
-    document.getElementById("editUserId").value = user.user_id;
+  if (!document.getElementById("editorPasswordModal")) {
+    document.body.insertAdjacentHTML("beforeend", modalHtml);
+  }
+}
 
-    const emailInput = document.getElementById("editEmail");
-    if (user.employee) {
-        emailInput.readOnly = true;
-        emailInput.style.backgroundColor = "#e9ecef";
-        emailInput.style.cursor = "pointer";
-        emailInput.onclick = () => {
-            Swal.fire({
-                title: "Cannot Edit Email Here",
-                text: "This email is linked to the employee profile. Please edit it from the Employee Profile page then click sync email in user list action.",
-                icon: "info",
-                confirmButtonText: "OK"
-            });
-        };
-    } else {
-        emailInput.readOnly = false;
-        emailInput.style.backgroundColor = "";
-        emailInput.style.cursor = "text";
-        emailInput.onclick = null;
-    }
 
-    $('#editAccountModal').modal('show');
+document.addEventListener("DOMContentLoaded", createEditorPasswordModal);
+
+async function editAccount(userId) {
+    const [userResponse, roleResponse] = await Promise.all([
+        fetch("http://localhost:8000/user/view"),
+        fetch("http://localhost:8000/user/available_roles")
+    ]);
+    const users = await userResponse.json();
+    const roles = await roleResponse.json();
+    const user = users.find(u => u.user_id === userId);
+    if (!user) return;
+
+    const roleSelect = document.getElementById("editRole");
+    roleSelect.innerHTML = "";
+
+    roles.forEach(role => {
+        const option = document.createElement("option");
+        option.value = role.roles_name;
+        option.textContent = role.roles_name;
+        roleSelect.appendChild(option);
+    });
+
+    document.getElementById("editUsername").value = user.username;
+    document.getElementById("editEmail").value = user.email;
+    document.getElementById("editRole").value = user.roles[0]?.roles_name || '';
+    document.getElementById("editPassword").value = '';
+    document.getElementById("editUserId").value = user.user_id;
+
+    const emailInput = document.getElementById("editEmail");
+    if (user.employee) {
+        emailInput.readOnly = true;
+        emailInput.style.backgroundColor = "#e9ecef";
+        emailInput.style.cursor = "pointer";
+        emailInput.onclick = () => {
+            Swal.fire({
+                title: "Cannot Edit Email Here",
+                text: "This email is linked to the employee profile. Please edit it from the Employee Profile page then click sync email in user list action.",
+                icon: "info",
+                confirmButtonText: "OK"
+            });
+        };
+    } else {
+        emailInput.readOnly = false;
+        emailInput.style.backgroundColor = "";
+        emailInput.style.cursor = "text";
+        emailInput.onclick = null;
+    }
+
+    $('#editAccountModal').modal('show');
 }
 
 async function saveUserChanges() {
-    const userId = document.getElementById("editUserId").value;
-    const eusername = document.getElementById('editUsername').value.trim();
-    const eemail = document.getElementById('editEmail').value.trim();
-    const erole = document.getElementById('editRole').value.trim();
-    const epassword = document.getElementById("editPassword").value.trim();
-    const eusernameAvailable = await isUsernameAvailable(eusername, userId);
-    const eemailAvailable = await isEmailAvailable(eemail, userId);    
-    const eemailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const epassRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/
+    const userId = document.getElementById("editUserId").value;
+    const eusername = document.getElementById('editUsername').value.trim();
+    const eemail = document.getElementById('editEmail').value.trim();
+    const erole = document.getElementById('editRole').value.trim();
+    const epassword = document.getElementById("editPassword").value.trim();
+    const eusernameAvailable = await isUsernameAvailable(eusername, userId);
+    const eemailAvailable = await isEmailAvailable(eemail, userId);    
+    const eemailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const epassRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/;
 
-    if (!eusername || !eemail || !erole) {
-        Swal.fire('Error!', 'Please fill in all required fields.', 'error');
-        return;
+    // Validasi form seperti sebelumnya
+    if (!eusername || !eemail || !erole) {
+    Swal.fire('Error!', 'Please fill in all required fields.', 'error');
+    return;
     }
-
     if (!eusernameAvailable) {
         Swal.fire('Error Editing!', 'Username already exists. Please choose another one.', 'error');
         return;
     }
+    if (!eemailRegex.test(eemail)) {
+        Swal.fire('Error!', 'Please enter a valid email address. Example: yourname@gmail.com', 'error');
+        return;
+    }
+    if (!eemailAvailable) {
+        Swal.fire('Error!', 'Email already exists. Please choose another one.', 'error');
+        return;
+    }
+    if (epassword && !epassRegex.test(epassword)) {
+        Swal.fire("Error", "Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and symbols (.@$!%*?&).", "error");
+        return;
+    }
 
-    if (!eemailRegex.test(eemail)) {
-        Swal.fire('Error!', 'Please enter a valid email address. Example: yourname@gmail.com', 'error');
-        return;
-    }
+    $('#editAccountModal').modal('hide');
 
-    if (!eemailAvailable) {
-        Swal.fire('Error!', 'Email already exists. Please choose another one.', 'error');
-        return;
-    }
+    
+    const editorPasswordModal = new bootstrap.Modal(document.getElementById("editorPasswordModal"));
+    editorPasswordModal.show();
 
-    if (epassword && !epassRegex.test(epassword)) {
-        Swal.fire("Error", "Password must be at least 8 characters long and include uppercase letters, lowercase letters, numbers, and symbols (.@$!%*?&).", "error");
-        return;
-    }
+    const form = document.getElementById("editorPasswordForm");
+    const confirmButton = form.querySelector('button[type="submit"]');
 
-    const formData = new FormData();
-    formData.append("username", eusername);
-    formData.append("email", eemail);
-    formData.append("role_name", erole);
-    if (epassword) {
-        formData.append("password", epassword);
-    }
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
 
-    try {
-        const response = await fetch(`http://localhost:8000/user/update/${userId}`, {
-            method: "PUT",
-            headers: getAuthHeaders(),
-            body: formData,
-        });
+    newForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const editorPassword = document.getElementById("editorPasswordInput").value;
+        if (!editorPassword) return;
 
-        if (response.ok) {
-            Swal.fire("Success", "Account updated successfully!", "success");
-            $('#editAccountModal').modal('hide');
-            fetchUsers();
-        } else {
-            const err = await response.json();
-            Swal.fire("Error", err.detail || "Failed to update account", "error");
-        }
-    } catch (error) {
-        Swal.fire("Error", error.message, "error");
-    }
+        
+        editorPasswordModal.hide();
+
+        const formData = new FormData();
+        formData.append("username", eusername);
+        formData.append("email", eemail);
+        formData.append("role_name", erole);
+        formData.append("editor_password", editorPassword);
+        if (epassword) {
+            formData.append("password", epassword);
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8000/user/update/${userId}`, {
+                method: "PUT",
+                headers: getAuthHeaders(),
+                body: formData,
+            });
+
+            if (response.ok) {
+                Swal.fire("Success", "Account updated successfully!", "success");
+                fetchUsers();
+            } else {
+                const err = await response.json();
+                Swal.fire("Error", err.detail || "Failed to update account", "error");
+            }
+        } catch (error) {
+            Swal.fire("Error", error.message, "error");
+        }
+    }, { once: true }); 
 }
+
 
 //delete account
 async function deleteAccount(id) {
-    const confirmResult = await Swal.fire({
-        title: 'Are you sure you want to delete?',
-        text: `User ID: ${id}`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes',
-        cancelButtonText: 'Cancel'
-    });
+    $('#editorPasswordModal').modal('show');
+    const form = document.getElementById("editorPasswordForm");
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
 
-    if (confirmResult.isConfirmed) {
-        try {
-            const response = await fetch(`http://localhost:8000/user/delete/${id}`, {
-            method: 'DELETE',
-            headers: getAuthHeaders(),
-            });
+    newForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const editorPassword = document.getElementById("editorPasswordInput").value.trim();
+        if (!editorPassword) return;
+        $('#editorPasswordModal').modal('hide');
 
-            if (response.ok) {
-                Swal.fire({
-                    title: 'Deleted!',
-                    text: 'Account successfully deleted.',
-                    icon: 'success',
-                    timer: 1500,
-                    showConfirmButton: false
-            });
+        const confirmResult = await Swal.fire({
+            title: 'Are you sure you want to delete?',
+            text: `User ID: ${id}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'Cancel'
+        });
 
-            fetchUsers();
+        if (confirmResult.isConfirmed) {
+            try {
+                const formData = new FormData();
+                formData.append("editor_password", editorPassword);
 
-            } else {
-                const errorData = await response.json();
-                Swal.fire('Error!', errorData.detail || 'Failed to delete Account.', 'error');
+                const response = await fetch(`http://localhost:8000/user/delete/${id}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders(),
+                    body: formData
+                });
+
+                if (response.ok) {
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'Account successfully deleted.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    fetchUsers();
+                } else {
+                    const errorData = await response.json();
+                    Swal.fire('Error!', errorData.detail || 'Failed to delete Account.', 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error!', `An error occurred: ${error.message}`, 'error');
             }
-        } catch (error) {
-            Swal.fire('Error!', `An error occurred: ${error.message}`, 'error');
         }
-    }
+    }, { once: true });
 }
+
 
 //sync email
 async function syncEmail(id) {

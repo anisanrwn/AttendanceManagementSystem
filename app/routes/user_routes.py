@@ -9,6 +9,7 @@ from app.utils.verifpass import hash_password, validate_password_strength
 from app.utils.time import get_ntp_time 
 from typing import List, Optional
 from datetime import timezone, timedelta
+from app.utils.verifpass import verify_password
 
 router = APIRouter(prefix="/user", tags=["User"])
 
@@ -133,9 +134,14 @@ async def create_user(
     email: str = Form(...),
     password: str = Form(...),
     role_name: str = Form(...),
+    editor_password: str = Form(...),  
     db: Session = Depends(get_db)
 ):
     try:
+        
+        if not verify_password(editor_password, current_user.password):
+            raise HTTPException(status_code=403, detail="The password you entered is incorrect.")
+
         if employee_id:
             employee = db.query(m.Employee).filter_by(employee_id=employee_id).first()
             if employee and not email:
@@ -200,6 +206,7 @@ async def create_user(
 
         raise HTTPException(status_code=500, detail="Failed to create user")
 
+
 @router.put("/update/{user_id}", response_model=s.UserRead)
 def update_user(
     request: Request,
@@ -208,22 +215,39 @@ def update_user(
     username: str = Form(...),
     email: str = Form(...),
     password: Optional[str] = Form(None),
+    editor_password: str = Form(...),
     role_name: Optional[str] = Form(None),
     db: Session = Depends(get_db)
 ):
-    try:
-        user = db.query(m.User).filter_by(user_id=user_id).first()
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+    editor = db.query(m.User).filter(m.User.user_id == current_user.user_id).first()
 
+    try:
+        if not verify_password(editor_password, current_user.password):
+            raise HTTPException(status_code=403, detail="The password you entered is incorrect.")
+
+        existing_user = db.query(m.User).filter(m.User.email == email, m.User.user_id != user_id).first()
+        user = db.query(m.User).filter(m.User.user_id == user_id).first()
+
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found.")
+
+        if existing_user:
+            raise HTTPException(status_code=400, detail="The email is already in use by another user.")
+    
+    # Ambil target user yang mau diedit
+        user = db.query(m.User).filter(m.User.user_id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found.")
+        
         user.username = username
         user.email = email
 
-        if password:
+        if password is not None and password.strip() != "":
             validate_password_strength(password)
             hashed_password = hash_password(password)
             user.password = hashed_password
             user.activity_date = get_ntp_time()
+
 
         if role_name:
             role = db.query(m.Roles).filter_by(roles_name=role_name).first()
@@ -253,6 +277,8 @@ def update_user(
     except Exception as e:
         db.rollback()
 
+        print(f"Update user failed: {e}")
+
         create_activity_log(
             db=db,
             request=request,
@@ -268,9 +294,14 @@ async def delete_user(
     request: Request,
     current_user: m.User = Depends(get_current_user),  
     user_id: int = Path(..., title="The ID of the account to delete"),
+    editor_password: str = Form(...),
     db: Session = Depends(get_db)
 ):
     try:
+        editor = db.query(m.User).filter(m.User.user_id == current_user.user_id).first()
+        if not verify_password(editor_password, editor.password):
+            raise HTTPException(status_code=403, detail="The password you entered is incorrect.")
+        
         user = db.query(m.User).filter_by(user_id=user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="Account not found")
@@ -288,9 +319,12 @@ async def delete_user(
 
         return user
 
+    except HTTPException:
+        db.rollback()
+        raise
+
     except Exception as e:
         db.rollback()
-
         create_activity_log(
             db=db,
             request=request,
@@ -298,9 +332,7 @@ async def delete_user(
             action="User deletion failed",
             detail=str(e)
         )
-
         raise HTTPException(status_code=500, detail="Failed to delete account")
-
 
 @router.put("/sync-email/{user_id}")
 def sync_email_from_employee(user_id: int, db: Session = Depends(get_db)):
