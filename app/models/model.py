@@ -154,4 +154,12 @@ class RoleLock(Base):
     role_id = Column(Integer, ForeignKey("roles.roles_id"))
     
     role = relationship("Roles", back_populates="locks")
-    
+
+class BackupSchedule(Base):
+    __tablename__ = 'backup_schedule'
+
+    id = Column(Integer, primary_key=True, index=True)
+    interval_minutes = Column(Integer, default=1440)
+    start_time = Column(String(5))  
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())

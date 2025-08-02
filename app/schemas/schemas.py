@@ -266,3 +266,6 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class BackupSchedule(BaseModel):
+    intervalMinutes: int
+    startTime: str  
