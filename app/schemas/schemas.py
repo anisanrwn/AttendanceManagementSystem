@@ -249,6 +249,7 @@ class ActivityLogResponse(BaseModel):
     action: str
     ip_address: Optional[str]
     device: Optional[str]
+    user_roles: list[str]
 
     class Config:
         from_attributes = True

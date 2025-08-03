@@ -40,6 +40,7 @@ def get_activity_logs(db: Session = Depends(get_db)):
             user_role_class=user_role_class,
             action=log.detail or log.action,  
             ip_address=log.ip_address or "-",  
-            device=log.device or "-" 
+            device=log.device or "-",
+            user_roles=user_role_names
         ))
     return results

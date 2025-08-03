@@ -60,7 +60,7 @@
           </div>
 
           <!-- Navbar List-->
-          <div class="menu-inner-shadow"></div>
+           <div class="menu-inner-shadow"></div>
           <ul class="menu-inner py-1">
             <li class="menu-item">
               <a href="admin_dashboard.html" class="menu-link">
@@ -75,14 +75,14 @@
               </a>
             </li>
             <li class="menu-item">
-              <a href="PermissionList.html" class="menu-link">
+              <a href="javascript:void(0)" class="menu-link" onclick="checkAccess('PermissionList.html', ['Super Admin'])">
                 <i class="menu-icon tf-icons bx bx-id-card"></i>
                 <div data-i18n="Basic">Permission List</div>
               </a>
             </li>
             <li class="menu-item">
-              <a href="RecapAttendance.html" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-calendar-check"></i> 
+              <a href="javascript:void(0)" class="menu-link" onclick="checkAccess('RecapAttendance.html', ['Super Admin'])">
+                <i class="menu-icon tf-icons bx bx-calendar-check"></i>
                 <div data-i18n="Basic">Recap Attendance</div>
               </a>
             </li>
@@ -96,19 +96,19 @@
               </a>
             </li>
             <li class="menu-item">
-              <a href="LockSystem.html" class="menu-link">
+              <a href="javascript:void(0)" class="menu-link" onclick="checkAccess('LockSystem.html', ['Admin'])">
                 <i class="menu-icon tf-icons bx bx-lock"></i>
                 <div data-i18n="Basic">Lock System</div>
               </a>
-            </li>
-             <li class="menu-item">
-              <a href="automated_backup.html" class="menu-link">
+            </li>   
+            <li class="menu-item">
+              <a href="javascript:void(0)" class="menu-link" onclick="checkAccess('automated_backup.html', ['Admin'])">
                 <i class="menu-icon tf-icons bx bx-cloud-upload"></i>
                 <div data-i18n="Basic">Automated Backup</div>
               </a>
-            </li> 
+            </li>
             <li class="menu-item active">
-              <a href="LogActivity.html" class="menu-link">
+              <a href="javascript:void(0)" class="menu-link" onclick="checkAccess('LogActivity.html', ['Admin'])">
                 <i class="menu-icon tf-icons bx bx-clipboard"></i>
                 <div data-i18n="Basic">Log Activity</div>
               </a>
@@ -190,11 +190,30 @@
               <!-- Activity Log -->
               <div class="card">
                 <h5 class="card-header">Activity Log</h5>
-                <div class="table-responsive text-nowrap">
+               <div class="card-body">
+              <div class="d-flex justify-content-end align-items-center flex-wrap gap-2">
+                  <div class="d-flex align-items-center flex-wrap gap-2">
+               <input type="text" id="searchName" class="form-control" placeholder="Search by Name" style="width: 180px;">
+              <select id="filterRole" class="form-select" style="width: 160px;">
+                  <option value="">All Roles</option>
+                  <option value="Super Admin">Super Admin</option>
+                  <option value="Admin">Admin</option>
+                  <option value="Employee">Employee</option>
+              </select>
+
+            <input type="text" id="filterFromDate" class="form-control" style="width: 150px;" placeholder="From Date" onfocus="this.type='date'" onblur="if(!this.value) this.type='text'">
+            <input type="text" id="filterToDate" class="form-control" style="width: 150px;" placeholder="To Date" onfocus="this.type='date'" onblur="if(!this.value) this.type='text'">
+
+            <button id="clearFiltersButton" class="btn" style="background-color: #7f82ff; color: white; width: 130px;">Clear Filters</button>
+        </div>
+      </div>
+  </div> 
+              <div class="table-responsive text-nowrap">
                   <table class="table table-sm" id="activityLogTable">
                     <thead>
                       <tr>
                         <th class="text-center">Timestamp</th>
+                        <th class="text-center">Roles</th>
                         <th class="text-center">User</th>
                         <th class="text-center">Action</th>
                         <th class="text-center">IP Address</th>
@@ -213,6 +232,9 @@
       </div>
     </div>
     <!-- Core JS -->
+     <!-- Flatpickr CSS & JS CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="../assets/vendor/libs/jquery/jquery.js"></script>
     <script src="../assets/vendor/libs/popper/popper.js"></script>
     <script src="../assets/vendor/js/bootstrap.js"></script>
@@ -230,5 +252,6 @@
     <script src="/assets/js/notifications.js"></script>
     <script src="/assets/js/navbar.js"></script>
     <script src="/assets/js/log-activity.js"></script>
+    <script src="../assets/js/role-access.js"></script>
   </body>
 </html>

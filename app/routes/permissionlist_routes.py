@@ -55,9 +55,23 @@ def update_permission_status(permission_id: int, action: str, db: Session = Depe
     if user and employee:
         subject = "Status of Permission Request"
         status_str = "Approved" if action == "approved" else "Declined"
-        body = f"Dear {employee.first_name},\n\nYour permission request has been {status_str} from HR.\n\nBest Regards, \n\nHRD PT United Tractors Jambi."
-        send_email(user.email, subject, body)
-        
+    
+    body = (
+        f"Dear {employee.first_name},\n\n"
+        f"Your permission request has been {status_str} by HR.\n\n"
+        f"Details:\n"
+        f"- Type: {permission.permission_type}\n"
+        f"- Reason: {permission.reason}\n"
+        f"- Start Date: {permission.start_date.strftime('%Y-%m-%d') if permission.start_date else 'N/A'}\n"
+        f"- End Date: {permission.end_date.strftime('%Y-%m-%d') if permission.end_date else 'N/A'}\n"
+        f"- {status_str} Date: {permission.approved_date.strftime('%Y-%m-%d') if permission.approved_date else 'N/A'}\n\n"
+        f"Best Regards,\n\n"
+        f"HRD PT United Tractors Jambi."
+    )
+
+    send_email(user.email, subject, body)
+
+      
     if action == "approved":
         from datetime import timedelta
 

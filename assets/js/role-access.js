@@ -7,8 +7,6 @@
           const currentPage = currentPath.substring(currentPath.lastIndexOf('/') + 1);
           
           const restrictedPages = {
-            'LockSystem.html': ['Admin'],
-            'LogActivity.html': ['Admin'],
             'PermissionList.html': ['Super Admin'],
             'RecapAttendance.html': ['Super Admin']
           };
