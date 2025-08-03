@@ -72,8 +72,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const data = await response.json().catch(() => ({}));
 
+            if (response.status === 423) {
+                sessionStorage.setItem("user_email", formData.get('email'));
+                window.location.href = "../html/verifyacc.html";
+                return;
+            }
             if (!response.ok) {
-                const errorMessage = getHttpErrorMessage(response.status, data.detail || "");
+                const errorMessage = data.detail || "An unexpected error occurred.";
                 showAlert(errorMessage, 'error');
 
                 if (data.detail === "Your role is currently locked. Please contact an administrator.") {
@@ -192,6 +197,11 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             404: {
                 default: "Data not found.",
+                "User  not found": "User not found.",
+                "Notification not found or you don't have permission": "Notification not found or access denied.",
+            },
+             423: {
+                default: "Your account has been permanently locked.",
                 "User  not found": "User not found.",
                 "Notification not found or you don't have permission": "Notification not found or access denied.",
             },

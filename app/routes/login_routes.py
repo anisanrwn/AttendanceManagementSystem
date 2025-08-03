@@ -24,9 +24,9 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import Optional
 from fastapi import BackgroundTasks 
-
-
-
+from app.utils.auth import ( verify_token, create_access_token, create_refresh_token, create_unlock_token, verify_unlock_token )
+from fastapi.responses import HTMLResponse
+from device_detector import DeviceDetector
 
 router = APIRouter(
     prefix="/login",
@@ -39,6 +39,7 @@ SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 
 otp_storage = {}
+permanent_lock_tokens = {}
 
 def generate_otp():
     return ''.join(random.choices(string.digits, k=6))
@@ -270,12 +271,17 @@ async def login_user(
 ):
     ip_address = request.headers.get("x-forwarded-for", request.client.host)
     raw_user_agent = request.headers.get("user-agent", "unknown")
-    user_agent_parsed = parse(raw_user_agent)
-    browser_name = f"{user_agent_parsed.browser.family} {user_agent_parsed.browser.version_string}".strip()
-    os_name = user_agent_parsed.os.family
-    device_name = user_agent_parsed.device.family
+    dd = DeviceDetector(raw_user_agent).parse()
+
+    browser_name = dd.client_name()     # Opera, Chrome, Firefox, etc.
+    browser_version = dd.client_version()
+    os_name = dd.os_name()
+    device_type = dd.device_type()
 
     user = db.query(m.User).options(joinedload(m.User.roles)).filter_by(email=email).first()
+
+    if email in permanent_lock_tokens:
+        raise HTTPException(status_code=423, detail="Your account is locked. Please check your email to unlock.")
 
     attempt = (
         db.query(m.LoginAttempt)
@@ -300,11 +306,16 @@ async def login_user(
                 status_code=403,
                 detail=HM.ACCOUNT_LOCKED.format(time=lockout_local.strftime('%H:%M:%S'))
             )
-        if attempt.failed_attempts >= 10:
-            raise HTTPException(
-                status_code=403,
-                detail=HM.ACCOUNT_LOCKED.format(time=lockout_local.strftime('%H:%M:%S'))
-            )
+    if attempt and attempt.failed_attempts >= 15:
+            if email not in permanent_lock_tokens:
+                if user and attempt and attempt.failed_attempts == 15:
+                    unlock_token = create_unlock_token(email)
+                    permanent_lock_tokens[email] = unlock_token
+                    unlock_link = f"http://localhost:8000/login/unlock-account?token={unlock_token}"
+                    send_permanent_lock_email(user.email, unlock_link)
+        
+            raise HTTPException(status_code=423, detail="Your account has been permanently locked. Check your email for verification.")
+            
 
     if user:
         current_time = datetime.utcnow()
@@ -315,7 +326,6 @@ async def login_user(
         if locks:
             raise HTTPException(status_code=403, detail=HM.ROLE_LOCKED)
         
-    
 
     if not user or not verify_password(password, user.password):
         if attempt and (now - attempt.attempt_time) < timedelta(minutes=30):
@@ -331,7 +341,7 @@ async def login_user(
             db.add(attempt)
 
         if attempt.failed_attempts == 5:
-            attempt.lockout_until = now + timedelta(minutes=5)
+            attempt.lockout_until = now + timedelta(minutes=1)
             if user:
                 locked_until_str = (attempt.lockout_until + timedelta(hours=7)).strftime('%H:%M:%S')
                 message = f"Detected 5 failed login attempts. Your account has been locked until {locked_until_str}."
@@ -370,7 +380,7 @@ async def login_user(
                 except Exception as e:
                     print(f"Failed to Send Email lockout: {e}")
 
-        if attempt.failed_attempts >= 10:
+        if attempt.failed_attempts == 10:
             attempt.lockout_until = now + timedelta(hours=1)
             if user:
                 locked_until_str = (attempt.lockout_until + timedelta(hours=7)).strftime('%H:%M:%S')
@@ -413,6 +423,12 @@ async def login_user(
         db.commit()
         raise HTTPException(status_code=401, detail=HM.UNAUTHORIZED)
     
+    if attempt and attempt.failed_attempts > 0:
+            if not attempt.is_successful:
+                attempt.failed_attempts = 0
+                attempt.lockout_until = None
+                db.commit()
+
     otp = generate_otp()
     expiry_time = datetime.utcnow() + timedelta(minutes=5)
     otp_storage[email] = {
@@ -426,7 +442,6 @@ async def login_user(
     if not send_otp_email(email, otp):
         raise HTTPException(status_code=500, detail="Failed to send OTP code. Please try again.")
 
-    # Catat login attempt belum berhasil (menunggu OTP)
     new_attempt = m.LoginAttempt(
         user_id=user.user_id,
         email=email,
@@ -518,7 +533,6 @@ async def verify_otp(
                 send_new_device_email, user.email, ip_address, browser_name
             )
 
-        
 
     db.commit()
     mark_absent_for_missing_days(db, user.employee_id)
@@ -568,3 +582,165 @@ async def resend_otp(
         raise HTTPException(status_code=500, detail="Failed to send OTP code. Please try again.")
 
     return {"status": "success", "message": "The new OTP code has been sent to your email"}
+
+@router.get("/unlock-account")
+async def unlock_account(token: str, db: Session = Depends(get_db)):
+    try:
+        payload = verify_unlock_token(token)
+        email = payload.get("sub")
+
+
+        if payload.get("type") != "unlock":
+            raise HTTPException(status_code=400, detail="Invalid token type.")
+
+
+        user = db.query(m.User).filter(m.User.email == email).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found.")
+
+
+        attempt = db.query(m.LoginAttempt)\
+            .filter(m.LoginAttempt.email == email)\
+            .order_by(m.LoginAttempt.attempt_time.desc())\
+            .first()
+
+
+        if attempt and attempt.failed_attempts >= 15:
+            attempt.failed_attempts = 0
+            attempt.lockout_until = None
+            db.commit()
+            print(f"Reset failed attempts for user: {email}")
+        else:
+            print(f"No locked attempt found or already reset for: {email}")
+
+
+        if email in permanent_lock_tokens:
+            del permanent_lock_tokens[email]
+            print(f"Removed permanent lock token for user: {email}")
+
+
+        return HTMLResponse(content=f"""
+    <html>
+        <head>
+            <title>Account Unlocked</title>
+            <style>
+                body {{
+                    background-color: #f0f2f5;
+                    font-family: 'Segoe UI', sans-serif;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                }}
+                .card {{
+                    background-color: white;
+                    padding: 40px;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                    text-align: center;
+                    max-width: 500px;
+                }}
+                .card h2 {{
+                    color: #6f42c1;
+                    margin-bottom: 10px;
+                }}
+                .card p {{
+                    color: #333;
+                    font-size: 16px;
+                    line-height: 1.6;
+                }}
+                .btn {{
+                    background-color: #007bff;
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 6px;
+                    text-decoration: none;
+                    font-size: 16px;
+                    display: inline-block;
+                    margin-top: 20px;
+                }}
+                .btn:hover {{
+                    background-color: #0056b3;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <h2>Your Account Has Been Unlocked!</h2>
+                <p>Your account is now active again. You can log in and continue using the system as usual.</p>
+            </div>
+        </body>
+    </html>
+""", status_code=200)
+
+
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=400, detail="Verification token has expired.")
+    except jwt.JWTError:
+        raise HTTPException(status_code=400, detail="Invalid verification token.")
+
+
+@router.post("/login/send-unlock-verification")
+async def send_unlock_verification(email: str = Form(...), db: Session = Depends(get_db)):
+        user = db.query(m.User).filter(m.User.email == email).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found.")
+
+        attempt = db.query(m.LoginAttempt).filter(m.LoginAttempt.email == email).order_by(m.LoginAttempt.attempt_time.desc()).first()
+        if not attempt or attempt.failed_attempts < 15:
+            raise HTTPException(status_code=400, detail="Account is not permanently locked.")
+           
+        token = create_unlock_token(email)
+        permanent_lock_tokens[email] = token
+        verify_link = f"http://localhost:8000/login/unlock-account?token={token}"
+
+
+        if not send_permanent_lock_email(user.email, verify_link):
+            raise HTTPException(status_code=500, detail="Failed to send verification email.")
+
+
+        return {"message": "Unlock verification email sent successfully."}
+   
+def send_permanent_lock_email(to_email: str, verification_link: str):
+    try:
+        email_message = MIMEMultipart()
+        email_message["From"] = EMAIL_ADDRESS
+        email_message["To"] = to_email
+        email_message["Subject"] = "Account Permanently Locked - Attendance System"
+
+
+        email_body = f"""
+        <html>
+        <body>
+            <h2>Account Permanently Locked</h2>
+            <p>We detected <strong>15 failed login attempts</strong> on your account.</p>
+            <p>Your account has been <strong>permanently locked</strong> as a security measure.</p>
+            <p>To unlock your account, please click the link below to verify your identity:</p>
+            <a href="{verification_link}" 
+            style="
+                display: inline-block;
+                padding: 12px 24px;
+                background-color: #6f42c1;
+                color: white;
+                text-decoration: none;
+                font-weight: bold;
+                border-radius: 6px;
+                font-family: sans-serif;
+            ">
+            Unlock My Account
+            </a>
+            <p>If you did not request this, please contact the IT department immediately.</p>
+        </body>
+        </html>
+        """
+        email_message.attach(MIMEText(email_body, "html"))
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
+        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+        server.send_message(email_message)
+        server.quit()
+        return True
+    except Exception as e:
+        print(f"Failed to send permanent lockout email: {e}")
+        return False
