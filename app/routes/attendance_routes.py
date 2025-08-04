@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import model as m
 from app.schemas import schemas as s
-from app.utils.face_recog import verify_face
+from app.utils.face_recog import verify_face_multi
 from app.utils.attendance import format_time, calculate_total_working,calculate_late, calculate_overtime
 from app.utils.time import get_ntp_time
 from app.utils.holiday import fetch_national_holidays 
@@ -38,7 +38,8 @@ def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depen
         raise HTTPException(status_code=400, detail="Employee has no face encoding")
 
     known_encoding = json.loads(employee.face_encoding)
-    is_verified, distance = verify_face(payload.image_base64, known_encoding)
+    is_verified, distances = verify_face_multi(payload.image_base64, known_encoding)
+
     if not is_verified:
         raise HTTPException(
             status_code=400,
@@ -66,7 +67,7 @@ def clock_in_attendance(payload: s.AttendanceClockInSession, db: Session = Depen
         clock_in_longitude=payload.clock_in_longitude,
         clock_in_reason=payload.clock_in_reason,
         clock_in_verified=True,
-        clock_in_distance=distance,
+        clock_in_distance=min(distances) if distances else None,
         face_verified=is_verified,
         attendance_date=today,
         attendance_status="Punch In" if is_verified else "Absent",
@@ -91,7 +92,8 @@ def clock_out_attendance(payload: s.AttendanceClockOutSession, db: Session = Dep
         raise HTTPException(status_code=400, detail="Employee has no face encoding")
 
     known_encoding = json.loads(employee.face_encoding)
-    is_verified, distance = verify_face(payload.image_base64, known_encoding)
+    is_verified, distances = verify_face_multi(payload.image_base64, known_encoding)
+
     if not is_verified:
         raise HTTPException(
             status_code=400,
@@ -118,7 +120,7 @@ def clock_out_attendance(payload: s.AttendanceClockOutSession, db: Session = Dep
     attendance.clock_out_verified = True
     attendance.face_verified = attendance.face_verified and is_verified 
     attendance.attendance_status = "Punch Out" if is_verified else "Absent"
-    attendance.clock_out_distance = distance
+    attendance.clock_out_distance = min(distances) if distances else None
     attendance.working_hour = calculate_total_working(attendance.clock_in, attendance.clock_out, today)
     attendance.overtime = calculate_overtime(now.time(), OFFICE_END, now.date())
 
@@ -245,10 +247,16 @@ def verify_route(payload: s.AttendanceVerifyIdentity, db: Session = Depends(get_
     if not employee.face_encoding:
         raise HTTPException(status_code=400, detail="No face encoding for this employee")
 
-    known_encoding = json.loads(employee.face_encoding)
-    is_verified, distance = verify_face(payload.image_base64, known_encoding)
+    known_encodings = json.loads(employee.face_encoding)
+    is_verified, distances = verify_face_multi(payload.image_base64, known_encodings)
 
-    if distance is None:
+    if distances is None:
         raise HTTPException(status_code=400, detail="No face detected")
 
-    return {"is_verified": bool(is_verified), "distance": float(distance)}
+    return {
+        "is_verified": bool(is_verified),
+        "distances": distances,
+        "min_distance": float(min(distances)),
+        "max_distance": float(max(distances)),
+        "avg_distance": float(sum(distances) / len(distances))
+    }

@@ -5,7 +5,7 @@ from app.models import model as m
 from app.schemas import schemas as s
 from app.services.activity_log import create_activity_log
 from app.utils.auth_log import get_current_user  
-from app.utils.face_recog import read_image, encode_face
+from app.utils.face_recog import read_image, encode_face_multi
 import json
 from typing import Optional, List
 from datetime import date
@@ -18,7 +18,6 @@ async def get_all_employees(db: Session = Depends(get_db)):
     employees = db.query(m.Employee).all()
     return employees
 
-#add employee data
 @router.post("/add", response_model=s.EmployeeRead)
 async def add_employee(
     request: Request,
@@ -31,27 +30,41 @@ async def add_employee(
     position: str = Form(...),
     department: str = Form(...),
     join_date: date = Form(...),
-    file: UploadFile = File(...),
+    files: List[UploadFile] = File(...), 
     db: Session = Depends(get_db)
 ):
+    print("✅ Form fields received:", first_name, last_name, email, nrp_id, phone_number, position, department, join_date)
+    print("✅ Total files:", len(files))
+
     try:
-        existing_employee = db.query(m.Employee).filter(m.Employee.nrp_id == nrp_id).first()
-        if existing_employee:
+        # 🔹 Cek apakah NRP sudah ada
+        if db.query(m.Employee).filter(m.Employee.nrp_id == nrp_id).first():
             raise HTTPException(status_code=400, detail="Employee with this NRP ID already exists")
 
-        image_bytes = await file.read()
-        img = read_image(image_bytes)
-        encoding = encode_face(img)
+        all_encodings = []
 
-        if not encoding:
-            raise HTTPException(status_code=400, detail="No face detected in the uploaded image.")
+        for idx, file in enumerate(files, start=1):
+            image_bytes = await file.read()
+            img = read_image(image_bytes)
 
-        encoding_json = json.dumps(encoding)
+            encodings = encode_face_multi(img)
+            if encodings is None or len(encodings) == 0:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"No face detected in image {idx}. Please upload clear face photos."
+                )
+
+            all_encodings.extend(encodings)
+
+        if not all_encodings:
+            raise HTTPException(status_code=400, detail="No face detected in any uploaded images.")
+
+        encoding_json = json.dumps(all_encodings)
 
         employee = m.Employee(
             first_name=first_name,
             last_name=last_name,
-            nrp_id=nrp_id,
+            nrp_id = nrp_id,
             email=email,
             phone_number=phone_number,
             position=position,
@@ -74,6 +87,8 @@ async def add_employee(
 
         return employee
 
+    except HTTPException:
+        raise
     except Exception as e:
         db.rollback()
         create_activity_log(
@@ -84,7 +99,6 @@ async def add_employee(
             detail=str(e)
         )
         raise HTTPException(status_code=400, detail=f"Error processing request: {str(e)}")
-
 
 #edit atau update employee data
 @router.post("/edit/{employee_id}", response_model=s.EmployeeUpdate)
@@ -229,3 +243,24 @@ def check_email(email: str, exclude_id: Optional[int] = None, db: Session = Depe
         return {"available": False}
     return {"available": True}
 
+@router.get("/check_nrp/{nrp}")
+def check_nrp(nrp: str, exclude_id: Optional[int] = None, db: Session = Depends(get_db)):
+    query = db.query(m.Employee).filter(m.Employee.nrp_id == nrp)
+    if exclude_id:
+        query = query.filter(m.Employee.employee_id != exclude_id)
+    
+    employee = query.first()
+    if employee:
+        return {"available": False}
+    return {"available": True}
+
+@router.get("/check_phone/{phone}")
+def check_phone(phone: str, exclude_id: Optional[int] = None, db: Session = Depends(get_db)):
+    query = db.query(m.Employee).filter(m.Employee.phone_number == phone)
+    if exclude_id:
+        query = query.filter(m.Employee.employee_id != exclude_id)
+    
+    employee = query.first()
+    if employee:
+        return {"available": False}
+    return {"available": True}

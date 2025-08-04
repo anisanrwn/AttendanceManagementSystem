@@ -91,24 +91,24 @@ async function updateClock() {
   const isWeekend = now.getDay() === 0 || now.getDay() === 6;
   const isHoliday = holidays.includes(now.toISOString().split("T")[0]);
 
-   if (isHoliday) {
-     attendanceStatus.textContent = "Happy Holiday!";
-     countdownText.textContent = "Enjoy your day off!";
-     punchInBtn.disabled = true;
+  if (isHoliday) {
+    attendanceStatus.textContent = "Happy Holiday!";
+    countdownText.textContent = "Enjoy your day off!";
+    punchInBtn.disabled = true;
 
-   } else if (isWeekend) {
-     attendanceStatus.textContent = "Happy Weekend!";
-     countdownText.textContent = "Enjoy your weekend!";
-     punchInBtn.disabled = true;
+  } else if (isWeekend) {
+    attendanceStatus.textContent = "Happy Weekend!";
+    countdownText.textContent = "Enjoy your weekend!";
+    punchInBtn.disabled = true;
   
   } else if (status === "Absent") {
-    // const maxClockIn = toTimeToday("17:00");
-    // if (now > maxClockIn) {
-    //   attendanceStatus.textContent = "Clock-in time is over.";
-    //   countdownText.textContent = "You cannot clock in anymore.";
-    //   punchInBtn.disabled = true;
+  //   const maxClockIn = toTimeToday("17:00");
+  //   if (now > maxClockIn) {
+  //   attendanceStatus.textContent = "Clock-in time is over.";
+  //   countdownText.textContent = "You cannot clock in anymore.";
+  //   punchInBtn.disabled = true;
 
-    // } else 
+  // } else 
       if (now < punchIn) {
       attendanceStatus.textContent = `Office hour starts at ${punchInTime}`;
       countdownText.textContent = `Starts in ${formatTime(punchIn - now)}`;
@@ -281,7 +281,8 @@ captureFaceBtn.onclick = async () => {
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
-
+      
+      stopLocationTracking();
       stepPage.style.display = "none";
       attendancePage.style.display = "block";
 
@@ -360,25 +361,47 @@ async function resetToAttendancePage() {
 }
 
 async function handleLivenessCheck() {
-  while (true) {
+  let attempts = 0;
+
+  while (attempts < 3) {
     await Swal.fire({
-      title: 'Liveness Check Required',
-      text: 'For verification, please blink at least twice within the next few seconds. No need to rush, just blink naturally.',
-      icon: 'info',
-      confirmButtonText: 'Start'
-    });
+    title: 'Liveness Check Required',
+    html: `
+      <p>To proceed with verification, please do the following:</p>
+      <ul style="text-align: left;">
+        <li>1. Remove any glasses, mask, or anything covering your face</li>
+        <li>2. Position your face fully in front of the camera</li>
+        <li>3. Blink at least twice naturally</li>
+      </ul>
+    `,
+    icon: 'info',
+    confirmButtonText: 'Start'
+  });
 
     const passedLiveness = await startLivenessCheck();
 
     if (passedLiveness) {
       await Swal.fire({
         title: 'Blink Detected!',
-        text: 'Liveness check passed..',
+        text: 'Liveness check passed.',
         icon: 'success',
         confirmButtonText: 'OK'
       });
-      return true; 
+      return true;
     } else {
+      attempts++;
+
+      if (attempts >= 3) {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Sorry!',
+          text: "We couldn't verify your identity after multiple attempts.",
+          confirmButtonText: 'OK'
+        });
+        window.location.href = '/html/employee_takeattendance.html';
+        return false;
+      }
+
       const retry = await Swal.fire({
         icon: 'error',
         title: 'Liveness Check Failed',
@@ -394,4 +417,3 @@ async function handleLivenessCheck() {
     }
   }
 }
-

@@ -69,10 +69,11 @@ async function viewProfile(id) {
     }
 }
 
-
 async function isEmailAvail(email, id = null) {
+    if (!email) return true; 
+
     try {
-        let url = `http://localhost:8000/employee/check_email/${email}`;
+        let url = `http://localhost:8000/employee/check_email/${encodeURIComponent(email)}`;
         if (id) {
             url += `?exclude_id=${id}`;
         }
@@ -82,81 +83,6 @@ async function isEmailAvail(email, id = null) {
     } catch (error) {
         console.error("Error checking email availability:", error);
         return false;
-    }
-}
-
-// Add employee
-document.getElementById('submit').addEventListener('click', saveEmployee);
-async function saveEmployee(e) {
-    e.preventDefault(); 
-    const firstName = document.getElementById('first_name').value.trim();
-    const lastName = document.getElementById('last_name').value.trim();
-    const nrp = document.getElementById('nrp_id').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const phone = document.getElementById('phone_number').value.trim();
-    const position = document.getElementById('position').value.trim();
-    const department = document.getElementById('department').value.trim();
-    const joinDate = document.getElementById('join_date').value.trim();
-    const image = document.getElementById('photo').value.trim();
-    const emailAvailable = await isEmailAvail(email);
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^08[0-9]{8,11}$/;
-    if (!firstName || !lastName || !email || !phone || !nrp || !position || !department|| !joinDate || !image) {
-        Swal.fire('Error!', 'Please fill in all required fields.', 'error');
-        return;
-    }
-    if (!emailRegex.test(email)) {
-        Swal.fire('Error!', 'Please enter a valid email address. Example : yourname@gmail.com', 'error');
-        return;
-    }
-    if (!emailAvailable) {
-        Swal.fire('Error!', 'Email already exists. Please choose another one.', 'error');
-        return;
-    }
-    if (!phoneRegex.test(phone)) {
-        Swal.fire('Error!', 'Phone number must be 10–13 digits (numbers only) and starts with 08.', 'error');
-        return;
-    }
-    if (nrp.length !== 9) {
-        Swal.fire('Error!', 'NRP must be exactly 9 digits.', 'error');
-        return;
-    }
-    const formData = new FormData(employeeForm);
-    const token = localStorage.getItem('token');
-    try {
-        $('#addEmployeeModal').modal('hide');
-        Swal.fire({
-            title: 'Registering...',
-            text: 'Please wait while we save the employee data.',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-        const response = await fetch("http://localhost:8000/employee/add", {
-            method: "POST",
-             headers: {
-                "Authorization": `Bearer ${token}`
-            },
-            body: formData
-        });
-        Swal.close();
-        if (response.ok) {
-            Swal.fire({
-                title: 'Success!',
-                text: 'Employee registered successfully!',
-                icon: 'success',
-                timer: 1500,
-                showConfirmButton: false
-            });
-            employeeForm.reset();
-            fetchEmployees();
-        } else {
-            const errorData = await response.json();
-            Swal.fire('Error!', errorData.detail || 'Failed to register employee.', 'error');
-        }
-    } catch (error) {
-        Swal.fire('Error!', `An error occurred: ${error.message}`, 'error');
     }
 }
 
@@ -244,7 +170,7 @@ async function saveEditedEmployee(e) {
 
         const response = await fetch(`http://localhost:8000/employee/edit/${employeeId}`, {
             method: "POST",
-             headers: {
+            headers: {
                 "Authorization": `Bearer ${token}`
             },
             body: formData
@@ -375,11 +301,11 @@ function filterEmployees() {
     const searchValue = document.getElementById('searchInput').value.toLowerCase();
     const filterDepartment = document.getElementById('filterDepartment').value.toLowerCase();
     const filterPosition = document.getElementById('filterPosition').value.toLowerCase();
-           
+        
     const rows = document.querySelectorAll('#employeeTable tbody tr');
 
     rows.forEach(row => {
-        if (row.cells.length < 5) return;  // skip incomplete rows
+        if (row.cells.length < 5) return;
     
         const nrp = row.cells[0].textContent.toLowerCase();
         const firstName = row.cells[1].textContent.toLowerCase();
@@ -388,8 +314,8 @@ function filterEmployees() {
         const department = row.cells[4].textContent.toLowerCase();
     
         const matchesSearch = firstName.includes(searchValue) || 
-                             lastName.includes(searchValue) ||
-                             nrp.includes(searchValue);
+                            lastName.includes(searchValue) ||
+                            nrp.includes(searchValue);
     
         const matchesDepartment = filterDepartment === '' || department.includes(filterDepartment);
         const matchesPosition = filterPosition === '' || position.includes(filterPosition);
