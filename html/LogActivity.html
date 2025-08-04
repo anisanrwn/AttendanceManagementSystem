@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
-    <title>User List | Admin Dashboard</title>
+    <title>Log Activity | Admin Dashboard</title>
     <meta name="description" content="" />
 
     <!-- Favicon -->
@@ -186,31 +186,29 @@
             <!-- Main Content -->
             <div class="container-xxl flex-grow-1 container-p-y">
               <h4 class="fw-bold mt-6 mb-4"><span class="text-muted fw-light">Pages /</span> Log Activity</h4>
-              
+          
               <!-- Activity Log -->
               <div class="card">
                 <h5 class="card-header">Activity Log</h5>
-               <div class="card-body">
-              <div class="d-flex justify-content-end align-items-center flex-wrap gap-2">
-                  <div class="d-flex align-items-center flex-wrap gap-2">
-               <input type="text" id="searchName" class="form-control" placeholder="Search by Name" style="width: 180px;">
-              <select id="filterRole" class="form-select" style="width: 160px;">
-                  <option value="">All Roles</option>
-                  <option value="Super Admin">Super Admin</option>
-                  <option value="Admin">Admin</option>
-                  <option value="Employee">Employee</option>
-              </select>
-
-            <input type="text" id="filterFromDate" class="form-control" style="width: 150px;" placeholder="From Date" onfocus="this.type='date'" onblur="if(!this.value) this.type='text'">
-            <input type="text" id="filterToDate" class="form-control" style="width: 150px;" placeholder="To Date" onfocus="this.type='date'" onblur="if(!this.value) this.type='text'">
-
-            <button id="clearFiltersButton" class="btn" style="background-color: #7f82ff; color: white; width: 130px;">Clear Filters</button>
-        </div>
-      </div>
-  </div> 
-              <div class="table-responsive text-nowrap">
+                <div class="card-body">
+                  <div class="d-flex justify-content-end align-items-center flex-wrap gap-2">
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+                      <input type="text" id="searchName" class="form-control" placeholder="Search by Name" style="width: 180px;">
+                      <select id="filterRole" class="form-select" style="width: 160px;">
+                        <option value="">All Roles</option>
+                        <option value="Super Admin">Super Admin</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Employee">Employee</option>
+                      </select>
+                      <input type="text" id="filterFromDate" class="form-control" style="width: 150px;" placeholder="From Date" onfocus="this.type='date'" onblur="if(!this.value) this.type='text'">
+                      <input type="text" id="filterToDate" class="form-control" style="width: 150px;" placeholder="To Date" onfocus="this.type='date'" onblur="if(!this.value) this.type='text'">
+                      <button id="clearFiltersButton" class="btn" style="background-color: #7f82ff; color: white; width: 130px;">Clear Filters</button>
+                    </div>
+                  </div>
+                </div> 
+                <div class="table-responsive text-nowrap" style="max-height: 550px; overflow-y: auto;">
                   <table class="table table-sm" id="activityLogTable">
-                    <thead>
+                    <thead style="position: sticky; top: 0; background: white; z-index: 2;">
                       <tr>
                         <th class="text-center">Timestamp</th>
                         <th class="text-center">Roles</th>
