@@ -102,14 +102,13 @@ async function updateClock() {
     punchInBtn.disabled = true;
   
   } else if (status === "Absent") {
-  //   const maxClockIn = toTimeToday("17:00");
-  //   if (now > maxClockIn) {
-  //   attendanceStatus.textContent = "Clock-in time is over.";
-  //   countdownText.textContent = "You cannot clock in anymore.";
-  //   punchInBtn.disabled = true;
+    const maxClockIn = toTimeToday("17:00");
+    if (now > maxClockIn) {
+    attendanceStatus.textContent = "Clock-in time is over.";
+    countdownText.textContent = "You cannot clock in anymore.";
+    punchInBtn.disabled = true;
 
-  // } else 
-      if (now < punchIn) {
+    } else if (now < punchIn) {
       attendanceStatus.textContent = `Office hour starts at ${punchInTime}`;
       countdownText.textContent = `Starts in ${formatTime(punchIn - now)}`;
 
