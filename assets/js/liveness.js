@@ -62,7 +62,6 @@ export async function startLivenessCheck() {
   document.getElementById('captureFaceBtn').disabled = true;
 
   return new Promise((resolve) => {
-    // Reset variabel
     blinkCount = 0;
     lastEAR = 1.0;
     isLivenessActive = true;
@@ -73,7 +72,6 @@ export async function startLivenessCheck() {
     const leftEyeIndices = [33, 160, 158, 133, 153, 144];
     const rightEyeIndices = [263, 387, 385, 362, 380, 373];
 
-    // Inisialisasi faceMesh jika belum
     if (!faceMesh) {
       faceMesh = new window.FaceMesh({
         locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
@@ -145,9 +143,8 @@ export async function startLivenessCheck() {
       });
     }
 
-    // Inisialisasi camera ulang setiap kali
     if (camera) {
-      camera.stop(); // Stop camera jika masih nyala
+      camera.stop(); 
     }
 
     camera = new window.Camera(videoElement, {
@@ -162,7 +159,6 @@ export async function startLivenessCheck() {
 
     camera.start();
 
-    // Timeout fallback
     const TIMEOUT_MS = 5000;
     setTimeout(() => {
       if (isLivenessActive && blinkCount < 1) {
