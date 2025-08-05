@@ -94,6 +94,7 @@ export async function startLivenessCheck() {
           const currentEAR = (leftEAR + rightEAR) / 2.0;
           const earDrop = lastEAR - currentEAR;
           const now = getTrustedNow();
+          console.log(`Current EAR: ${currentEAR.toFixed(4)}, Last EAR: ${lastEAR.toFixed(4)}, Blink Count: ${blinkCount}`);
 
           if (!hasVerifiedIdentity) {
             hasVerifiedIdentity = true;
@@ -123,10 +124,14 @@ export async function startLivenessCheck() {
             console.log("Blink start detected...");
           }
 
-          if (earDrop > 0.12 && currentEAR < 0.25 && now - lastBlinkTime > 300) {
-            blinkCount++;
-            lastBlinkTime = now;
-            console.log(`Blink Detected! Count: ${blinkCount}`);
+          if (earDrop > 0.12 && currentEAR < 0.25) {
+            if (now - lastBlinkTime > 300) {
+              blinkCount++;
+              lastBlinkTime = now;
+              console.log(`Blink Detected! Current EAR: ${currentEAR.toFixed(4)}, Last EAR: ${lastEAR.toFixed(4)}, Blink Count: ${blinkCount}`);
+            } else {
+              console.log('Ignored: Blink too fast, possible spoof.');
+            }
           }
 
           lastEAR = currentEAR;
@@ -159,7 +164,7 @@ export async function startLivenessCheck() {
 
     camera.start();
 
-    const TIMEOUT_MS = 5000;
+    const TIMEOUT_MS = 10000;
     setTimeout(() => {
       if (isLivenessActive && blinkCount < 1) {
         console.log("Liveness timeout");
