@@ -536,7 +536,6 @@ async def verify_otp(
 
 
     db.commit()
-    mark_absent_for_missing_days(db, user.employee_id)
     
     create_activity_log(
         db=db,

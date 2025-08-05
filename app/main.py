@@ -8,8 +8,10 @@ from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 from dotenv import load_dotenv
-
 from app.routes import employee_routes, permissionlist_routes, user_routes, login_routes, locksystem_routes, attendance_routes, maps_routes, permission_routes, profile_routes, dashboard_routes, activity_routes, profileemployee_routes, backup_routes
+from app.utils.scheduler import start_scheduler
+
+start_scheduler()
 
 load_dotenv()
 
@@ -33,10 +35,10 @@ async def startup_event():
 # Add CORS middleware to allow requests from specific origins
 main_app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5500"],  # Specify allowed origins
+    allow_origins=["http://127.0.0.1:5500"],
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all HTTP methods
-    allow_headers=["*"],  # Allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Add session middleware with secret key for secure sessions

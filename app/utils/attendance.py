@@ -45,7 +45,7 @@ def mark_absent_for_missing_days(db: Session, employee_id: int):
     start_date = employee.join_date
     current_date = start_date
 
-    while current_date < today:
+    while current_date <= today:
         attendance_exist = db.query(m.Attendance).filter(
             m.Attendance.employee_id == employee_id,
             m.Attendance.attendance_date == current_date
