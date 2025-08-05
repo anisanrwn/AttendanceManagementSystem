@@ -31,18 +31,22 @@ document.addEventListener("DOMContentLoaded", () => {
     if (params.toString()) url += "?" + params.toString();
 
     try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Gagal fetch logs");
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Failed to fetch logs");
 
-      const logs = await response.json();
-      allLogs = logs;
-      renderLogs(logs);
+        const logs = await response.json();
+        allLogs = logs;
+        renderLogs(logs);
     } catch (error) {
-      console.error("Error fetching logs:", error);
-      alert("Gagal memuat activity log.");
+        console.error("Error fetching logs:", error);
+        Swal.fire({
+            icon: "error",
+            title: "Failed to Load Activity Logs",
+            text: "An error occurred while retrieving the activity logs. Please try again later.",
+            confirmButtonText: "OK"
+        });
     }
-  }
-
+}
   function renderLogs(logs) {
     tbody.innerHTML = '';
     if (logs.length === 0) {

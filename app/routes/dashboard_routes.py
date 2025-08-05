@@ -5,11 +5,15 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import model as m
 from datetime import datetime, timedelta, date
+from app.utils.auth_log import get_current_user
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
 @router.get("/today_rate")
-async def get_today_attendance(db: Session = Depends(get_db)):
+async def get_today_attendance(
+    db: Session = Depends(get_db),
+    current_user: m.User = Depends(get_current_user) 
+):
     today = date.today()
     try:
         total_employees = db.query(m.Employee).count()
@@ -27,7 +31,10 @@ async def get_today_attendance(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Failed to calculate attendance")
     
 @router.get("/count")
-async def get_total_employees(db: Session = Depends(get_db)):
+async def get_total_employees(
+    db: Session = Depends(get_db),
+    current_user: m.User = Depends(get_current_user)
+):
     try:
         total = (
             db.query(m.User).join(m.User.roles).filter(m.Roles.roles_id == 3).count()
@@ -37,7 +44,10 @@ async def get_total_employees(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Failed to fetch total employees")
     
 @router.get("/pending_list")
-async def get_pending_permissions(db: Session = Depends(get_db)):
+async def get_pending_permissions(
+    db: Session = Depends(get_db),
+    current_user: m.User = Depends(get_current_user)
+):
     try:
         pending_count = db.query(m.Permission).filter(m.Permission.permission_status == "Pending").count()
         return {"pending": pending_count}
@@ -45,7 +55,10 @@ async def get_pending_permissions(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Failed to fetch pending permissions")
     
 @router.get("/top-absent")
-def top_absent_employees(db: Session = Depends(get_db)):
+def top_absent_employees(
+    db: Session = Depends(get_db),
+    current_user: m.User = Depends(get_current_user)  
+):
     results = (
         db.query(
             func.concat(m.Employee.first_name, literal(" "), m.Employee.last_name).label("full_name"),
@@ -62,7 +75,9 @@ def top_absent_employees(db: Session = Depends(get_db)):
     return [{"name": r.full_name, "absent_count": r.absent_count} for r in results]
 
 @router.get("/attendance-trend")
-def attendance_trend_monthly(db: Session = Depends(get_db)):
+def attendance_trend_monthly(db: Session = Depends(get_db),
+    current_user: m.User = Depends(get_current_user)  
+):
     results = db.query(
         func.date_trunc('month', m.Attendance.attendance_date).label('month'),
         m.Attendance.attendance_status,
@@ -80,7 +95,9 @@ def attendance_trend_monthly(db: Session = Depends(get_db)):
     return [{"month": r[0].date().isoformat()[:7], "status": r[1], "count": r[2]} for r in results]
 
 @router.get("/weekly-working-hours/{employee_id}")
-def get_weekly_working_hours(employee_id: int, db: Session = Depends(get_db)):
+def get_weekly_working_hours(employee_id: int, db: Session = Depends(get_db),
+    current_user: m.User = Depends(get_current_user)  
+):
     today = datetime.today()
     start_of_week = today - timedelta(days=today.weekday())
 
@@ -116,7 +133,9 @@ def get_weekly_working_hours(employee_id: int, db: Session = Depends(get_db)):
     }
 
 @router.get("/monthly-attendance/{employee_id}")
-def get_monthly_attendance(employee_id: int, db: Session = Depends(get_db)):
+def get_monthly_attendance(employee_id: int, db: Session = Depends(get_db),
+    current_user: m.User = Depends(get_current_user)  
+):
     from collections import defaultdict
 
     records = db.query(

@@ -274,7 +274,7 @@ async def login_user(
     raw_user_agent = request.headers.get("user-agent", "unknown")
     dd = DeviceDetector(raw_user_agent).parse()
 
-    browser_name = dd.client_name()     # Opera, Chrome, Firefox, etc.
+    browser_name = dd.client_name()     
     browser_version = dd.client_version()
     os_name = dd.os_name()
     device_type = dd.device_type()
@@ -340,6 +340,15 @@ async def login_user(
                 failed_attempts=1
             )
             db.add(attempt)
+            
+            
+        create_activity_log(
+        db=db,
+        request=request,
+        user_id=user.user_id if user else None,
+        action="Failed Login",
+        detail=f"Failed login attempt using email {email}."
+        )
 
         if attempt.failed_attempts == 5:
             attempt.lockout_until = now + timedelta(minutes=1)
@@ -354,6 +363,14 @@ async def login_user(
                     created_at=datetime.utcnow() + timedelta(hours=7)
                 )
                 db.add(notification)
+                
+                create_activity_log(
+                db=db,
+                request=request,
+                user_id=user.user_id,
+                action="Account Temporarily Locked",
+                detail=f"5 failed login attempts detected. Account using email {email} locked until {locked_until_str}."
+               )
                 try:
                     email_message = MIMEMultipart()
                     email_message["From"] = EMAIL_ADDRESS
@@ -394,6 +411,13 @@ async def login_user(
                     created_at=datetime.utcnow() + timedelta(hours=7)
                 )
                 db.add(notification)
+                create_activity_log(
+                db=db,
+                request=request,
+                user_id=user.user_id,
+                action="Account Temporarily Locked",
+                detail=f"10 failed login attempts detected. Account using email {email} locked until {locked_until_str}."
+                 )
                 try:
                     email_message = MIMEMultipart()
                     email_message["From"] = EMAIL_ADDRESS
@@ -584,7 +608,7 @@ async def resend_otp(
     return {"status": "success", "message": "The new OTP code has been sent to your email"}
 
 @router.get("/unlock-account")
-async def unlock_account(token: str, db: Session = Depends(get_db)):
+async def unlock_account(token: str, request: Request, db: Session = Depends(get_db)):
     try:
         payload = verify_unlock_token(token)
         email = payload.get("sub")
@@ -617,6 +641,14 @@ async def unlock_account(token: str, db: Session = Depends(get_db)):
         if email in permanent_lock_tokens:
             del permanent_lock_tokens[email]
             print(f"Removed permanent lock token for user: {email}")
+            
+        create_activity_log(
+            db=db,
+            request=request,
+            user_id=user.user_id,
+            action="Account Unlocked",
+            detail=f"User {user.email} unlocked their account via verification link."
+        )
 
 
         return HTMLResponse(content=f"""

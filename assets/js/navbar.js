@@ -5,7 +5,6 @@ async function loadNavbarProfile(userId) {
 
     const profile = await response.json();
 
-    // Set Avatar (Navbar and Dropdown)
     const avatarUrl = profile.image_filename
       ? `http://localhost:8000/static/images/${profile.image_filename}`
       : '../assets/img/avatars/default.png';
@@ -13,14 +12,20 @@ async function loadNavbarProfile(userId) {
     document.getElementById('navbarProfileAvatar').src = avatarUrl;
     document.getElementById('dropdownProfileAvatar').src = avatarUrl;
 
-    // Set Name and Role/Position
+  
     document.getElementById('navbarUsername').innerText = profile.username;
     document.getElementById('navbarEmail').innerText = profile.email;
 
   } catch (error) {
     console.error("Failed to load navbar profile:", error);
-    alert('Failed to load profile. Please log in again.');
-    window.location.href = "login.html";
+    Swal.fire({
+      icon: 'error',
+      title: 'Failed to Load Profile',
+      text: 'Unable to load user profile. Please log in again.',
+      confirmButtonText: 'OK'
+    }).then(() => {
+      window.location.href = "login.html";
+    });
   }
 }
 
@@ -29,7 +34,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (userId) {
     loadNavbarProfile(userId);
   } else {
-    alert('Please login first');
-    window.location.href = "login.html";
+    Swal.fire({
+      icon: 'warning',
+      title: 'Not Logged In',
+      text: 'Please log in to continue.',
+      confirmButtonText: 'Login'
+    }).then(() => {
+      window.location.href = "login.html";
+    });
   }
 });
