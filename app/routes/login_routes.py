@@ -107,8 +107,9 @@ def send_new_device_email(to_email: str, ip_address: str, device: str):
         server.send_message(email_message)
         server.quit()
     except Exception as e:
-        # log saja; jangan blokir alur utama
-        print(f"[BG-TASK] gagal kirim email new-device: {e}")
+        
+        print(f"[BG-TASK] failed to send new-device email: {e}")
+
 
 @router.get("/notifications/stream")
 async def notification_stream(

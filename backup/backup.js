@@ -11,7 +11,7 @@ const PGPORT = process.env.PGPORT;
 const PGDATABASE = process.env.PGDATABASE;
 
 const backupFolder = path.join(__dirname, 'db_backups');
-const remoteBackupFolder = process.env.REMOTE_BACKUP_FOLDER;
+const remoteBackupFolder = 'gdrive:AttendanceBackup';
 const stateFile = path.join(__dirname, '.interval_state.json');
 
 if (!fs.existsSync(backupFolder)) {
@@ -102,7 +102,8 @@ function fetchInterval(callback) {
   });
 }
 
-function applyNewInterval(newIntervalMinutes) {
+
+function applyNewInterval(newIntervalMinutes, startTime = "00:00") {
   const roundedInterval = Math.round(newIntervalMinutes);
   if (isNaN(roundedInterval) || roundedInterval < 1) {
     console.warn('Invalid interval, must be >= 1 minute.');
@@ -111,7 +112,6 @@ function applyNewInterval(newIntervalMinutes) {
 
   if (lastFetchedInterval === roundedInterval) return;
 
-  
   lastFetchedInterval = roundedInterval;
 
   const newKey = `interval-${roundedInterval}`;
@@ -119,9 +119,9 @@ function applyNewInterval(newIntervalMinutes) {
   saveLastIntervalKey(newKey);
 
   currentIntervalMs = roundedInterval * 60 * 1000;
-  lastBackupTime = Date.now(); 
+  lastBackupTime = Date.now();
 
-  console.log(`Fetched & applied new interval: every ${roundedInterval} minutes`);
+
 }
 
 
@@ -167,5 +167,5 @@ function readLastIntervalKey() {
 // ======================
 // Start App
 // ======================
-console.log('Monitoring backup interval changes');
+console.log('Monitoring backup interval');
 monitorIntervalChanges();
