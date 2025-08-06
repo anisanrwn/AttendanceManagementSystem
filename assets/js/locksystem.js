@@ -13,6 +13,7 @@ async function fetchLockStatus() {
         tbody.innerHTML = "";
 
         locks.forEach(lock => {
+            if (lock.roles_name === "Super Admin") return;
             const roleBadgeClass = {
                 "Super Admin": "bg-label-primary",
                 "Admin": "bg-label-info",
