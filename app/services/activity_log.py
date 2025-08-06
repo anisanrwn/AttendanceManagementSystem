@@ -16,9 +16,14 @@ def create_activity_log(
         user_agent_string = request.headers.get("user-agent", "unknown") if request else "unknown"
 
         user_agent = parse(user_agent_string)
+        
+        os_info = user_agent.os.family
+        os_version = user_agent.os.version_string
 
-        os_info = user_agent.os.family  
-        os_version = user_agent.os.version_string  
+        if "Windows NT 10.0" in user_agent_string:
+            os_info = "Windows NT"
+            os_version = "10.0"
+
         browser_info = user_agent.browser.family  
         browser_version = user_agent.browser.version_string  
 
