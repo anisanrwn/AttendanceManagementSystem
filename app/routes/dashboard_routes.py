@@ -11,9 +11,7 @@ router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
 @router.get("/today_rate")
 async def get_today_attendance(
-    db: Session = Depends(get_db),
-    current_user: m.User = Depends(get_current_user) 
-):
+    db: Session = Depends(get_db)):
     today = date.today()
     try:
         total_employees = db.query(m.Employee).count()
@@ -33,7 +31,6 @@ async def get_today_attendance(
 @router.get("/count")
 async def get_total_employees(
     db: Session = Depends(get_db),
-    current_user: m.User = Depends(get_current_user)
 ):
     try:
         total = (
@@ -46,7 +43,6 @@ async def get_total_employees(
 @router.get("/pending_list")
 async def get_pending_permissions(
     db: Session = Depends(get_db),
-    current_user: m.User = Depends(get_current_user)
 ):
     try:
         pending_count = db.query(m.Permission).filter(m.Permission.permission_status == "Pending").count()
@@ -56,8 +52,7 @@ async def get_pending_permissions(
     
 @router.get("/top-absent")
 def top_absent_employees(
-    db: Session = Depends(get_db),
-    current_user: m.User = Depends(get_current_user)  
+    db: Session = Depends(get_db), 
 ):
     results = (
         db.query(
@@ -75,8 +70,7 @@ def top_absent_employees(
     return [{"name": r.full_name, "absent_count": r.absent_count} for r in results]
 
 @router.get("/attendance-trend")
-def attendance_trend_monthly(db: Session = Depends(get_db),
-    current_user: m.User = Depends(get_current_user)  
+def attendance_trend_monthly(db: Session = Depends(get_db),  
 ):
     results = db.query(
         func.date_trunc('month', m.Attendance.attendance_date).label('month'),
@@ -95,8 +89,7 @@ def attendance_trend_monthly(db: Session = Depends(get_db),
     return [{"month": r[0].date().isoformat()[:7], "status": r[1], "count": r[2]} for r in results]
 
 @router.get("/weekly-working-hours/{employee_id}")
-def get_weekly_working_hours(employee_id: int, db: Session = Depends(get_db),
-    current_user: m.User = Depends(get_current_user)  
+def get_weekly_working_hours(employee_id: int, db: Session = Depends(get_db), 
 ):
     today = datetime.today()
     start_of_week = today - timedelta(days=today.weekday())
@@ -133,8 +126,7 @@ def get_weekly_working_hours(employee_id: int, db: Session = Depends(get_db),
     }
 
 @router.get("/monthly-attendance/{employee_id}")
-def get_monthly_attendance(employee_id: int, db: Session = Depends(get_db),
-    current_user: m.User = Depends(get_current_user)  
+def get_monthly_attendance(employee_id: int, db: Session = Depends(get_db), 
 ):
     from collections import defaultdict
 

@@ -27,6 +27,8 @@ from fastapi import BackgroundTasks
 from app.utils.auth import ( verify_token, create_access_token, create_refresh_token, create_unlock_token, verify_unlock_token )
 from fastapi.responses import HTMLResponse
 from device_detector import DeviceDetector
+from app.core.config import SECRET_KEY, ALGORITHM
+
 
 router = APIRouter(
     prefix="/login",
@@ -351,7 +353,7 @@ async def login_user(
         )
 
         if attempt.failed_attempts == 5:
-            attempt.lockout_until = now + timedelta(minutes=1)
+            attempt.lockout_until = now + timedelta(seconds=10)
             if user:
                 locked_until_str = (attempt.lockout_until + timedelta(hours=7)).strftime('%H:%M:%S')
                 message = f"Detected 5 failed login attempts. Your account has been locked until {locked_until_str}."
@@ -399,7 +401,7 @@ async def login_user(
                     print(f"Failed to Send Email lockout: {e}")
 
         if attempt.failed_attempts == 10:
-            attempt.lockout_until = now + timedelta(hours=1)
+            attempt.lockout_until = now + timedelta(seconds=10)
             if user:
                 locked_until_str = (attempt.lockout_until + timedelta(hours=7)).strftime('%H:%M:%S')
                 message = f"Detected 10 failed login attempts. Your account has been locked until {locked_until_str}."
@@ -712,6 +714,14 @@ async def unlock_account(token: str, request: Request, db: Session = Depends(get
     except jwt.JWTError:
         raise HTTPException(status_code=400, detail="Invalid verification token.")
 
+def create_unlock_token(email: str):
+    expire = datetime.utcnow() + timedelta(minutes=15)
+    payload = {
+        "sub": email,
+        "type": "unlock",
+        "exp": expire
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 @router.post("/login/send-unlock-verification")
 async def send_unlock_verification(email: str = Form(...), db: Session = Depends(get_db)):
