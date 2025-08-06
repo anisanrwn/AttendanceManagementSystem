@@ -222,54 +222,69 @@ async function loadWorkingHoursChart() {
 
   // 4. Monthly Attendance Chart
   async function loadMonthlyAttendanceChart() {
-    const el = document.querySelector('#monthlyAttendanceChart');
-    if (!el) return;
+  const el = document.querySelector('#monthlyAttendanceChart');
+  if (!el) return;
 
-    const employeeId = sessionStorage.getItem('employee_id');
-    if (!employeeId) {
-      console.error('employee_id not found in sessionStorage');
-      return;
+  const token = localStorage.getItem("token");
+  const employeeId = sessionStorage.getItem('employee_id');
+
+  if (!token || !employeeId) {
+    window.location.href = "/html/login.html";
+    return;
+  }
+
+  try {
+    const response = await fetch(`http://localhost:8000/dashboard/monthly-attendance/${employeeId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        window.location.href = "/html/login.html";
+        return;
+      }
+      throw new Error("Gagal memuat data kehadiran bulanan");
     }
 
-    try {
-      const response = await fetch(`http://localhost:8000/dashboard/monthly-attendance/${employeeId}`);
-      const data = await response.json();
+    const data = await response.json();
 
-      const options = {
-        chart: { type: 'bar', height: 300, stacked: true },
-        colors: [config.colors.primary, config.colors.skycolor, config.colors.bluecolor],
-        series: data.series,
-        xaxis: {
-          categories: data.labels,
-          labels: { style: { fontSize: '13px', colors: axisColor } }
-        },
-        legend: {
-          position: 'top',
-          horizontalAlign: 'center',
-          labels: { colors: axisColor }
-        },
-        tooltip: { y: { formatter: val => `${val} days` } },
-        stroke: {
-          curve: 'smooth',
-          width: 2,
-          lineCap: 'round',
-          colors: [cardColor]
-        },
-        plotOptions: {
-          bar: {
-            horizontal: false,
-            columnWidth: '50%',
-            borderRadius: 3,
-            startingShape: 'rounded',
-            endingShape: 'rounded'
-          }
-        },
-        dataLabels: { enabled: false }
-      };
+    const options = {
+      chart: { type: 'bar', height: 300, stacked: true },
+      colors: [config.colors.primary, config.colors.skycolor, config.colors.bluecolor],
+      series: data.series,
+      xaxis: {
+        categories: data.labels,
+        labels: { style: { fontSize: '13px', colors: axisColor } }
+      },
+      legend: {
+        position: 'top',
+        horizontalAlign: 'center',
+        labels: { colors: axisColor }
+      },
+      tooltip: { y: { formatter: val => `${val} days` } },
+      stroke: {
+        curve: 'smooth',
+        width: 2,
+        lineCap: 'round',
+        colors: [cardColor]
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: '50%',
+          borderRadius: 3,
+          startingShape: 'rounded',
+          endingShape: 'rounded'
+        }
+      },
+      dataLabels: { enabled: false }
+    };
 
-      new ApexCharts(el, options).render();
-    } catch (error) {
-      console.error('Failed to load monthly attendance data:', error);
+    new ApexCharts(el, options).render();
+  } catch (error) {
+    console.error('Failed to load monthly attendance data:', error);
     }
   }
   loadTopAbsentChart();

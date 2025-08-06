@@ -50,7 +50,6 @@ async def manage_role_lock(
 
         role = db.query(m.Roles).get(request_data.role_id)
 
-        # ✅ Tambahkan log activity
         create_activity_log(
             db=db,
             request=request,
