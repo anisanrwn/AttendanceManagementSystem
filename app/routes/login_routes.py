@@ -28,7 +28,11 @@ from app.utils.auth import ( verify_token, create_access_token, create_refresh_t
 from fastapi.responses import HTMLResponse
 from device_detector import DeviceDetector
 from app.core.config import SECRET_KEY, ALGORITHM
+import random
+import jwt 
+from sqlalchemy.orm import Session
 
+SECRET_KEY_COLOR = "SECRET"
 
 router = APIRouter(
     prefix="/login",
@@ -610,39 +614,135 @@ async def resend_otp(
     return {"status": "success", "message": "The new OTP code has been sent to your email"}
 
 @router.get("/unlock-account")
-async def unlock_account(token: str, request: Request, db: Session = Depends(get_db)):
+async def unlock_account(
+    token: str,
+    request: Request,
+    db: Session = Depends(get_db),
+    user_answer: str = None,
+    color_token: str = None
+):
+  
+    if not user_answer:
+        colors = [("BLUE", "red"), ("RED", "blue"), ("PURPLE", "green")]
+        word, color = random.choice(colors)
+
+        encoded_color = jwt.encode({"color": color}, SECRET_KEY_COLOR, algorithm="HS256")
+
+        return HTMLResponse(content=f"""
+        <!DOCTYPE html>
+    <html lang="id">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Color Verification</title>
+        <style>
+            body {{
+                font-family: 'Segoe UI', sans-serif;
+                background-color: #f8f6ff; /* putih lembut */
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }}
+            .container {{
+                background: #ffffff;
+                padding: 30px 40px;
+                border-radius: 15px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+                text-align: center;
+                max-width: 350px;
+                width: 100%;
+            }}
+            h2 {{
+                margin-bottom: 20px;
+                color: #6a0dad; /* ungu tua */
+            }}
+            .color-text {{
+                font-size: 26px;
+                font-weight: bold;
+                margin: 15px 0;
+            }}
+            label {{
+                font-weight: 500;
+                color: #444;
+            }}
+            input[type="text"] {{
+                padding: 10px;
+                width: 80%;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                margin-top: 10px;
+                font-size: 14px;
+                outline-color: #6a0dad;
+            }}
+            button {{
+                margin-top: 20px;
+                background: #6a0dad;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: background 0.3s ease;
+            }}
+            button:hover {{
+                background: #530a9c;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Color Check</h2>
+            <p class="color-text" style="color:{color};">{word}</p>
+            <form method="get" action="{request.url.path}">
+                <input type="hidden" name="token" value="{token}">
+                <input type="hidden" name="color_token" value="{encoded_color}">
+                
+                <label>What is the color of the text above?</label><br>
+                <input type="text" name="user_answer"  required>
+                
+                <br>
+                <button type="submit">Verification</button>
+            </form>
+        </div>
+    </body>
+    </html>
+        """, status_code=200)
+
+    try:
+        decoded = jwt.decode(color_token, SECRET_KEY_COLOR, algorithms=["HS256"])
+        correct_color = decoded["color"]
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=400, detail="Token warna tidak valid.")
+
+    if user_answer.strip().lower() != correct_color.strip().lower():
+        return HTMLResponse(content="<h1 style='text-align:center;'>Jawaban salah! Silakan coba lagi.</h1>", status_code=400)
+
     try:
         payload = verify_unlock_token(token)
         email = payload.get("sub")
 
-
         if payload.get("type") != "unlock":
             raise HTTPException(status_code=400, detail="Invalid token type.")
-
 
         user = db.query(m.User).filter(m.User.email == email).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found.")
-
 
         attempt = db.query(m.LoginAttempt)\
             .filter(m.LoginAttempt.email == email)\
             .order_by(m.LoginAttempt.attempt_time.desc())\
             .first()
 
-
         if attempt and attempt.failed_attempts >= 15:
             attempt.failed_attempts = 0
             attempt.lockout_until = None
             db.commit()
-            print(f"Reset failed attempts for user: {email}")
-        else:
-            print(f"No locked attempt found or already reset for: {email}")
-
 
         if email in permanent_lock_tokens:
             del permanent_lock_tokens[email]
-            print(f"Removed permanent lock token for user: {email}")
             
         create_activity_log(
             db=db,
@@ -652,67 +752,67 @@ async def unlock_account(token: str, request: Request, db: Session = Depends(get
             detail=f"User {user.email} unlocked their account via verification link."
         )
 
-
+        # Halaman sukses
         return HTMLResponse(content=f"""
-    <html>
-        <head>
-            <title>Account Unlocked</title>
-            <style>
-                body {{
-                    background-color: #f0f2f5;
-                    font-family: 'Segoe UI', sans-serif;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                }}
-                .card {{
-                    background-color: white;
-                    padding: 40px;
-                    border-radius: 12px;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                    text-align: center;
-                    max-width: 500px;
-                }}
-                .card h2 {{
-                    color: #6f42c1;
-                    margin-bottom: 10px;
-                }}
-                .card p {{
-                    color: #333;
-                    font-size: 16px;
-                    line-height: 1.6;
-                }}
-                .btn {{
-                    background-color: #007bff;
-                    color: white;
-                    padding: 12px 24px;
-                    border: none;
-                    border-radius: 6px;
-                    text-decoration: none;
-                    font-size: 16px;
-                    display: inline-block;
-                    margin-top: 20px;
-                }}
-                .btn:hover {{
-                    background-color: #0056b3;
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="card">
-                <h2>Your Account Has Been Unlocked!</h2>
-                <p>Your account is now active again. You can log in and continue using the system as usual.</p>
-            </div>
-        </body>
-    </html>
-""", status_code=200)
-
+        <html>
+            <head>
+                <title>Account Unlocked</title>
+                <style>
+                    body {{
+                        background-color: #f0f2f5;
+                        font-family: 'Segoe UI', sans-serif;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                    }}
+                    .card {{
+                        background-color: white;
+                        padding: 40px;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                        text-align: center;
+                        max-width: 500px;
+                    }}
+                    .card h2 {{
+                        color: #6f42c1;
+                        margin-bottom: 10px;
+                    }}
+                    .card p {{
+                        color: #333;
+                        font-size: 16px;
+                        line-height: 1.6;
+                    }}
+                    .btn {{
+                        background-color: #007bff;
+                        color: white;
+                        padding: 12px 24px;
+                        border: none;
+                        border-radius: 6px;
+                        text-decoration: none;
+                        font-size: 16px;
+                        display: inline-block;
+                        margin-top: 20px;
+                    }}
+                    .btn:hover {{
+                        background-color: #0056b3;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="card">
+                    <h2>Your Account Has Been Unlocked!</h2>
+                    <p>Your account is now active again. You can log in and continue using the system as usual.</p>
+                </div>
+            </body>
+        </html>
+        """, status_code=200)
 
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=400, detail="Verification token has expired.")
     except jwt.JWTError:
         raise HTTPException(status_code=400, detail="Invalid verification token.")
+
 
 def create_unlock_token(email: str):
     expire = datetime.utcnow() + timedelta(minutes=15)
