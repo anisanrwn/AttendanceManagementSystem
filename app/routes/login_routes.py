@@ -44,44 +44,8 @@ EMAIL_PASSWORD = "dfxhwuyiwqszauxh"
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 
-otp_storage = {}
 permanent_lock_tokens = {}
 
-def generate_otp():
-    return ''.join(random.choices(string.digits, k=6))
-
-def send_otp_email(email, otp):
-
-    try:
-        message = MIMEMultipart()
-        message["From"] = EMAIL_ADDRESS
-        message["To"] = email
-        message["Subject"] = "Verification Code for Attendance System Login"
-        
-        body = f"""
-        <html>
-        <body>
-            <h2>Verification Code Login</h2>
-            <p>Here is your OTP code to login:</p>
-            <h1 style="background-color: #f2f2f2; padding: 10px; font-family: monospace; letter-spacing: 5px;">{otp}</h1>
-            <p>The code is valid for 5 minutes.</p>
-            <p>If you did not request this code, ignore this email.</p>
-        </body>
-        </html>
-        """
-        
-        message.attach(MIMEText(body, "html"))
-        
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-        server.starttls()
-        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-        server.send_message(message)
-        server.quit()
-        return True
-    except Exception as e:
-        print(f"Error mengirim email: {e}")
-        return False
-    
 def send_new_device_email(to_email: str, ip_address: str, device: str):
     try:
         email_message = MIMEMultipart()
@@ -113,7 +77,6 @@ def send_new_device_email(to_email: str, ip_address: str, device: str):
         server.send_message(email_message)
         server.quit()
     except Exception as e:
-        
         print(f"[BG-TASK] failed to send new-device email: {e}")
 
 
@@ -272,6 +235,7 @@ async def refresh_token(refresh_token: str = Body(...), db: Session = Depends(ge
 @router.post("/login")
 async def login_user(
     request: Request,
+    background_tasks: BackgroundTasks,
     email: str = Form(...),
     password: str = Form(...),
     db: Session = Depends(get_db)
@@ -287,9 +251,11 @@ async def login_user(
 
     user = db.query(m.User).options(joinedload(m.User.roles)).filter_by(email=email).first()
 
+    # Check permanent lock
     if email in permanent_lock_tokens:
         raise HTTPException(status_code=423, detail="Your account is locked. Please check your email to unlock.")
 
+    # Check temporary lockout
     attempt = (
         db.query(m.LoginAttempt)
         .filter_by(email=email, ip_address=ip_address)
@@ -313,17 +279,19 @@ async def login_user(
                 status_code=403,
                 detail=HM.ACCOUNT_LOCKED.format(time=lockout_local.strftime('%H:%M:%S'))
             )
-    if attempt and attempt.failed_attempts >= 15:
-            if email not in permanent_lock_tokens:
-                if user and attempt and attempt.failed_attempts == 15:
-                    unlock_token = create_unlock_token(email)
-                    permanent_lock_tokens[email] = unlock_token
-                    unlock_link = f"http://localhost:8000/login/unlock-account?token={unlock_token}"
-                    send_permanent_lock_email(user.email, unlock_link)
-        
-            raise HTTPException(status_code=423, detail="Your account has been permanently locked. Check your email for verification.")
-            
 
+    # Check for permanent lock (15 failed attempts)
+    if attempt and attempt.failed_attempts >= 15:
+        if email not in permanent_lock_tokens:
+            if user and attempt and attempt.failed_attempts == 15:
+                unlock_token = create_unlock_token(email)
+                permanent_lock_tokens[email] = unlock_token
+                unlock_link = f"http://localhost:8000/login/unlock-account?token={unlock_token}"
+                send_permanent_lock_email(user.email, unlock_link)
+        
+        raise HTTPException(status_code=423, detail="Your account has been permanently locked. Check your email for verification.")
+
+    # Check role locks
     if user:
         current_time = datetime.utcnow()
         locks = db.query(m.RoleLock).filter(
@@ -332,9 +300,10 @@ async def login_user(
 
         if locks:
             raise HTTPException(status_code=403, detail=HM.ROLE_LOCKED)
-        
 
+    # Validate credentials
     if not user or not verify_password(password, user.password):
+        # Handle failed login attempt
         if attempt and (now - attempt.attempt_time) < timedelta(minutes=30):
             attempt.failed_attempts += 1
         else:
@@ -346,37 +315,38 @@ async def login_user(
                 failed_attempts=1
             )
             db.add(attempt)
-            
-            
+        
+        # Log failed attempt
         create_activity_log(
-        db=db,
-        request=request,
-        user_id=user.user_id if user else None,
-        action="Failed Login",
-        detail=f"Failed login attempt using email {email}."
+            db=db,
+            request=request,
+            user_id=user.user_id if user else None,
+            action="Failed Login",
+            detail=f"Failed login attempt using email {email}."
         )
 
+        # Handle lockout at 5 failed attempts
         if attempt.failed_attempts == 5:
-            attempt.lockout_until = now + timedelta(seconds=10)
+            attempt.lockout_until = now + timedelta(minutes=1)
             if user:
                 locked_until_str = (attempt.lockout_until + timedelta(hours=7)).strftime('%H:%M:%S')
                 message = f"Detected 5 failed login attempts. Your account has been locked until {locked_until_str}."
                 notification = m.Notification(
                     user_id=user.user_id,
                     title="Failed Login Attempt",
-                    message = message,
+                    message=message,
                     notification_type="failed_login",
                     created_at=datetime.utcnow() + timedelta(hours=7)
                 )
                 db.add(notification)
                 
                 create_activity_log(
-                db=db,
-                request=request,
-                user_id=user.user_id,
-                action="Account Temporarily Locked",
-                detail=f"5 failed login attempts detected. Account using email {email} locked until {locked_until_str}."
-               )
+                    db=db,
+                    request=request,
+                    user_id=user.user_id,
+                    action="Account Temporarily Locked",
+                    detail=f"5 failed login attempts detected. Account using email {email} locked until {locked_until_str}."
+                )
                 try:
                     email_message = MIMEMultipart()
                     email_message["From"] = EMAIL_ADDRESS
@@ -404,26 +374,28 @@ async def login_user(
                 except Exception as e:
                     print(f"Failed to Send Email lockout: {e}")
 
+        # Handle lockout at 10 failed attempts
         if attempt.failed_attempts == 10:
-            attempt.lockout_until = now + timedelta(seconds=10)
+            attempt.lockout_until = now + timedelta(hours=1)
             if user:
                 locked_until_str = (attempt.lockout_until + timedelta(hours=7)).strftime('%H:%M:%S')
                 message = f"Detected 10 failed login attempts. Your account has been locked until {locked_until_str}."
                 notification = m.Notification(
                     user_id=user.user_id,
                     title="Failed Login Attempt",
-                    message = message,
+                    message=message,
                     notification_type="failed_login",
                     created_at=datetime.utcnow() + timedelta(hours=7)
                 )
                 db.add(notification)
+                
                 create_activity_log(
-                db=db,
-                request=request,
-                user_id=user.user_id,
-                action="Account Temporarily Locked",
-                detail=f"10 failed login attempts detected. Account using email {email} locked until {locked_until_str}."
-                 )
+                    db=db,
+                    request=request,
+                    user_id=user.user_id,
+                    action="Account Temporarily Locked",
+                    detail=f"10 failed login attempts detected. Account using email {email} locked until {locked_until_str}."
+                )
                 try:
                     email_message = MIMEMultipart()
                     email_message["From"] = EMAIL_ADDRESS
@@ -453,81 +425,19 @@ async def login_user(
 
         db.commit()
         raise HTTPException(status_code=401, detail=HM.UNAUTHORIZED)
-    
+
+    # Login successful - reset failed attempts if any
     if attempt and attempt.failed_attempts > 0:
-            if not attempt.is_successful:
-                attempt.failed_attempts = 0
-                attempt.lockout_until = None
-                db.commit()
+        if not attempt.is_successful:
+            attempt.failed_attempts = 0
+            attempt.lockout_until = None
 
-    otp = generate_otp()
-    expiry_time = datetime.utcnow() + timedelta(minutes=5)
-    otp_storage[email] = {
-        'otp': otp,
-        'expiry': expiry_time,
-        'user_id': user.user_id,
-        'ip_address': ip_address,
-        'user_agent': browser_name
-    }
-
-    if not send_otp_email(email, otp):
-        raise HTTPException(status_code=500, detail="Failed to send OTP code. Please try again.")
-
-    new_attempt = m.LoginAttempt(
-        user_id=user.user_id,
-        email=email,
-        ip_address=ip_address,
-        user_agent=browser_name,
-        failed_attempts=0,
-        is_successful=False,
-    )
-    db.add(new_attempt)
-    db.commit()
-
-    return {
-        "status": "otp_required",
-        "message": "The OTP code has been sent to your email",
-        "email": email
-    }
-
-
-@router.post("/verify-otp")
-async def verify_otp(
-    request: Request,
-    background_tasks: BackgroundTasks,
-    email: str = Form(...),
-    otp: str = Form(...), 
-    db: Session = Depends(get_db)
-):
-    ip_address = request.headers.get("x-forwarded-for", request.client.host)
-    raw_user_agent = request.headers.get("user-agent", "unknown")
-    user_agent_parsed = parse(raw_user_agent)
-    browser_name = f"{user_agent_parsed.browser.family} {user_agent_parsed.browser.version_string}".strip()
-
-    if email not in otp_storage:
-        raise HTTPException(status_code=400, detail="OTP session not found. Please login again.")
-
-    stored_data = otp_storage[email]
-    stored_otp = stored_data['otp']
-    expiry_time = stored_data['expiry']
-    user_id = stored_data['user_id']
-
-    if datetime.utcnow() > expiry_time:
-        del otp_storage[email]
-        raise HTTPException(status_code=400, detail="OTP code has expired. Please login again.")
-
-    if otp != stored_otp:
-        raise HTTPException(status_code=400, detail="Incorrect OTP code.")
-
-    del otp_storage[email]
-
-    user = db.query(m.User).options(joinedload(m.User.roles)).filter_by(user_id=user_id).first()
-
-   
+    # Create tokens for successful login
     access_token = create_access_token(data={"sub": user.email, "user_id": user.user_id})
     refresh_token = create_refresh_token(data={"sub": user.email, "type": "refresh"})
 
-    new_attempt = m.LoginAttempt(
+    # Create successful login attempt record
+    new_successful_attempt = m.LoginAttempt(
         user_id=user.user_id,
         email=email,
         ip_address=ip_address,
@@ -535,8 +445,9 @@ async def verify_otp(
         user_agent=browser_name,
         failed_attempts=0
     )
-    db.add(new_attempt)
+    db.add(new_successful_attempt)
 
+    # Check for new device login (compare with last successful login)
     last_success = (
         db.query(m.LoginAttempt)
         .filter(
@@ -552,6 +463,7 @@ async def verify_otp(
             last_success.ip_address != ip_address or
             last_success.user_agent != browser_name
         ):
+            # Create notification for new device login
             notification = m.Notification(
                 user_id=user.user_id,
                 title="Login from New Device",
@@ -560,13 +472,16 @@ async def verify_otp(
                 created_at=datetime.utcnow() + timedelta(hours=7)
             )
             db.add(notification)
+            
+            # Send new device email notification
             background_tasks.add_task(
                 send_new_device_email, user.email, ip_address, browser_name
             )
 
-
+    # Commit all database changes
     db.commit()
     
+    # Log successful login activity
     create_activity_log(
         db=db,
         request=request,
@@ -575,6 +490,7 @@ async def verify_otp(
         detail=f"User {user.email} logged in successfully"
     )
     
+    # Prepare response with user data and tokens
     user_dict = {
         "user_id": user.user_id,
         "email": user.email,
@@ -586,32 +502,7 @@ async def verify_otp(
     
     return user_dict
 
-@router.post("/resend-otp")
-async def resend_otp(
-    email: str = Form(...),
-    db: Session = Depends(get_db)
-):
-    if email not in otp_storage:
-        raise HTTPException(status_code=400, detail="OTP session not found. Please login again.")
 
-    otp = generate_otp()
-    expiry_time = datetime.utcnow() + timedelta(minutes=5)
-    user_id = otp_storage[email]['user_id']
-    ip_address = otp_storage[email]['ip_address']
-    user_agent = otp_storage[email]['user_agent']
-
-    otp_storage[email] = {
-        'otp': otp,
-        'expiry': expiry_time,
-        'user_id': user_id,
-        'ip_address': ip_address,
-        'user_agent': user_agent
-    }
-
-    if not send_otp_email(email, otp):
-        raise HTTPException(status_code=500, detail="Failed to send OTP code. Please try again.")
-
-    return {"status": "success", "message": "The new OTP code has been sent to your email"}
 
 @router.get("/unlock-account")
 async def unlock_account(

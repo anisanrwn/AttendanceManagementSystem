@@ -1,9 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
     const loginForm = document.getElementById('loginForm');
-    const otpForm = document.getElementById('otpForm');
-    const resendOtpButton = document.getElementById('resendOtp');
-    const otpInput = document.getElementById('otp');
-    let countdownInterval;
 
     // Alert SweetAlert
     function showAlert(message, type = 'error') {
@@ -12,27 +8,6 @@ document.addEventListener("DOMContentLoaded", function () {
             title: type === 'success' ? 'Success' : 'Error',
             text: message,
         });
-    }
-
-    function startCountdown() {
-        const countdownElement = document.getElementById('countdown');
-        let timeLeft = 300;
-        if (countdownInterval) clearInterval(countdownInterval);
-
-        function updateCountdown() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            countdownElement.textContent = `Code valid for: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            if (timeLeft <= 0) {
-                clearInterval(countdownInterval);
-                countdownElement.textContent = 'The code has expired. Please resubmit.';
-            } else {
-                timeLeft--;
-            }
-        }
-
-        updateCountdown();
-        countdownInterval = setInterval(updateCountdown, 1000);
     }
 
     // Fungsi untuk menangani login sukses
@@ -87,25 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            // Jika butuh OTP
-            if (data.status === "otp_required") {
-                document.getElementById('otpEmail').value = formData.get('email');
-                loginForm.classList.add('hidden');
-                otpForm.classList.remove('hidden');
-                document.getElementById('otp').focus();
-                startCountdown();
-
-            Swal.fire({
-                icon: 'success',
-                title: 'OTP Sent',
-                text: 'An OTP has been sent to your email. Please check your inbox.',
-                confirmButtonColor: '#3085d6'
-            });
-
-            return;
-        }
-
-            // Jika login sukses langsung
+            // Login sukses langsung
             handleSuccessfulLogin(data);
 
         } catch (error) {
@@ -114,72 +71,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    otpForm.addEventListener('submit', async function (event) {
-        event.preventDefault();
-        const formData = new FormData(otpForm);
-
-        try {
-            const response = await fetch("http://127.0.0.1:8000/login/verify-otp", {
-                method: "POST",
-                body: formData,
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                showAlert(errorData.detail || "Verification failed, please try again");
-                return;
-            }
-
-            const user = await response.json();
-            handleSuccessfulLogin(user);
-
-        } catch (error) {
-            showAlert("An error occurred: " + error.message);
-        }
-    });
-
-    resendOtpButton.addEventListener('click', async function() {
-        const email = document.getElementById('otpEmail').value;
-        if (!email) {
-            showAlert("Email not valid");
-            return;
-        }
-
-        try {
-            const formData = new FormData();
-            formData.append('email', email);
-
-            const response = await fetch("http://127.0.0.1:8000/login/resend-otp", {
-                method: "POST",
-                body: formData,
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                showAlert(errorData.detail || "Failed to resend OTP");
-                return;
-            }
-
-            const data = await response.json();
-            showAlert(data.message || "The new OTP has been sent", "success");
-            startCountdown();
-
-        } catch (error) {
-            showAlert("An error occurred: " + error.message);
-        }
-    });
-
-    otpInput.addEventListener('input', function () {
-        this.value = this.value.replace(/[^0-9]/g, '');
-    });
-
-    otpInput.addEventListener('keyup', function () {
-        if (this.value.length === 6) {
-            otpForm.dispatchEvent(new Event('submit'));
-        }
-    });
-
-  
     function getHttpErrorMessage(statusCode, detailMessage = "") {
         const httpExceptions = {
             401: {
