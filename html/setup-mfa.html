@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en" class="light-style layout-menu-fixed" dir="ltr" data-theme="theme-default" data-assets-path="../assets/" data-template="vertical-menu-template-free">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
+    <title>Setup MFA - Attendance System</title>
+    <meta name="description" content="" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../assets/img/logo.png" />
+    <!-- Your existing CSS imports -->
+    <link rel="stylesheet" href="../assets/vendor/css/core.css" />
+    <link rel="stylesheet" href="../assets/vendor/css/theme-default.css" />
+    <link rel="stylesheet" href="../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="../assets/vendor/libs/apex-charts/apex-charts.css" />
+    <link rel="stylesheet" href="../assets/css/demo.css" />
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+     <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet"/>
+
+    <!-- Icons. Uncomment required icon fonts -->
+    <link rel="stylesheet" href="../assets/vendor/fonts/boxicons.css" />
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="../assets/vendor/css/core.css" class="template-customizer-core-css" />
+    <link rel="stylesheet" href="../assets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
+    <link rel="stylesheet" href="../assets/css/demo.css" />
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+
+    <!-- Page -->
+    <link rel="stylesheet" href="../assets/vendor/css/pages/page-auth.css" />
+    
+    <!-- Helpers -->
+    <script src="../assets/vendor/js/helpers.js"></script>
+
+    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <script src="../assets/js/config.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        /* Perfect centering for the entire page */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .authentication-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, white 0%, white 100%);
+        }
+        
+        .authentication-inner {
+            width: 100%;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .card-body {
+            padding: 40px;
+        }
+        
+        .mfa-step {
+            border-left: 4px solid #007bff;
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 0 10px 10px 0;
+        }
+        .qr-container {
+            text-align: center;
+            padding: 30px;
+            border: 2px dashed #007bff;
+            border-radius: 15px;
+            background-color: #f8f9ff;
+            margin: 20px 0;
+        }
+        .manual-entry {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+            border: 1px solid #dee2e6;
+        }
+        .app-store-links {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        .app-store-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        .app-store-btn:hover {
+            background-color: #f8f9fa;
+            border-color: #007bff;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin: 5px;
+        }
+        .step-number {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+        .step-number.active {
+            background-color: #007bff;
+            color: white;
+            transform: scale(1.1);
+        }
+        .step-number.completed {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        /* Enhanced form styling */
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        .btn-lg {
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 12px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .card-body {
+                padding: 25px;
+            }
+            
+            .authentication-wrapper {
+                padding: 10px;
+            }
+            
+            .step-item span {
+                font-size: 14px;
+            }
+            
+            .app-store-links {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        
+        /* Loading animation */
+        .spinner-border {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="authentication-wrapper">
+        <div class="authentication-inner">
+            <div class="card">
+                <div class="card-body">
+                    <!-- Logo -->
+                    <div class="app-brand justify-content-center" style="margin-bottom: 30px;">
+                        <span class="app-brand-logo demo">
+                            <img src="../assets/img/logo.png" alt="Logo" width="50" />
+                        </span>
+                        <span class="app-brand-text demo menu-text fw-bolder ms-2" style="font-size: 1.2rem; text-transform: uppercase; color: black;">
+                            UNITED TRACTORS
+                        </span>
+                    </div>
+                    
+                    <h4 class="mb-2 text-center">Setup Multi-Factor Authentication</h4>
+                    <p class="mb-4 text-center text-muted">Secure your account with Google Authenticator</p>
+                    
+                    <!-- Security Notice -->
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-shield-exclamation me-2"></i>
+                        <strong>Security Enhancement Required:</strong> MFA is now mandatory for your account due to previous failed login attempts.
+                    </div>
+                    
+                    <!-- Step Indicator -->
+                    <div class="step-indicator">
+                        <div class="step-item">
+                            <div class="step-number completed" id="step-1">1</div>
+                            <span>Install App</span>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number active" id="step-2">2</div>
+                            <span>Scan QR Code</span>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number" id="step-3">3</div>
+                            <span>Verify</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 1: Install App Instructions -->
+                    <div class="mfa-step">
+                        <h6><i class="bi bi-download me-2"></i>Step 1: Install Google Authenticator</h6>
+                        <p class="mb-3">Download the official Google Authenticator app:</p>
+                        <div class="app-store-links">
+                            <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" 
+                               target="_blank" class="app-store-btn">
+                                <i class="bi bi-google-play me-2"></i>Google Play
+                            </a>
+                            <a href="https://apps.apple.com/app/google-authenticator/id388497605" 
+                               target="_blank" class="app-store-btn">
+                                <i class="bi bi-apple me-2"></i>App Store
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Generate QR Code -->
+                    <div class="mfa-step">
+                        <h6><i class="bi bi-qr-code me-2"></i>Step 2: Scan QR Code</h6>
+                        <p>Generate your unique QR code and scan it with Google Authenticator:</p>
+                        
+                        <div class="text-center">
+                            <button type="button" class="btn btn-primary btn-lg" onclick="generateQRCode()" id="generate-btn">
+                                <i class="bi bi-qr-code me-2"></i>Generate QR Code
+                            </button>
+                        </div>
+                        
+                        <!-- Loading State -->
+                        <div class="text-center d-none" id="loading">
+                            <div class="spinner-border text-primary" role="status" style="margin: 20px 0;">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="text-muted">Generating your unique QR code...</p>
+                        </div>
+                        
+                        <!-- QR Code Display -->
+                        <div id="qr-section" class="qr-container" style="display: none;">
+                            <h6 class="mb-3">Scan this QR Code</h6>
+                            <img id="qr-image" src="" alt="QR Code" style="max-width: 250px; border: 3px solid #007bff; border-radius: 10px;">
+                            
+                            <div class="manual-entry mt-3">
+                                <small class="text-muted"><strong>Can't scan? Enter this key manually:</strong></small><br>
+                                <code id="manual-key" style="font-size: 14px;"></code>
+                            </div>
+                            
+                            <div class="alert alert-info mt-3" role="alert">
+                                <i class="bi bi-info-circle me-2"></i>
+                                Open Google Authenticator → Tap "+" → "Scan QR code" → Point camera at QR code
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Verification -->
+                    <div class="mfa-step" id="verification-section" style="display: none;">
+                        <h6><i class="bi bi-shield-check me-2"></i>Step 3: Verify Setup</h6>
+                        <p>Enter the 6-digit code from Google Authenticator to complete setup:</p>
+                        
+                        <form onsubmit="verifySetup(event)" id="verify-form">
+                            <div class="mb-3">
+                                <label for="mfa_code" class="form-label">Verification Code</label>
+                                <input type="text" class="form-control text-center" id="mfa_code" name="mfa_code" 
+                                       maxlength="6" pattern="[0-9]{6}" placeholder="000000" 
+                                       style="font-size: 28px; letter-spacing: 8px; font-family: 'Courier New', monospace;" 
+                                       autocomplete="off" required>
+                                <small class="text-muted">Code changes every 30 seconds</small>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success d-grid w-100 btn-lg">
+                                <i class="bi bi-check-circle me-2"></i>
+                                <span class="verify-text">Verify & Enable MFA</span>
+                                <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                            </button>
+                        </form>
+                        
+                        <div class="text-center mt-3">
+                            <button type="button" class="btn btn-outline-danger" onclick="cancelSetup()">
+                                <i class="bi bi-x-circle me-1"></i>Cancel Setup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showAlert(message, type = 'error') {
+            Swal.fire({
+                icon: type,
+                title: type === 'success' ? 'Success' : type === 'warning' ? 'Warning' : 'Error',
+                text: message,
+                confirmButtonColor: type === 'success' ? '#28a745' : '#007bff'
+            });
+        }
+
+        function updateStepIndicator(currentStep) {
+            // Reset all steps
+            document.getElementById('step-1').className = 'step-number completed';
+            document.getElementById('step-2').className = currentStep >= 2 ? 'step-number active' : 'step-number';
+            document.getElementById('step-3').className = currentStep >= 3 ? 'step-number active' : 'step-number';
+            
+            if (currentStep === 3) {
+                document.getElementById('step-2').className = 'step-number completed';
+                document.getElementById('step-3').className = 'step-number active';
+            }
+        }
+
+        async function generateQRCode() {
+            const email = sessionStorage.getItem('setup_email');
+            if (!email) {
+                showAlert('Session expired. Please login again.', 'error');
+                window.location.href = '/html/login.html';
+                return;
+            }
+            
+            // Update UI
+            document.getElementById('generate-btn').style.display = 'none';
+            document.getElementById('loading').classList.remove('d-none');
+            updateStepIndicator(2);
+            
+            try {
+                const formData = new FormData();
+                formData.append('email', email);
+                
+                const response = await fetch('http://127.0.0.1:8000/login/setup-mfa', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Display QR code
+                    document.getElementById('qr-image').src = result.qr_code;
+                    document.getElementById('manual-key').textContent = result.manual_entry_key;
+                    
+                    // Update UI
+                    document.getElementById('loading').classList.add('d-none');
+                    document.getElementById('qr-section').style.display = 'block';
+                    document.getElementById('verification-section').style.display = 'block';
+                    updateStepIndicator(3);
+                    
+                    // Focus on verification input
+                    setTimeout(() => {
+                        document.getElementById('mfa_code').focus();
+                    }, 500);
+                    
+                    showAlert('QR Code generated successfully! Scan it with Google Authenticator.', 'success');
+                } else {
+                    throw new Error(result.detail || 'Failed to generate QR code');
+                }
+                
+            } catch (error) {
+                console.error('QR generation error:', error);
+                document.getElementById('loading').classList.add('d-none');
+                document.getElementById('generate-btn').style.display = 'block';
+                showAlert('Failed to generate QR code: ' + error.message, 'error');
+                updateStepIndicator(2);
+            }
+        }
+        
+        async function verifySetup(event) {
+            event.preventDefault();
+            
+            const email = sessionStorage.getItem('setup_email');
+            const mfaCode = event.target.mfa_code.value;
+            
+            if (!mfaCode || mfaCode.length !== 6) {
+                showAlert('Please enter a valid 6-digit code', 'error');
+                return;
+            }
+            
+            // Update button state
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const verifyText = submitBtn.querySelector('.verify-text');
+            const spinner = submitBtn.querySelector('.spinner-border');
+            
+            submitBtn.disabled = true;
+            verifyText.textContent = 'Verifying...';
+            spinner.classList.remove('d-none');
+            
+            try {
+                const formData = new FormData();
+                formData.append('email', email);
+                formData.append('mfa_code', mfaCode);
+                
+                const response = await fetch('http://127.0.0.1:8000/login/verify-mfa-setup', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Success
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'MFA Setup Complete!',
+                        text: 'Your account is now secured with Multi-Factor Authentication. You will be redirected to login.',
+                        timer: 3000,
+                        timerProgressBar: true,
+                        showConfirmButton: true,
+                        confirmButtonText: 'Go to Login Now'
+                    }).then(() => {
+                        sessionStorage.removeItem('setup_email');
+                        window.location.href = '/html/login.html';
+                    });
+                } else {
+                    showAlert(result.detail || 'Verification failed. Please check your code and try again.', 'error');
+                    event.target.mfa_code.value = '';
+                    event.target.mfa_code.focus();
+                }
+                
+            } catch (error) {
+                console.error('Verification error:', error);
+                showAlert('Network error occurred. Please try again.', 'error');
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                verifyText.textContent = 'Verify & Enable MFA';
+                spinner.classList.add('d-none');
+            }
+        }
+        
+        function cancelSetup() {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Cancel MFA Setup?',
+                text: 'MFA is required for your account security. You will need to set it up to access your account.',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Cancel',
+                cancelButtonText: 'Continue Setup',
+                confirmButtonColor: '#dc3545'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    sessionStorage.removeItem('setup_email');
+                    window.location.href = '/html/login.html';
+                }
+            });
+        }
+        
+        // Auto-format and validate MFA input
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user came from login redirect
+            const setupEmail = sessionStorage.getItem('setup_email');
+            if (!setupEmail) {
+                showAlert('Invalid access. Please login first.', 'error');
+                setTimeout(() => {
+                    window.location.href = '/html/login.html';
+                }, 2000);
+                return;
+            }
+            
+            // MFA input formatting
+            const mfaInput = document.getElementById('mfa_code');
+            if (mfaInput) {
+                mfaInput.addEventListener('input', function() {
+                    // Only allow numbers
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                    
+                    // Auto-submit when 6 digits entered
+                    if (this.value.length === 6) {
+                        setTimeout(() => {
+                            document.getElementById('verify-form').dispatchEvent(new Event('submit'));
+                        }, 800); // Slight delay for better UX
+                    }
+                });
+                
+                // Handle paste events
+                mfaInput.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const paste = (e.clipboardData || window.clipboardData).getData('text');
+                    const cleanPaste = paste.replace(/[^0-9]/g, '').substring(0, 6);
+                    this.value = cleanPaste;
+                    
+                    if (cleanPaste.length === 6) {
+                        setTimeout(() => {
+                            document.getElementById('verify-form').dispatchEvent(new Event('submit'));
+                        }, 800);
+                    }
+                });
+            }
+            
+            // Prevent back navigation
+            window.history.pushState(null, null, window.location.href);
+            window.onpopstate = function() {
+                window.history.pushState(null, null, window.location.href);
+                showAlert('Please complete MFA setup to continue.', 'warning');
+            };
+        });
+        
+        // Countdown timer for code expiry (optional enhancement)
+        function startCountdown() {
+            let timeLeft = 30;
+            const countdownEl = document.createElement('small');
+            countdownEl.className = 'text-warning d-block mt-2';
+            countdownEl.id = 'countdown';
+            
+            const mfaCodeGroup = document.getElementById('mfa_code').parentNode;
+            mfaCodeGroup.appendChild(countdownEl);
+            
+            const interval = setInterval(() => {
+                countdownEl.textContent = `Code expires in ${timeLeft} seconds`;
+                timeLeft--;
+                
+                if (timeLeft < 0) {
+                    clearInterval(interval);
+                    countdownEl.textContent = 'Code expired. Generate a new code in your app.';
+                    countdownEl.className = 'text-danger d-block mt-2';
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

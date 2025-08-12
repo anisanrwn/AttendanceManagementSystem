@@ -32,6 +32,11 @@ class User(Base):
     email = Column(String(100), unique=True)
     password = Column(String(500))
     activity_date= Column(DateTime(timezone=True), server_default=func.now())
+    mfa_secret = Column(String(32), nullable=True)          
+    mfa_enabled = Column(Boolean, default=False)          
+    requires_mfa_setup = Column(Boolean, default=False)     
+    failed_login_count = Column(Integer, default=0)         
+    mfa_backup_codes = Column(Text, nullable=True) 
     
     employee = relationship("Employee", back_populates="user")
     roles = relationship("Roles", secondary="user_roles", back_populates="users")
@@ -163,3 +168,6 @@ class BackupSchedule(Base):
     start_time = Column(String(5))  
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    
+
+

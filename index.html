@@ -22,6 +22,8 @@
     <link rel="stylesheet" href="../assets/vendor/css/core.css" class="template-customizer-core-css" />
     <link rel="stylesheet" href="../assets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
     <link rel="stylesheet" href="../assets/css/demo.css" />
+     <link rel="stylesheet" href="../assets/css/login.css" />
+    
 
     <!-- Vendors CSS -->
     <link rel="stylesheet" href="../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
@@ -57,18 +59,77 @@
               <h4 class="mb-2 text-center">Welcome to Attendance System Management! </h4>
               <p class="mb-4 text-center">Please sign-in</p>
               <form id="loginForm" class="mb-3">
-                <div class="mb-3">
-                  <label for="username" class="form-label">Email</label>
-                  <input type="text" class="form-control" id="email" name="email" placeholder="Enter your email" required/>
+                 <!-- Step 1: Email & Password -->
+    <div id="step1">
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" 
+                   placeholder="Enter your email" required />
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" 
+                   placeholder="Enter your password" required />
+        </div>
+    </div>
+    
+    <!-- Step 2: MFA Code -->
+    <div id="step2" style="display:none;">
+        <div class="mb-3">
+            <div class="alert alert-info" role="alert">
+                <i class="bx bx-info-circle me-2"></i>
+                Enter the 6-digit code from your Google Authenticator app
+            </div>
+            <label for="otp" class="form-label">MFA Code</label>
+            <input type="text" class="form-control text-center" id="otp" name="otp" 
+                   placeholder="000000" maxlength="6" pattern="[0-9]{6}"
+                   style="font-size: 24px; letter-spacing: 5px;" autocomplete="off" />
+            <small class="text-muted">Code changes every 30 seconds</small>
+        </div>
+    </div>
+
+  <div class="mb-3">
+    <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
+  </div>
+</form>
+
+               <div class="forgot-password-link">
+                            <a href="#" onclick="openForgotPasswordModal()">Forgot your password?</a>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeForgotPasswordModal()">&times;</span>
+            <h3>Reset Password</h3>
+            <p style="color: #666; text-align: center; margin-bottom: 20px;">
+                Enter your email address and we'll send you a link to reset your password.
+            </p>
+            
+            <form id="forgotPasswordForm">
                 <div class="mb-3">
-                  <label class="form-label" for="password">Password</label>
-                  <input type="password" id="password" class="form-control" name="password" placeholder="Enter your password" required />
+                    <label for="resetEmail" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="resetEmail" name="email"
+                           placeholder="Enter your email address" required />
                 </div>
+                
+                <div id="resetMessage"></div>
+                
                 <div class="mb-3">
-                  <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
+                    <button class="btn btn-primary d-grid w-100" type="submit">Send Reset Link</button>
                 </div>
-              </form>
+                
+                <div style="text-align: center; margin-top: 15px;">
+                    <a href="#" onclick="closeForgotPasswordModal()" style="color: #666; font-size: 14px;">Back to Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
             </div>
           </div>
         </div>
