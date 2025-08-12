@@ -206,7 +206,6 @@ async def create_user(
 
         raise HTTPException(status_code=500, detail="Failed to create user")
 
-
 @router.put("/update/{user_id}", response_model=s.UserRead)
 def update_user(
     request: Request,
@@ -234,7 +233,6 @@ def update_user(
         if existing_user:
             raise HTTPException(status_code=400, detail="The email is already in use by another user.")
     
-    # Ambil target user yang mau diedit
         user = db.query(m.User).filter(m.User.user_id == user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found.")

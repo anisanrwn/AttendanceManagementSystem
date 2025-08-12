@@ -22,21 +22,18 @@ let locationUpdateTimeoutId = null;
 
 // Request access to device location
 export function requestLocationAccess() {
-    // Reset and stop any previous location tracking
     stopLocationTracking();
     
     if (navigator.geolocation) {
-        // Show loading state
         document.getElementById('allowLocationBtn').innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Getting Location...';
         document.getElementById('allowLocationBtn').disabled = true;
-        
-        // Start with a one-time position request with longer timeout
+
         navigator.geolocation.getCurrentPosition(
             positionSuccess,
             positionError,
             { 
                 enableHighAccuracy: true,
-                timeout: LOCATION_TIMEOUT, // Increased timeout for initial request
+                timeout: LOCATION_TIMEOUT,
                 maximumAge: 0
             }
         );
@@ -52,28 +49,24 @@ function positionSuccess(position) {
         lng: position.coords.longitude,
         accuracy: position.coords.accuracy,
     };
-    
-    // Update UI with current position
+
     updateLocationUI(currentPosition);
     
-    // Add to path coordinates
-    userPathCoordinates = []; // Clear previous path
+    userPathCoordinates = []; 
     userPathCoordinates.push({ lat: currentPosition.lat, lng: currentPosition.lng });
     
     goToStep(2);
     initializeMap();
     
-    // Start continuous location tracking
     startLocationTracking();
-    
-    // Reset button state
+
     document.getElementById('allowLocationBtn').innerHTML = 'Allow Location Access';
     document.getElementById('allowLocationBtn').disabled = false;
 }
 
 // When there's an error getting position
 function positionError(error) {
-    // Reset button state
+
     document.getElementById('allowLocationBtn').innerHTML = 'Allow Location Access';
     document.getElementById('allowLocationBtn').disabled = false;
     
@@ -97,23 +90,21 @@ function positionError(error) {
 
 // Start continuous location tracking
 function startLocationTracking() {
-    // Clear any existing watch
+
     if (locationWatchId !== null) {
         navigator.geolocation.clearWatch(locationWatchId);
     }
     
-    // Set up continuous location tracking with higher timeout
     locationWatchId = navigator.geolocation.watchPosition(
         updateUserLocation,
         positionError,
         { 
             enableHighAccuracy: true,
-            timeout: LOCATION_TIMEOUT, // Increased timeout
-            maximumAge: 5000 // Allow positions up to 5 seconds old
+            timeout: LOCATION_TIMEOUT, 
+            maximumAge: 5000 
         }
     );
     
-    // Also set up a timer to request location updates at regular intervals
     scheduleLocationUpdate();
 }
 
@@ -131,19 +122,16 @@ function scheduleLocationUpdate() {
                 }
             );
         }
-        // Schedule the next update
         scheduleLocationUpdate();
     }, LOCATION_UPDATE_INTERVAL);
 }
 
 // Update the location UI with current position
 function updateLocationUI(position) {
-    // Update the location details in the UI
     document.getElementById('currentLat').textContent = position.lat.toFixed(6);
     document.getElementById('currentLng').textContent = position.lng.toFixed(6);
     document.getElementById('locationAccuracy').textContent = Math.round(position.accuracy);
     
-    // Calculate distance from office if we have the map initialized
     if (map && google) {
         const userLatLng = new google.maps.LatLng(position.lat, position.lng);
         const officeLatLng = new google.maps.LatLng(officeLocation.lat, officeLocation.lng);
@@ -154,12 +142,11 @@ function updateLocationUI(position) {
 
 // Add a position to path coordinates for drawing on map
 function addToPathCoordinates(position) {
-    // Only add to path coordinates if significantly different from last point
     if (userPathCoordinates.length === 0 || 
         calculateDistance(
             userPathCoordinates[userPathCoordinates.length - 1],
             { lat: position.lat, lng: position.lng }
-        ) > 5) { // Only add points if they're more than 5 meters apart (increased threshold)
+        ) > 5) { 
         userPathCoordinates.push({ lat: position.lat, lng: position.lng });
         updateUserPath();
     }
@@ -168,7 +155,7 @@ function addToPathCoordinates(position) {
 // Calculate distance between two points
 function calculateDistance(point1, point2) {
     // Haversine distance calculation
-    const R = 6371e3; // Earth radius in meters
+    const R = 6371e3; 
     const φ1 = point1.lat * Math.PI / 180;
     const φ2 = point2.lat * Math.PI / 180;
     const Δφ = (point2.lat - point1.lat) * Math.PI / 180;
@@ -184,7 +171,6 @@ function calculateDistance(point1, point2) {
 
 async function initializeMap() {
     const api_key = await fetchMapsApiKey();
-    // Register global callback
     window.renderMap = renderMap;
 
     const script = document.createElement('script');
@@ -209,7 +195,6 @@ async function fetchMapsApiKey() {
 function renderMap() {
     const mapElement = document.getElementById('map');
     
-    // Set map height
     mapElement.style.height = '400px';
     mapElement.style.width = '100%';
     mapElement.style.borderRadius = '10px';
@@ -224,7 +209,6 @@ function renderMap() {
         streetViewControl: false
     });
     
-    // Add user marker with accuracy circle
     userMarker = new google.maps.Marker({
         position: {lat: currentPosition.lat, lng: currentPosition.lng},
         map: map,
@@ -235,7 +219,6 @@ function renderMap() {
         }
     });
     
-    // Add accuracy circle around user
     const accuracyCircle = new google.maps.Circle({
         strokeColor: '#1e90ff',
         strokeOpacity: 0.8,
@@ -247,8 +230,7 @@ function renderMap() {
         radius: currentPosition.accuracy
     });
     userMarker.set('accuracyCircle', accuracyCircle);
-    
-    // Add office marker
+
     const officeMarker = new google.maps.Marker({
         position: officeLocation,
         map: map,
@@ -258,7 +240,7 @@ function renderMap() {
         }
     });
     
-    // Add geofence circle
+
     officeBoundary = new google.maps.Circle({
         strokeColor: '#1cc88a',
         strokeOpacity: 0.8,
@@ -269,8 +251,7 @@ function renderMap() {
         center: officeLocation,
         radius: GEOFENCE_RADIUS
     });
-    
-    // Initialize user path
+
     userPath = new google.maps.Polyline({
         path: userPathCoordinates,
         geodesic: true,
@@ -280,7 +261,6 @@ function renderMap() {
     });
     userPath.setMap(map);
     
-    // Check if user is inside geofence
     checkGeofence();
 }
 
@@ -291,24 +271,19 @@ function updateUserLocation(position) {
         lng: position.coords.longitude,
         accuracy: position.coords.accuracy,
     };
-    
-    // Add to path coordinates
+
     addToPathCoordinates(currentPosition);
     
-    // Update UI
     updateLocationUI(currentPosition);
     
     if (userMarker && map) {
-        // Update user marker position
         userMarker.setPosition({lat: currentPosition.lat, lng: currentPosition.lng});
         
-        // Update accuracy circle
         const accuracyCircle = userMarker.get('accuracyCircle');
         if (accuracyCircle) {
             accuracyCircle.setCenter({lat: currentPosition.lat, lng: currentPosition.lng});
             accuracyCircle.setRadius(currentPosition.accuracy);
         } else {
-            // Create the accuracy circle if it doesn't exist
             const newAccuracyCircle = new google.maps.Circle({
                 strokeColor: '#1e90ff',
                 strokeOpacity: 0.8,
@@ -322,14 +297,12 @@ function updateUserLocation(position) {
             userMarker.set('accuracyCircle', newAccuracyCircle);
         }
         
-        // Pan map to current position
         map.panTo({lat: currentPosition.lat, lng: currentPosition.lng});
     }
     
     checkGeofence();
 }
 
-// Update the user path on the map
 function updateUserPath() {
     if (userPath && map) {
         userPath.setPath(userPathCoordinates);
@@ -338,19 +311,14 @@ function updateUserPath() {
 
 // Check if user is inside the geofence
 function checkGeofence() {
-    // Calculate distance between user and office
     if (!currentPosition || !map) return;
     
     const userLatLng = new google.maps.LatLng(currentPosition.lat, currentPosition.lng);
     const officeLatLng = new google.maps.LatLng(officeLocation.lat, officeLocation.lng);
     
-    // Calculate distance in meters
     const distance = google.maps.geometry.spherical.computeDistanceBetween(userLatLng, officeLatLng);
     
-    // Check if inside geofence
     insideGeofence = distance <= GEOFENCE_RADIUS;
-    
-    // Update UI
     const statusElement = document.getElementById('locationStatus');
     statusElement.textContent = insideGeofence ? 
         'You are inside the designated area' : 
@@ -367,7 +335,6 @@ function checkGeofence() {
         document.getElementById('reasonForm').style.display = 'block';
     }
     
-    // Enable the next button
     document.getElementById('verifyLocationBtn').disabled = false;
 }
 

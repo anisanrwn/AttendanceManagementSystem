@@ -427,7 +427,7 @@ async def login_user(
 
         # Handle lockout at 10 failed attempts
         elif current_attempt.failed_attempts == 10:
-            current_attempt.lockout_until = now + timedelta(hours=1)  
+            current_attempt.lockout_until = now + timedelta(minutes = 2)  
             if user:
                 lockout_utc = current_attempt.lockout_until
                 if lockout_utc.tzinfo is None:

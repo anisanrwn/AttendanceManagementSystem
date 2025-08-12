@@ -276,10 +276,8 @@ function resetCapture() {
     updateStepUI();
 }
 
-
 function resetCaptureAndForm() {
     resetCapture();
     employeeForm.reset();
     capturedPreview.innerHTML = "";
 }
-

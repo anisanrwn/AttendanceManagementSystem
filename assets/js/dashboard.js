@@ -4,7 +4,7 @@ async function fetchTotalEmployees() {
         const data = await response.json();
         document.getElementById('total-employees').textContent = data.total;
     } catch (error) {
-        console.error("Gagal ambil data total employee:", error);
+        console.error("Error fatching employees total data:", error);
     }
 }
 fetchTotalEmployees()

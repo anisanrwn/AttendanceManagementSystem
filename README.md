@@ -1,6 +1,6 @@
-SEFRUIT TUTORIAL BY YUYUZ!!!!
----------------------------------------------------------------------------------------------------------------------------------------------------------
-karena setup envnya org" ini beda", jdinya gue gitginore myvenv sama .env. ini step inti lgsg copas aja di terminal :
+TUTORIAL BY Yustina!!!!
+------------------------------------------------------------------------------------------------------------------------------------------------------
+karena setup envnya org" ini beda", jdinya gue gitginore myvenv sama .env. ini step inti lgsg copy aja di terminal :
 - python -m venv myvenv 
 - myvenv/Scripts/activate 
 - cd dlib-install
@@ -9,8 +9,9 @@ karena setup envnya org" ini beda", jdinya gue gitginore myvenv sama .env. ini s
 - pip install -r yuyusrequirement.txt (py 12) / pip install -r yuyusrequirement.txt (+ pip install numpy==1.25.1)
 - buat file .env & paste yg di desc wa
 - uvicorn app.main:main_app --reload
----------------------------------------------------------------------------------------------------------------------------------------------------------
-biar tau dan ga kaget tiba" duar folder segaban dengan python segaban ygy 
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+information regarding the folder and what it is for.
 
 1. Klo ku make environment baru jdinya ga ganggu klo install install lib sama yg ada di device kalian. tpi klo mau caranya di terminal
    - python -m venv myvenv  
@@ -60,8 +61,7 @@ biar tau dan ga kaget tiba" duar folder segaban dengan python segaban ygy
 
 14. GMAPS API : 
    - track location user dan maintain dia di range terdekat
-
-anjay berasa developer beut cuy buat readme aowkkwkw mari kita menggila bersama gezzz demi luluz ygy semangat oll terima gaji kalau masih gapaham tanya gpt aja ya karena ini dah mudah dipahami menurut ku yea.
+----------------------------------------------------------------------------------------------------------------------------------
 
 TUTOR TEST AUTOMATED BACKUP
 

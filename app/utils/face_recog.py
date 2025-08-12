@@ -15,7 +15,6 @@ def encode_face_multi(img) -> list:
         raise ValueError("No face found in the image.")
     return [enc.tolist() for enc in encodings]
 
-
 def verify_face_multi(image_base64, known_encodings, threshold=0.5):
     image_bytes = base64.b64decode(image_base64)
     np_arr = np.frombuffer(image_bytes, np.uint8)

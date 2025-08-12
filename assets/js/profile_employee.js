@@ -107,12 +107,8 @@ async function editEmployee(id) {
         document.getElementById('editphone_number').value = employee.phone_number;
         document.getElementById('editposition').value = employee.position;
         document.getElementById('editdepartment').value = employee.department;
-
-        // Set ID ke form supaya pas save bisa tahu edit siapa
         const editEmployeeForm = document.getElementById('editEmployeeForm');
         editEmployeeForm.setAttribute('data-employee-id', id);
-
-        // Buka Modal
         const editModal = new bootstrap.Modal(document.getElementById('editEmployeeModal'));
         editModal.show();
 
@@ -125,8 +121,6 @@ async function editEmployee(id) {
 async function saveEditedEmployee(e) {
     e.preventDefault(); 
     const editEmployeeForm = document.getElementById('editEmployeeForm');
-
-    // Ambil employeeId terlebih dahulu sebelum dipakai
     const employeeId = editEmployeeForm.getAttribute('data-employee-id');
 
     // manual validation
@@ -136,9 +130,7 @@ async function saveEditedEmployee(e) {
     const ephone = document.getElementById('editphone_number').value.trim();
     const eposition = document.getElementById('editposition').value.trim();
     const edepartment = document.getElementById('editdepartment').value.trim();
-
-    const eemailAvailable = await isEmailAvail(eemail, employeeId);  // ✅ employeeId sudah diinisialisasi
-    
+    const eemailAvailable = await isEmailAvail(eemail, employeeId);  
     const eemailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const ephoneRegex = /^08[0-9]{8,11}$/;
 
@@ -199,6 +191,7 @@ async function saveEditedEmployee(e) {
         Swal.fire('Error!', `An error occurred: ${error.message}`, 'error');
     }
 }
+
 //delete employee
 async function deleteEmployee(id) {
     const confirmResult = await Swal.fire({
@@ -283,8 +276,6 @@ loadPosition();
 const searchInput = document.getElementById('searchInput');
 const filterDepartment = document.getElementById('filterDepartment');
 const filterPosition = document.getElementById('filterPosition');
-
-// Debounce untuk mencegah spam pencarian
 let debounceTimer;
 const debounce = (callback, delay) => {
     return (...args) => {

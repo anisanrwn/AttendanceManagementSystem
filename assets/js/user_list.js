@@ -76,7 +76,6 @@ async function loadEmployee() {
 }
 loadEmployee();
 
-// auto filled email pas employee selected
 document.getElementById('employeeSelect').addEventListener('change', function () {
     const selectedOption = this.options[this.selectedIndex];
     const email = selectedOption.dataset.email || '';
@@ -84,8 +83,6 @@ document.getElementById('employeeSelect').addEventListener('change', function ()
     document.getElementById('email').readOnly = !!email;
 });
 
-
-// load roles yg ada dari database
 async function loadRoles(dropdownIds = ['roleSelect','filterRole']) {
     try {
         const response = await fetch('http://localhost:8000/user/available_roles'); 
@@ -357,7 +354,6 @@ async function saveUserChanges() {
     const eemailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const epassRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/;
 
-    // Validasi form seperti sebelumnya
     if (!eusername || !eemail || !erole) {
     Swal.fire('Error!', 'Please fill in all required fields.', 'error');
     return;

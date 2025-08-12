@@ -16,7 +16,6 @@
 
   const token = localStorage.getItem("token");
   if (!token) {
-    // Redirect ke login kalau token tidak ada
     window.location.href = "/html/login.html";
     return;
   }
