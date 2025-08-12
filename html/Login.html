@@ -65,39 +65,37 @@
               <h4 class="mb-2 text-center">Welcome to Attendance System Management! </h4>
               <p class="mb-4 text-center">Please sign-in</p>
               <form id="loginForm" class="mb-3">
-    <!-- Step 1: Email & Password -->
-    <div id="step1">
-        <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" 
-                   placeholder="Enter your email" required />
-        </div>
-        <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password" 
-                   placeholder="Enter your password" required />
-        </div>
-    </div>
-    
-    <!-- Step 2: MFA Code -->
-    <div id="step2" style="display:none;">
-        <div class="mb-3">
-            <div class="alert alert-info" role="alert">
-                <i class="bx bx-info-circle me-2"></i>
-                Enter the 6-digit code from your Google Authenticator app
-            </div>
-            <label for="otp" class="form-label">MFA Code</label>
-            <input type="text" class="form-control text-center" id="otp" name="otp" 
-                   placeholder="000000" maxlength="6" pattern="[0-9]{6}"
-                   style="font-size: 24px; letter-spacing: 5px;" autocomplete="off" />
-            <small class="text-muted">Code changes every 30 seconds</small>
-        </div>
-    </div>
+              <div id="step1">
+                   <div class="mb-3">
+                         <label for="email" class="form-label">Email</label>
+                         <input type="email" class="form-control" id="email" name="email" 
+                               placeholder="Enter your email" required />
+                  </div>
+              <div class="mb-3">
+                      <label for="password" class="form-label">Password</label>
+                      <input type="password" class="form-control" id="password" name="password" 
+                               placeholder="Enter your password" required />
+                     </div>
+                </div>
 
-  <div class="mb-3">
-    <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
-  </div>
-</form>
+                <div id="step2" style="display:none;">
+                  <div class="mb-3">
+                     <div class="alert alert-info" role="alert">
+                        <i class="bx bx-info-circle me-2"></i>
+                           Enter the 6-digit code from your Google Authenticator app
+                    </div>
+                    <label for="otp" class="form-label">MFA Code</label>
+                    <input type="text" class="form-control text-center" id="otp" name="otp" 
+                       placeholder="000000" maxlength="6" pattern="[0-9]{6}"
+                       style="font-size: 24px; letter-spacing: 5px;" autocomplete="off" />
+                    <small class="text-muted">Code changes every 30 seconds</small>
+                   </div>
+                 </div>
+
+                <div class="mb-3">
+                    <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
+                 </div>
+              </form>
                 <div class="forgot-password-link">
                             <a href="#" onclick="openForgotPasswordModal()">Forgot your password?</a>
                         </div>

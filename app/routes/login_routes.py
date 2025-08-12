@@ -295,19 +295,19 @@ async def login_user(
         lockout_utc = latest_attempt.lockout_until
         if lockout_utc.tzinfo is None:
             lockout_utc = lockout_utc.replace(tzinfo=timezone.utc)
-        jakarta_tz = pytz.timezone("Asia/Jakarta")
-        lockout_local = lockout_utc.astimezone(jakarta_tz)
-        
+            jakarta_tz = pytz.timezone("Asia/Jakarta")
+            lockout_local = lockout_utc.astimezone(jakarta_tz)
+    
         raise HTTPException(
-            status_code=423,
-            detail={
-                "type": "account_locked",
-                "message": "Your account is currently locked",
-                "locked_until": lockout_local.strftime('%H:%M:%S'),
-                "attempts": latest_attempt.failed_attempts,
-                "duration": "Please wait until the specified time"
-            }
-        )
+           status_code=401,  
+           detail={
+              "type": "account_locked",
+              "message": f"Your account is currently locked due to {latest_attempt.failed_attempts} failed attempts",
+              "locked_until": lockout_local.strftime('%H:%M:%S'),
+              "attempts": latest_attempt.failed_attempts,
+              "duration": f"Please wait until {lockout_local.strftime('%H:%M:%S')}"
+        }
+    )
 
     # Check for permanent lock (15+ attempts)
     if latest_attempt and latest_attempt.failed_attempts >= 15:
@@ -333,7 +333,6 @@ async def login_user(
             
             if user.failed_login_count >= 1:
                 user.requires_mfa_setup = True
-                print(f"DEBUG: Set requires_mfa_setup=True for {email}, failed_count={user.failed_login_count}")
         
         if latest_attempt and (now - latest_attempt.attempt_time) < timedelta(minutes=5):
             latest_attempt.failed_attempts += 1
@@ -353,8 +352,6 @@ async def login_user(
                 attempt_time=now
             )
             db.add(current_attempt)
-        
-        print(f"DEBUG: Failed attempt #{current_attempt.failed_attempts} for {email}")
         
         if current_attempt.failed_attempts == 5:
             current_attempt.lockout_until = now + timedelta(minutes=1)
@@ -507,14 +504,7 @@ async def login_user(
         db.commit()  # Commit failed login changes
         raise HTTPException(status_code=401, detail=HM.UNAUTHORIZED)
     
-    
-    print(f"DEBUG LOGIN SUCCESS for {email}:")
-    print(f"  - failed_login_count: {user.failed_login_count}")
-    print(f"  - requires_mfa_setup: {user.requires_mfa_setup}")
-    print(f"  - mfa_enabled: {user.mfa_enabled}")
-
     if user.requires_mfa_setup and not user.mfa_enabled:
-        print(f"DEBUG: Requiring MFA setup for {email}")
         return {
             "status": "mfa_setup_required",
             "message": "MFA setup required due to previous failed login attempts",
@@ -522,14 +512,11 @@ async def login_user(
         }
 
     if user.requires_mfa_setup and user.mfa_enabled:
-        print(f"DEBUG: Requiring MFA verification for {email}")
         return {
             "status": "mfa_required",
             "message": "Please enter your Google Authenticator code", 
             "email": email
         }
-
-    print(f"DEBUG: Direct login for {email} (no penalty)")
     
     if latest_attempt and latest_attempt.failed_attempts > 0:
         latest_attempt.failed_attempts = 0  

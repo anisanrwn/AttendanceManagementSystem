@@ -1,9 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded'); // Debug log
+    console.log('DOM loaded'); 
     
-    // Modal functions
     window.openForgotPasswordModal = function() {
-        console.log('Opening modal...'); // Debug log
+        console.log('Opening modal...'); 
         const modal = document.getElementById('forgotPasswordModal');
         if (modal) {
             modal.style.display = 'block';
@@ -17,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     window.closeForgotPasswordModal = function() {
-        console.log('Closing modal...'); // Debug log
+        console.log('Closing modal...');
         const modal = document.getElementById('forgotPasswordModal');
         if (modal) {
             modal.style.display = 'none';
@@ -26,7 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (form) form.reset();
             if (messageDiv) messageDiv.innerHTML = '';
             
-            // Reset email input styling
             const emailInput = document.getElementById('resetEmail');
             if (emailInput) {
                 emailInput.style.borderColor = '#ddd';
@@ -34,7 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Close modal when clicking outside
     window.onclick = function(event) {
         const modal = document.getElementById('forgotPasswordModal');
         if (event.target == modal) {
@@ -42,14 +39,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // ✅ ENHANCED: Handle forgot password form submission with real-time validation
     const forgotForm = document.getElementById('forgotPasswordForm');
     if (forgotForm) {
         const emailInput = document.getElementById('resetEmail');
         const submitBtn = forgotForm.querySelector('button[type="submit"]');
         const messageDiv = document.getElementById('resetMessage');
         
-        // Real-time email validation
         if (emailInput) {
             emailInput.addEventListener('input', function() {
                 const email = this.value.trim();
@@ -73,7 +68,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
             
-            // Validate on blur
             emailInput.addEventListener('blur', function() {
                 const email = this.value.trim();
                 if (email) {
@@ -106,22 +100,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // Clear previous messages
             hideMessage();
             
             try {
                 console.log('🚀 Sending forgot password request for:', email);
                 
-                // Show loading state
                 if (submitBtn) {
                     submitBtn.textContent = 'Sending...';
                     submitBtn.disabled = true;
                     submitBtn.style.opacity = '0.7';
                 }
                 
-                // ✅ FIXED: Real API call with proper timeout and error handling
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+                const timeoutId = setTimeout(() => controller.abort(), 30000);
                 
                 const response = await fetch('http://localhost:8000/login/forgot-password', {
                     method: 'POST',
@@ -143,7 +134,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('📋 Response data:', result);
                 
                 if (response.ok) {
-                    // ✅ Success - Email sent
                     const successMessage = result.message || 'Password reset link has been sent to your email. Please check your inbox and spam folder.';
                     showMessage(successMessage, 'success');
                     
@@ -160,19 +150,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     }, 4000);
                     
                 } else {
-                    // ❌ Error response
                     console.error('❌ API Error:', result);
                     
                     let errorMessage = 'An error occurred. Please try again.';
                     
-                    // Handle different HTTP status codes
+                    
                     switch (response.status) {
                         case 400:
                             errorMessage = result.detail || 'Invalid request. Please check your input.';
                             break;
                         case 404:
                             errorMessage = 'If this email exists in our system, a reset link will be sent.';
-                            // For security, we don't reveal if email exists or not
+                            
                             break;
                         case 429:
                             errorMessage = 'Too many requests. Please wait a few minutes before trying again.';
@@ -241,7 +230,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             `;
             
-            // Add CSS animation if not already present
             if (!document.querySelector('#modalAnimationStyle')) {
                 const style = document.createElement('style');
                 style.id = 'modalAnimationStyle';
@@ -262,7 +250,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Handle login form (existing functionality continues...)
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
@@ -273,11 +260,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ✅ EXISTING LOGIN CODE (unchanged - keeping all the original MFA and lockout logic)
 document.addEventListener("DOMContentLoaded", function () {
     const loginForm = document.getElementById('loginForm');
-    let currentStep = 1; // Track current step (1: login, 2: MFA)
-    let userEmail = ''; // Store email for MFA steps
+    let currentStep = 1; 
+    let userEmail = ''; 
 
     // Alert SweetAlert
     function showAlert(message, type = 'error') {
@@ -332,7 +318,6 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('otp').value = '';
     }
 
-    // Fungsi untuk menangani login sukses
     function handleSuccessfulLogin(user) {
         console.log("Login success:", user);
         localStorage.setItem('token', user.access_token);
@@ -361,97 +346,102 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Handle regular login (Step 1)
-    async function handleRegularLogin(formData) {
-        try {
-            const response = await fetch("http://127.0.0.1:8000/login/login", {
-                method: "POST",
-                body: formData,
-            });
+async function handleRegularLogin(formData) {
+    try {
+        const response = await fetch("http://127.0.0.1:8000/login/login", {
+            method: "POST",
+            body: formData,
+        });
 
-            const data = await response.json().catch(() => ({}));
+        const data = await response.json().catch(() => ({}));
 
-            // 🔧 FIXED: Handle different types of account locked
-            if (response.status === 423) {
-                // Check if it's permanent lock or existing lockout
-                if (typeof data.detail === 'string') {
-                    // Permanent lock (15+ attempts) - redirect to verify page
-                    if (data.detail.includes("permanently locked") || data.detail.includes("check your email")) {
-                        sessionStorage.setItem("user_email", formData.get('email'));
-                        window.location.href = "../html/verifyacc.html";
-                        return;
-                    }
-                }
-                
-                // Existing lockout (user trying to login while still locked) - redirect to verify page
-                if (typeof data.detail === 'object' && data.detail.type === 'account_locked') {
-                    if (data.detail.message && data.detail.message.includes("currently locked")) {
-                        sessionStorage.setItem("user_email", formData.get('email'));
-                        window.location.href = "../html/verifyacc.html";
-                        return;
-                    }
-                }
-                
-                // Fallback for any other 423 response - redirect
-                sessionStorage.setItem("user_email", formData.get('email'));
-                window.location.href = "../html/verifyacc.html";
-                return;
-            }
-
-            // 🔧 FIXED: Handle temporary lockout (5 & 10 attempts) - Show pop-up
-            if (response.status === 401) {
-                // Check if it's a structured lockout response (5 or 10 attempts)
-                if (typeof data.detail === 'object' && data.detail.type === 'account_locked') {
-                    const attempts = data.detail.attempts;
-                    const duration = data.detail.duration;
-                    const lockedUntil = data.detail.locked_until;
-                    
-                    let lockoutMessage = `Account locked due to ${attempts} failed login attempts.\n`;
-                    lockoutMessage += `Locked until: ${lockedUntil}\n`;
-                    lockoutMessage += `Duration: ${duration}`;
-                    
-                    showAlert(lockoutMessage, 'warning');
+        if (response.status === 423) {
+            if (typeof data.detail === 'string') {
+                if (data.detail.includes("permanently locked") || 
+                    data.detail.includes("check your email") ||
+                    data.detail.includes("Check your email for verification")) {
+                    sessionStorage.setItem("user_email", formData.get('email'));
+                    window.location.href = "../html/verifyacc.html";
                     return;
                 }
+            }
+            
+            if (typeof data.detail === 'object' && data.detail.type === 'account_locked') {
+                const attempts = data.detail.attempts;
+                const duration = data.detail.duration;
+                const lockedUntil = data.detail.locked_until;
                 
-                // Regular 401 error
-                const errorMessage = getHttpErrorMessage(response.status, data.detail);
-                showAlert(errorMessage, 'error');
-
-                if (data.detail === "Your role is currently locked. Please contact an administrator.") {
-                    window.location.href = "../html/undermaintenance.html";
-                }
+                let lockoutMessage = `Account locked due to ${attempts} failed login attempts.\n`;
+                lockoutMessage += `Locked until: ${lockedUntil}\n`;
+                lockoutMessage += `Duration: ${duration}`;
+                
+                showAlert(lockoutMessage, 'warning');
                 return;
             }
-
-            if (!response.ok) {
-                const errorMessage = getHttpErrorMessage(response.status, data.detail);
-                showAlert(errorMessage, 'error');
-
-                if (data.detail === "Your role is currently locked. Please contact an administrator.") {
-                    window.location.href = "../html/undermaintenance.html";
-                }
-                return;
-            }
-
-            // Handle different response types
-            if (data.status === 'mfa_setup_required') {
-                showMFASetupModal();
-            } else if (data.status === 'mfa_required') {
-                userEmail = formData.get('email');
-                sessionStorage.setItem('login_email', userEmail);
-                showMFAStep();
-            } else {
-                // Direct login success (no MFA)
-                handleSuccessfulLogin(data);
-            }
-
-        } catch (error) {
-            console.error('Login error:', error);
-            showAlert('Network error occurred', 'error');
+            
+            const errorMessage = data.detail || 'Account is locked. Please try again later.';
+            showAlert(errorMessage, 'error');
+            return;
         }
-    }
 
-    // Handle MFA verification (Step 2)
+        if (response.status === 401) {
+            if (typeof data.detail === 'object' && data.detail.type === 'account_locked') {
+                const attempts = data.detail.attempts;
+                const duration = data.detail.duration;
+                const lockedUntil = data.detail.locked_until;
+                
+                let lockoutTitle = `Account Temporarily Locked`;
+                let lockoutMessage = `Your account has been locked due to ${attempts} failed login attempts.\n\n`;
+                lockoutMessage += `Locked until: ${lockedUntil}\n`;
+                
+                Swal.fire({
+                    icon: 'warning',
+                    title: lockoutTitle,
+                    text: lockoutMessage,
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#ffc107',
+                    allowOutsideClick: false
+                });
+                return;
+            }
+            
+            const errorMessage = getHttpErrorMessage(response.status, data.detail);
+            showAlert(errorMessage, 'error');
+
+            if (data.detail === "Your role is currently locked. Please contact an administrator.") {
+                window.location.href = "../html/undermaintenance.html";
+            }
+            return;
+        }
+
+        // Handle other error status codes
+        if (!response.ok) {
+            const errorMessage = getHttpErrorMessage(response.status, data.detail);
+            showAlert(errorMessage, 'error');
+
+            if (data.detail === "Your role is currently locked. Please contact an administrator.") {
+                window.location.href = "../html/undermaintenance.html";
+            }
+            return;
+        }
+
+        if (data.status === 'mfa_setup_required') {
+            showMFASetupModal();
+        } else if (data.status === 'mfa_required') {
+            userEmail = formData.get('email');
+            sessionStorage.setItem('login_email', userEmail);
+            showMFAStep();
+        } else {
+            // Direct login success (no MFA)
+            handleSuccessfulLogin(data);
+        }
+
+    } catch (error) {
+        console.error('Login error:', error);
+        showAlert('Network error occurred', 'error');
+    }
+}
+
     async function handleMFAVerification(mfaCode) {
         try {
             const formData = new FormData();
