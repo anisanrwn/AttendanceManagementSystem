@@ -23,9 +23,6 @@ let lastIntervalKey = readLastIntervalKey();
 let lastFetchedInterval = null; 
 let lastBackupTime = 0; 
 
-// ======================
-// Backup Logic
-// ======================
 function getBackupFileName() {
   const now = new Date();
   return `backup-${now.toISOString().replace(/[:.]/g, '-')}.sql`;
@@ -80,9 +77,6 @@ function runBackup() {
   });
 }
 
-// ======================
-// Interval Logic
-// ======================
 let currentIntervalMs = null;
 
 function fetchInterval(callback) {
@@ -147,9 +141,7 @@ function monitorIntervalChanges() {
   setTimeout(monitorIntervalChanges, 10 * 1000); 
 }
 
-// ======================
-// State Persistence
-// ======================
+
 function saveLastIntervalKey(key) {
   fs.writeFileSync(stateFile, JSON.stringify({ lastIntervalKey: key }), 'utf8');
 }
@@ -164,8 +156,5 @@ function readLastIntervalKey() {
   }
 }
 
-// ======================
-// Start App
-// ======================
 console.log('Monitoring backup interval');
 monitorIntervalChanges();

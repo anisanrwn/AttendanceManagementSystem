@@ -31,6 +31,8 @@ class User(Base):
     username = Column(String(100), unique=True)
     email = Column(String(100), unique=True)
     password = Column(String(500))
+    security_question = Column(String(255), default="What was the first movie you watched in a cinema?")
+    security_answer = Column(String(500))
     activity_date= Column(DateTime(timezone=True), server_default=func.now())
     mfa_secret = Column(String(32), nullable=True)          
     mfa_enabled = Column(Boolean, default=False)          

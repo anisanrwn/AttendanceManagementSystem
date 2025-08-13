@@ -134,6 +134,7 @@ async def create_user(
     email: str = Form(...),
     password: str = Form(...),
     role_name: str = Form(...),
+    security_answer: str = Form(...),
     editor_password: str = Form(...),  
     db: Session = Depends(get_db)
 ):
@@ -157,11 +158,15 @@ async def create_user(
         validate_password_strength(password)
         hashed_password = hash_password(password)
 
+        hashed_security_answer = hash_password(security_answer.strip().lower())
+
         new_user = m.User(
             employee_id=employee_id,
             username=username,
             email=email,
             password=hashed_password,
+            security_question="What was the first movie you watched in a cinema?",
+            security_answer=hashed_security_answer,
             activity_date=get_ntp_time()
         )
         db.add(new_user)

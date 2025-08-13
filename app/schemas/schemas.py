@@ -92,6 +92,7 @@ class UserBase(BaseModel):
     
 class UserCreate(UserBase):
     password: str
+    security_answer: str
     roles: list[RoleRead]
     employee_id: Optional[int] = None
 
@@ -99,6 +100,7 @@ class UserRead(UserBase):
     user_id: int
     employee: Optional[EmployeeRead] 
     roles: list[RoleRead]
+    security_question: Optional[str] = None  
 
     class Config:
         from_attributes = True
